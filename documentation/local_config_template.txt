@@ -1,0 +1,5 @@
+# This file (with this exact name) should be saved in the stressor controllability superdirectory (the one containing the GameWrapper.py script)
+# Lines starting with the hash character are interpreted as comments
+
+# The output_directory is where output data files are saved at the end of each task (including all log files)
+output_directory=[insert absolute path]
