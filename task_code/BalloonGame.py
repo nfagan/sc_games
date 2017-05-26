@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy2 Experiment Builder (v1.84.1),
-    on Sun Apr  9 11:03:17 2017
+This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
+    on Fri May 26 14:04:06 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -26,21 +26,18 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-expName = 'FINAL_PILOT_SC_11.28'  # from the Builder filename that created this script
-expInfo = {u'isNonstressed': u'preselected', u'yoke_source': u'preselected', u'participantID': u'preselected'}
-dlg = gui.DlgFromDict(dictionary=expInfo, title=expName)
-if dlg.OK == False:
-    core.quit()  # user pressed cancel
+expName = u'balloon_game'  # from the Builder filename that created this script
+expInfo = {u'dont_use': u''}
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = '/Users/ecohodes/Dropbox/sc/sc_output/BalloonGame/logs/%s_%s' % (expName, expInfo['date'])
+filename = _thisDir + os.sep + "../" * 100 + sys.argv[-1]
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/ecohodes/Dropbox/sc/Balloon Game/BalloonGame.psyexp',
+    originPath=u'/Users/Jeff/stressor_controllability/task_code/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -53,7 +50,7 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 win = visual.Window(
     size=(1440, 900), fullscr=True, screen=0,
     allowGUI=False, allowStencil=False,
-    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor=u'testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True,
     units='norm')
 # store frame rate of monitor if we can measure it
@@ -65,84 +62,55 @@ else:
 
 # Initialize components for Routine "initialize"
 initializeClock = core.Clock()
-# project directory (edit this line if installing on a new system)
-projectDir = '/Users/ecohodes/Dropbox/sc/'
-
-# import time function module
+from optparse import OptionParser
 from datetime import datetime
 
+# collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
+parser = OptionParser()
+parser.add_option("-s", "--source", metavar="SOURCE_DIR", dest="source_dir", help="the local sc task directory")
+parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant ID")
+parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
+parser.add_option("-y", "--yoke_source", metavar="YOKE_SOURCE", dest="yoke_source", help="a yoking file to which the current participant should be yoked")
+parser.add_option("-b", "--boring_mode", action="store_true", dest="is_boring", help="invokes non-stress version of game")
+(options, args) = parser.parse_args()
+projectDir = options.source_dir
+outputDir = options.output_dir
+id = options.id
+yokeSourceFile = options.yoke_source
+boringMode = options.is_boring
+
+if not projectDir or not outputDir or not id:
+    parser.print_help()
+    sys.exit()
+
 # folder that holds images and sounds used in the experiment
-media = projectDir + "sc_media/"
+media = projectDir + "/sc_media/"
 instructionSlides = media + "Balloon_instruction_slides/"
 boringInstructionSlides = media + "Balloon_nonstressed_instruction_slides/"
 
-# indicates if the game should be played in the non-stressed (boring) mode
-boringMode = False 
-
-# validate that an experimental ID has been selected
-id = expInfo['participantID']
-if id == '':
-    print "Error: No participant ID was entered."
-    core.quit()
-elif id == 'preselected':
-    try:
-        id = sys.argv[1]
-    except:
-        print "Error: No participant ID was entered."
-        core.quit()
-
-
-
-
 # setting up where to store output data
-outputDir = projectDir + "sc_output/BalloonGame"
 outputFile = outputDir + '/' + expInfo['date'] + '_ID_' + id + '_data.txt'
 f = open(outputFile, 'w')
 
 # setting up for unyoked participants (uncontrollable stress)
-yokingOutputDir = projectDir + "yoking_files/"
-
+yokingOutputDir = outputDir + "/yoking_files"
 isYokedParticipant = False
-yokeSourceFile = 'NA'
-
-if expInfo['yoke_source'] == 'preselected':
-    try:
-        yokeSourceFile = sys.argv[2]
-        if yokeSourceFile == "1" or yokeSourceFile == "0":
-            yokeSourceFile = 'NA'
-    except:
-        yokeSourceFile = 'NA'
-        print "Warning: No yoking source file found, so running controllable stress game"
-elif expInfo['yoke_source'] != '':
-    yokeSourceFile = expInfo['yoke_source']
-
-if yokeSourceFile != 'NA':
+if yokeSourceFile:
     isYokedParticipant = True
     try:
         y = open(yokeSourceFile, 'r')
     except:
-        print "Error: Could not open yoke source file %s" %(yokeSourceFile)
+        print "Error: Could not open yoke source file %s" % yokeSourceFile
         core.quit()
 else:
     yokingOutputFile = yokingOutputDir + '/' + expInfo['date'] + '_ID_' + id + '_yoke.txt'
     try:
         y = open(yokingOutputFile, 'w')
     except:
-        print "Error: Could not create yoke source file %s" %(yokeSourceFile)
+        print "Error: Could not create yoking file %s" % yokingOutputFile
         core.quit()
 
 # turn on the non-stressed mode, if applicable
-try:
-    isBoring = sys.argv[3]
-    if isBoring == "1":
-        boringMode = True
-except: 
-    isBoring = expInfo['isNonstressed']
-    if isBoring == "1" or isBoring == "yes":
-        boringMode = True
-    else:
-        print "Assuming that the game should not be boring."
-
 if (boringMode and not isYokedParticipant):
     print "Error: Non-stressed (boring) condition was selected without a yoking source file being specified."
     core.quit()
@@ -909,7 +877,7 @@ for thisTrial in trials:
                 totalPopped += 1
                 updateLog = 1
                 if not isYokedParticipant:
-                    yokingParams = [expInfo['participantID'], str(currentTrial), "0", "NA"] # 0 means balloon not saved (and saving time is NA)
+                    yokingParams = [id, str(currentTrial), "0", "NA"] # 0 means balloon not saved (and saving time is NA)
                     y.write("\t".join(yokingParams + ["\n"]))
             else:
                 justPoppedBalloon = 0
@@ -922,7 +890,7 @@ for thisTrial in trials:
                 totalSaved += 1
                 updateLog = 1
                 if not isYokedParticipant:
-                    yokingParams = [expInfo['participantID'], str(currentTrial), str(justSavedBalloon), str(t)]
+                    yokingParams = [id, str(currentTrial), str(justSavedBalloon), str(t)]
                     y.write("\t".join(yokingParams + ["\n"]))
             else:
                 justSavedBalloon = 0
@@ -933,7 +901,7 @@ for thisTrial in trials:
             timeSinceSuccess = successClock.getTime()
         
         # logging
-        logInfo = [expInfo['participantID'], str(datetime.now()), str(currentTrial), str(t), str(balloon.pos[0]), str(balloon.pos[1]), 
+        logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(balloon.pos[0]), str(balloon.pos[1]), 
             str(the_hand.pos[0]), str(the_hand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), 
             str(justPoppedBalloon), str(justSavedBalloon), str(totalPopped), str(totalSaved)]
         

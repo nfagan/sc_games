@@ -27,5 +27,13 @@ Note: Order for steps 1-3 doesn't matter, but steps 4-5 must come in order at th
 	cd LabJackPython
 	sudo python setup.py install
 
+Two More Things:
+The module should now be correctly installed, but you need to make sure that your Psychopy scripts use the correct audio driver (portaudio). If you build your scripts using the Builder interface of the Psychopy application, you need to change a setting in the application before generating your scripts. Go to Preferences (click the button with the screwdriver/wrench), and replace the contents of the audio driver field with the following: ['portaudio']
+
+This is optional, but to stop the pointless "ApplePersistenceIgnoreState" message from appearing every time you run, execute the following commande from the Terminal.
+	defaults write org.python.python ApplePersistenceIgnoreState NO
+
+Troubleshooting:
+1. If you've done the above and you're getting an error related related to an "unknown encoding" in matplotlib, there's a known problem that sometimes appears on MacOS. The solution is to downgrade matplotlib to version 1.4.3 using pip. If you don't know how to do this, ask for help.
 
 

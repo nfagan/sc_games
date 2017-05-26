@@ -1,0 +1,6 @@
+To get started:
+1) Install Psychopy module (see instructions in documentation folder)
+2) Create a local_conf text file (see template in documentation folder)
+
+Once you've done the above, run the GameWrapper.py script to run the games. You don't need a copy of the Psychopy application to do this.
+
