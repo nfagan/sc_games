@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sat Apr  8 22:39:17 2017
+    on Sat May 27 20:59:13 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -28,20 +28,17 @@ os.chdir(_thisDir)
 # Store info about the experiment session
 expName = 'noise'  # from the Builder filename that created this script
 expInfo = {u'participantID': u''}
-dlg = gui.DlgFromDict(dictionary=expInfo, title=expName)
-if dlg.OK == False:
-    core.quit()  # user pressed cancel
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = '/Users/ecohodes/Dropbox/sc/sc_output/NoiseRating/logs/%s_%s' % (expName, expInfo['date'])
+filename = _thisDir + os.sep + "NoiseRating_%s" % expInfo['date']
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/ecohodes/Dropbox/sc/Noise Rating/NoiseRating.psyexp',
-    savePickle=True, saveWideText=True,
+    originPath=u'/Users/Jeff/stressor_controllability/psyexp/NoiseRating.psyexp',
+    savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
 logFile = logging.LogFile(filename+'.log', level=logging.EXP)
@@ -64,13 +61,35 @@ else:
 
 # Initialize components for Routine "trial"
 trialClock = core.Clock()
-# Project directory (change this and the log directory declared
-# "Experiment Settings" if moving to a new environment)
-projectDir = '/Users/ecohodes/Dropbox/sc/'
+from optparse import OptionParser
+from subprocess import Popen, call
+
+# collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
+parser = OptionParser()
+parser.add_option("-s", "--source", metavar="SOURCE_DIR", dest="source_dir", help="the local sc task directory")
+parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant ID")
+parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
+
+(options, args) = parser.parse_args()
+projectDir = options.source_dir
+outputDir = options.output_dir
+id = options.id
+
+if not projectDir or not outputDir or not id:
+    Popen("sleep 5; rm %s.log %s.psydat" %(filename, filename), shell=True)
+    parser.print_help()
+    core.quit()
+
+logDir = outputDir + '/logs'
+if not os.path.exists(logDir): os.mkdir(logDir)
+
+# Moving Psychopy's automatic log files to a better location
+new_filename = "%s/NoiseRating_%s_%s" % (logDir, id, expInfo['date'])
+call("mv %s* %s.log" % (filename, new_filename), shell=True)
+filename = new_filename
 
 # path of folder containing the sounds
-media = projectDir + 'sc_media/'
-outputDir = projectDir + 'sc_output/NoiseRating/'
+media = projectDir + '/sc_media/'
 
 # A and B are Psychopy placeholders for the netural sounds
 soundsToRate = [media + 'chime.wav', media + 'Balloon_Pop.wav', media + 'SHAPES_USE.wav', media + 'egg_crack.wav']
@@ -87,12 +106,12 @@ playSoundNow = False
 # valid participant ID
 import re
 pattern = '^[A-Za-z0-9][A-Za-z0-9_\-]*$'
-if not re.search(pattern, expInfo['participantID']):
+if not re.search(pattern, id):
     print "Error: Invalid or missing participant ID."
     print "The participant ID must start with a letter or number, and it can only contain numbers, letters, hyphens, and underscores."
     core.quit()
 
-outputFile = outputDir + "noise_ratings_%s.txt" % expInfo['participantID']
+outputFile = "%s/NoiseRating_%s_%s.txt" % (outputDir, id, expInfo['date'])
 f = open(outputFile, 'w')
 f.write("Participant\tNoise\tRating\n")
 Slide = visual.ImageStim(
@@ -135,6 +154,7 @@ for thisSound in sounds:
     continueRoutine = True
     # update component parameters for each repeat
     currentSound = soundsToRate.pop(0)
+    
     key_listener = event.BuilderKeyResponse()
     soundToRate.setSound(currentSound, secs=1)
     # keep track of which components have finished
@@ -170,7 +190,7 @@ for thisSound in sounds:
             except:
                 pass
             else:
-                f.write("%s\t%s\t%d\n" %(expInfo['participantID'], currentSound, rating))
+                f.write("%s\t%s\t%d\n" %(id, currentSound, rating))
                 currentSlide = instructionSlide
                 continueRoutine = False
         
@@ -248,7 +268,6 @@ for thisSound in sounds:
 print "Finished run!"
 
 # these shouldn't be strictly necessary (should auto-save)
-thisExp.saveAsWideText(filename+'.csv')
 thisExp.saveAsPickle(filename)
 logging.flush()
 # make sure everything is closed down

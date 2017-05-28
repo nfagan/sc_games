@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Fri May 26 14:04:06 2017
+    on Sat May 27 20:55:57 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -26,18 +26,18 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-expName = u'balloon_game'  # from the Builder filename that created this script
+expName = 'balloon_game'  # from the Builder filename that created this script
 expInfo = {u'dont_use': u''}
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = _thisDir + os.sep + "../" * 100 + sys.argv[-1]
+filename = _thisDir + os.sep + "BalloonGame_%s" % expInfo['date']
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/Jeff/stressor_controllability/task_code/BalloonGame.psyexp',
+    originPath=u'/Users/Jeff/stressor_controllability/psyexp/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -50,7 +50,7 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 win = visual.Window(
     size=(1440, 900), fullscr=True, screen=0,
     allowGUI=False, allowStencil=False,
-    monitor=u'testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True,
     units='norm')
 # store frame rate of monitor if we can measure it
@@ -64,6 +64,7 @@ else:
 initializeClock = core.Clock()
 from optparse import OptionParser
 from datetime import datetime
+from subprocess import Popen, call
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
 parser = OptionParser()
@@ -81,7 +82,16 @@ boringMode = options.is_boring
 
 if not projectDir or not outputDir or not id:
     parser.print_help()
+    Popen("sleep 2; rm %s.log %s.psydat" %(filename, filename), shell=True)
     sys.exit()
+
+logDir = outputDir + "/logs"
+if not os.path.exists(logDir): os.mkdir(logDir)
+
+new_filename = "%s/BalloonGame_%s_%s" % (logDir, id, expInfo['date'])
+call("mv %s* %s.log" % (filename, new_filename), shell=True)
+filename = new_filename
+
 
 # folder that holds images and sounds used in the experiment
 media = projectDir + "/sc_media/"
@@ -89,7 +99,7 @@ instructionSlides = media + "Balloon_instruction_slides/"
 boringInstructionSlides = media + "Balloon_nonstressed_instruction_slides/"
 
 # setting up where to store output data
-outputFile = outputDir + '/' + expInfo['date'] + '_ID_' + id + '_data.txt'
+outputFile = "%s/BalloonGame_%s_%s_data.txt" % (outputDir, id, expInfo['date'])
 f = open(outputFile, 'w')
 
 # setting up for unyoked participants (uncontrollable stress)
@@ -103,7 +113,7 @@ if yokeSourceFile:
         print "Error: Could not open yoke source file %s" % yokeSourceFile
         core.quit()
 else:
-    yokingOutputFile = yokingOutputDir + '/' + expInfo['date'] + '_ID_' + id + '_yoke.txt'
+    yokingOutputFile = "%s/BalloonGame_%s_%s_yoke.txt" % (yokingOutputDir, id, expInfo['date'])
     try:
         y = open(yokingOutputFile, 'w')
     except:
