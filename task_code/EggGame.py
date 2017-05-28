@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sat Apr  8 22:35:12 2017
+This experiment was created using PsychoPy2 Experiment Builder (v1.84.1),
+    on Sun May 28 09:51:47 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -26,21 +26,18 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-expName = 'EggGame'  # from the Builder filename that created this script
+expName = u'EggGame'  # from the Builder filename that created this script
 expInfo = {u'participantID': u'preselected'}
-dlg = gui.DlgFromDict(dictionary=expInfo, title=expName)
-if dlg.OK == False:
-    core.quit()  # user pressed cancel
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = '/Users/ecohodes/Dropbox/sc/sc_output/EggGame/logs/%s_%s' % (expName, expInfo['date'])
+filename = _thisDir + os.sep + "EggGame_%s" % expInfo['date']
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/ecohodes/Dropbox/sc/Egg Game/EggGame.psyexp',
+    originPath=u'/Users/Jeff/stressor_controllability/psyexp/EggGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -53,7 +50,7 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 win = visual.Window(
     size=(1440, 900), fullscr=True, screen=0,
     allowGUI=False, allowStencil=False,
-    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor=u'testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True,
     units='norm')
 # store frame rate of monitor if we can measure it
@@ -65,31 +62,43 @@ else:
 
 # Initialize components for Routine "initialize"
 initializeClock = core.Clock()
-# directory containing all files (edit this if moving to a new environment)
-projectDir = "/Users/ecohodes/Dropbox/sc/"
+from optparse import OptionParser
+from subprocess import Popen, call
 
-media = projectDir + "sc_media/"
+# collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
+parser = OptionParser()
+parser.add_option("-s", "--source", metavar="SOURCE_DIR", dest="source_dir", help="the local sc task directory")
+parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant ID")
+parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
+
+(options, args) = parser.parse_args()
+projectDir = options.source_dir
+outputDir = options.output_dir
+id = options.id
+
+if not projectDir or not outputDir or not id:
+    Popen("sleep 5; rm %s.log %s.psydat" %(filename, filename), shell=True)
+    parser.print_help()
+    core.quit()
+
+logDir = outputDir + '/logs'
+if not os.path.exists(logDir): os.mkdir(logDir)
+
+# Moving Psychopy's automatic log files to a better location
+new_filename = "%s/NoiseRating_%s_%s" % (logDir, id, expInfo['date'])
+call("mv %s* %s.log" % (filename, new_filename), shell=True)
+filename = new_filename
+
+
+media = projectDir + "/sc_media/"
 instructionSlides = media + "Egg_instruction_slides/"
 
 # import datetime 
 from datetime import datetime
 
-# validate that an experimental ID has been selected
-id = expInfo['participantID']
-if id == '':
-    print "Error: No participant ID was entered."
-    core.quit()
-elif id == 'preselected':
-    try:
-        id = sys.argv[1]
-    except:
-        print "Error: No participant ID was entered."
-        core.quit()
-
 
 # define output file
-outputDir = projectDir + "sc_output/EggGame/"
-outputFile = outputDir + expInfo['date'] + '_ID_' + id + '.txt'
+outputFile = "%s/EggGame_%s_%s_data.txt" %(outputDir, id, expInfo['date'])
 
 
 # length of anticipatory period (before each trial starts)
@@ -682,7 +691,7 @@ for thisTrial_loop in Trial_loop:
         
         
         # logging
-        logInfo = [expInfo['participantID'], str(datetime.now()), str(currentTrial), str(t), str(egg.pos[0]), str(egg.pos[1]), 
+        logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(egg.pos[0]), str(egg.pos[1]), 
             str(the_hand.pos[0]), str(the_hand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), 
             str(justCrackedEgg)]
         

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sat May 27 20:55:57 2017
+    on Sun May 28 09:56:29 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -82,7 +82,7 @@ boringMode = options.is_boring
 
 if not projectDir or not outputDir or not id:
     parser.print_help()
-    Popen("sleep 2; rm %s.log %s.psydat" %(filename, filename), shell=True)
+    Popen("sleep 5; rm %s.log %s.psydat" %(filename, filename), shell=True)
     sys.exit()
 
 logDir = outputDir + "/logs"
