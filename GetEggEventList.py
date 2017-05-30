@@ -76,13 +76,8 @@ def main():
 		current_trialClock = float(fields[3])
 		time_since_start = (event_time - start_time).total_seconds()
 		trial = int(fields[2])
-		poppedBalloon = int(fields[12])
-		savedBalloon = int(fields[13])
-		x_balloon, y_balloon, x_hand, y_hand = fields[4], fields[5], fields[6], fields[7]
-		xDist = abs(float(x_hand) - float(x_balloon))
-		yDist = abs(float(y_hand) - float(y_balloon))
+		cracked_egg = int(fields[12])
 		event_type = "other"
-		should_have_caught = True if (xDist < .05 and yDist < .05) else False
 		if trial > current_trial:
 			current_trial = trial
 			event_type = "trial_%d_start" % trial
@@ -94,16 +89,8 @@ def main():
 			time_since_start += 4.0 # length of anticipatory period
 			nid += 1
 			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
-		elif poppedBalloon == 1:
-			event_type = "trial_%d_pop" % trial
-			nid += 1
-			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
-		elif savedBalloon == 1:
-			event_type = "trial_%d_save" % trial
-			nid += 1
-			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
-		elif should_have_caught:
-			event_type = "trial_%d_should_catch" % trial
+		elif cracked_egg == 1:
+			event_type = "trial_%d_crack" % trial
 			nid += 1
 			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
 
