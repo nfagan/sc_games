@@ -8,7 +8,7 @@ import re
 
 # This script takes in a timestamp from the acquistion software (which, along with a "lag" factor, tells when GSR acquisition started)
 # and then creates a list of relevant task events with time given in terms of seconds since start of acquisition
-# The output list is in a specific format that is designed for importing as an event list into the GSR software
+# The output list is in a specific format that is designed for importing as an event list into Ledalab continuous decomposition analysis package.
 
 def main():
 	# declare input arguments
@@ -59,7 +59,7 @@ def main():
 		print "Error: Could not create output file \"%s\"." %output_file
 
 	f.readline() # skipping header
-	w.write("time\tnid\tdescription\n") # this is the format required by the gsr software for importing events
+	w.write("time\tnid\tdescription\n") # this is the format required by the Ledalab event import functionality
 
 	# read through task output file and convert timestamps for relevant events
 	current_trial = 0
