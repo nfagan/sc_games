@@ -94,7 +94,7 @@ def main():
 			time_since_start += 4.0 # length of anticipatory period
 			nid += 1
 			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
-		elif poppedBalloon == 1:
+		if poppedBalloon == 1:
 			event_type = "trial_%d_pop" % trial
 			nid += 1
 			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
@@ -102,7 +102,7 @@ def main():
 			event_type = "trial_%d_save" % trial
 			nid += 1
 			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
-		elif should_have_caught:
+		if should_have_caught:
 			event_type = "trial_%d_should_catch" % trial
 			nid += 1
 			w.write("%f\t%d\t%s\n" % (time_since_start, nid, event_type))
