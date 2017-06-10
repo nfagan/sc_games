@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy2 Experiment Builder (v1.84.1),
-    on Sun May 28 09:51:47 2017
+This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
+    on Sat Jun 10 17:32:42 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -26,7 +26,7 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-expName = u'EggGame'  # from the Builder filename that created this script
+expName = 'EggGame'  # from the Builder filename that created this script
 expInfo = {u'participantID': u'preselected'}
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
@@ -50,7 +50,7 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 win = visual.Window(
     size=(1440, 900), fullscr=True, screen=0,
     allowGUI=False, allowStencil=False,
-    monitor=u'testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True,
     units='norm')
 # store frame rate of monitor if we can measure it
@@ -62,7 +62,7 @@ else:
 
 # Initialize components for Routine "initialize"
 initializeClock = core.Clock()
-from optparse import OptionParser
+from optparse import OptionParser, SUPPRESS_HELP
 from subprocess import Popen, call
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
@@ -70,11 +70,13 @@ parser = OptionParser()
 parser.add_option("-s", "--source", metavar="SOURCE_DIR", dest="source_dir", help="the local sc task directory")
 parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant ID")
 parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
+parser.add_option("-v", "--version", metavar="VERSION", dest="version", default="unknown", help=SUPPRESS_HELP)
 
 (options, args) = parser.parse_args()
 projectDir = options.source_dir
 outputDir = options.output_dir
 id = options.id
+version= options.version
 
 if not projectDir or not outputDir or not id:
     Popen("sleep 5; rm %s.log %s.psydat" %(filename, filename), shell=True)
@@ -184,6 +186,7 @@ eggDegrees = 0
 # log info
 currentTrial = 0
 f = open(outputFile, 'w')
+f.write("# Version: %s\n" % version)
 f.write("ID\tTime\tTrial\tRel_time\tX_egg\tY_egg\tX_hand\tY_hand\tkey_just_pressed\tvalid_key_press\t" +
 "total_key_presses\ttotal_valid_key_presses\tjust_cracked_egg\n")
 

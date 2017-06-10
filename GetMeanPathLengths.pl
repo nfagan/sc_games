@@ -27,6 +27,7 @@ for (@headerCols) {
 
 my %pathLengths;
 for my $line (@lines) {
+	next if ($line =~ /^#/);
 	my @fields = split /\t/, $line;
 	my $trialNum = $fields[$trialCol];
 	if (! exists $fields[$xHandCol] || ! exists $fields[$yHandCol]) {

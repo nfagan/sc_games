@@ -21,6 +21,7 @@ open my $IN, '<', $file or die $!;
 my $header = <$IN>;
 print $header;
 while (my $line = <$IN>) {
+	next if ($line = ~/^#/);
 	my @fields = split /\t/, $line;
 	my $badTime = $fields[1];
 	my ($minutes, $seconds) = split /:/, $badTime;

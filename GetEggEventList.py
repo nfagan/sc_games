@@ -65,6 +65,7 @@ def main():
 	current_trial = 0
 	nid = 0
 	for line in f:
+		if line.startswith("#"): continue
 		fields = line.rstrip().split("\t")
 		event_time_left = re.sub("\..*", '', fields[1])
 		event_time_right = re.sub(".*\.", '.', fields[1])

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sun May 28 09:56:29 2017
+    on Sat Jun 10 17:43:42 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -62,7 +62,7 @@ else:
 
 # Initialize components for Routine "initialize"
 initializeClock = core.Clock()
-from optparse import OptionParser
+from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import Popen, call
 
@@ -73,12 +73,14 @@ parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant I
 parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
 parser.add_option("-y", "--yoke_source", metavar="YOKE_SOURCE", dest="yoke_source", help="a yoking file to which the current participant should be yoked")
 parser.add_option("-b", "--boring_mode", action="store_true", dest="is_boring", help="invokes non-stress version of game")
+parser.add_option("-v", "--version", metavar="VERSION", dest="version", help=SUPPRESS_HELP, default="unknown")
 (options, args) = parser.parse_args()
 projectDir = options.source_dir
 outputDir = options.output_dir
 id = options.id
 yokeSourceFile = options.yoke_source
 boringMode = options.is_boring
+version = options.version
 
 if not projectDir or not outputDir or not id:
     parser.print_help()
@@ -91,6 +93,15 @@ if not os.path.exists(logDir): os.mkdir(logDir)
 new_filename = "%s/BalloonGame_%s_%s" % (logDir, id, expInfo['date'])
 call("mv %s* %s.log" % (filename, new_filename), shell=True)
 filename = new_filename
+
+# set variable to "controllable_stress", "uncontrollable_stress", or "nonstressed"
+condition = "unknown"
+if boringMode:
+    condition = "nonstressed"
+elif yokeSourceFile:
+    condition = "uncontrollable_stress"
+else:
+    condition = "controllable_stress"
 
 
 # folder that holds images and sounds used in the experiment
@@ -260,26 +271,7 @@ balloonSettings = [(.4, -1, xSpeed6, ySpeed1, [-.8, .8, -.8, .8, -.8, .8, -.8]),
 (-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
     
 # define starting hand positions
-handPositions = [(0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8),
-                (0, -.8), (0, -.8),
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8), 
-                (0, -.8), (0, -.8),
-                (0, -.8), (0, -.8)]
+handPositions = (0, -.8)
 
 # log info
 currentTrial = 0
@@ -287,6 +279,10 @@ totalPopped = 0
 totalSaved = 0
 
 # write data file headers
+f.write("# Version: %s\n" % version)
+f.write("# Condition: %s\n" % condition)
+if condition != "controllable_stress":
+    f.write("# Yoked to: %s\n" % yokeSourceFile)
 f.write("ID\tTime\tTrial\tRel_time\tX_balloon\tY_balloon\tX_hand\tY_hand\tkey_just_pressed\tvalid_key_press\t" +
 "total_key_presses\ttotal_valid_key_presses\tjust_popped_balloon\tjust_saved_balloon\ttotal_popped\ttotal_saved\n")
 
@@ -764,8 +760,6 @@ for thisTrial in trials:
     print str(currentTrial) + "\t" + str(balloonPosition)
     balloonShift = (currentBalloonSettings[2], currentBalloonSettings[3])
     zigs = currentBalloonSettings[4]
-    
-    handPosition = (handPositions.pop(0))
     
     if boringMode:
         handOpacity = 0
