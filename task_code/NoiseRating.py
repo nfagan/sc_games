@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sat May 27 20:59:13 2017
+    on Sat Jun 10 17:02:05 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -69,11 +69,13 @@ parser = OptionParser()
 parser.add_option("-s", "--source", metavar="SOURCE_DIR", dest="source_dir", help="the local sc task directory")
 parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant ID")
 parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
+parser.add_option("-v", "--version", metavar="VERSION", dest="version", help="current version of code (don't invoke this option manually)", default="unknown")
 
 (options, args) = parser.parse_args()
 projectDir = options.source_dir
 outputDir = options.output_dir
 id = options.id
+version = options.version
 
 if not projectDir or not outputDir or not id:
     Popen("sleep 5; rm %s.log %s.psydat" %(filename, filename), shell=True)
@@ -113,6 +115,7 @@ if not re.search(pattern, id):
 
 outputFile = "%s/NoiseRating_%s_%s.txt" % (outputDir, id, expInfo['date'])
 f = open(outputFile, 'w')
+f.write("# Version: %s\n" % version)
 f.write("Participant\tNoise\tRating\n")
 Slide = visual.ImageStim(
     win=win, name='Slide',

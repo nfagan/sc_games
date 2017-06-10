@@ -2,14 +2,21 @@ import sys
 import os
 import re
 import datetime
-from subprocess import call
+import signal
+from subprocess import call, check_output
 
+# make it pretty when user quits with Control-C
+def catch_sigint(signal, frame):
+	print "\nThe user has aborted the script."
+	sys.exit()
+signal.signal(signal.SIGINT, catch_sigint)
 
 # This script should not be moved from its location in the sc task directory
 source_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Read the local config file
 config_file = source_dir + '/local_config'
+
 try:
 	config = open(config_file, 'r')
 except IOError as e:
@@ -65,6 +72,34 @@ noise_rating_info = {
 	'DirName': "NoiseRating",
 	'Script': "%s/task_code/NoiseRating.py" % source_dir,
 }
+
+# making sure that the scripts/media files that will be used match the current commit
+# this would all need to be changed if the folder structure changed
+change_list = (check_output("git -C %s status --porcelain" % source_dir, shell=True).split("\n"))
+source_clean = True
+for line in  change_list:
+	if re.search(os.path.basename(__file__), line):
+		source_clean = False
+	if re.search("sc_media", line):
+		source_clean = False
+	if re.search("task_code", line):
+		source_clean = False
+
+# Making sure project code hasn't been altered accidentally
+version = "unknown"
+if source_clean:
+	version = check_output("git -C %s rev-parse --short HEAD" % source_dir, shell=True).strip()
+else:
+	print "Warning: The project source directory has been altered from the last commit."
+	print "Unless you know what you're doing, you should pull the source code from Bitbucket before continuing."
+	print "Here's a list of the changes:"
+	for line in change_list: print line
+	to_continue = raw_input("\nWould you like to continue (y/n)? ")
+	while True:
+		if to_continue == 'n':
+			sys.exit()
+		if to_continue == 'y': break
+		to_continue = raw_input("Invalid response. Choose \"y\" to continue or \"n\" to quit: ")
 
 game_options = (balloon_game_info, egg_game_info, noise_rating_info)
 num_games = len(game_options)
@@ -182,7 +217,7 @@ while True:
 
 timestamp = '{:%Y-%b-%d_%H:%M:%S}'.format(datetime.datetime.now())
 # all three scripts require the arguments given with "--id", "--source_dir", and "--output_dir"
-script_with_args = python_bin + " '%s' --source=%s --output=%s --id=%s" %(chosen_game_info['Script'], source_dir, output_directory, participant_id)
+script_with_args = python_bin + " '%s' --source=%s --output=%s --id=%s --version=%s" %(chosen_game_info['Script'], source_dir, output_directory, participant_id, version)
 if yoking_source_file: script_with_args += " --yoke_source=%s" % yoking_source_file
 if is_boring: script_with_args += " --boring_mode"
 print "Running this: %s" % script_with_args
