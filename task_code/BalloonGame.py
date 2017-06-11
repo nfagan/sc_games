@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sat Jun 10 17:43:42 2017
+    on Sun Jun 11 09:22:29 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -853,7 +853,7 @@ for thisTrial in trials:
                 if keyJustPressed != '':
                     updateLog = 1
                     validKeyPress = '0'
-                    totalValidKeyPresses += 1
+                    totalKeyPresses += 1
         
         
         # moving the balloon during the main part of the trial
