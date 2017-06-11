@@ -58,7 +58,10 @@ def main():
 	except:
 		print "Error: Could not create output file \"%s\"." %output_file
 
-	f.readline() # skipping header
+	# skip header lines (which are comment lines followed by one non-comment line)
+	for line in f:
+		if not line.startswith("#"): break
+		
 	w.write("time\tnid\tdescription\n") # this is the format required by Ledalab for importing events
 
 	# read through task output file and convert timestamps for relevant events

@@ -8,6 +8,7 @@ $/ = undef;
 my $fileContent = <$IN>;
 close $IN;
 my @lines = split /[\n\r]+/, $fileContent;
+shift @lines while ($lines[0] =~ /^#/);
 my $headerLine = shift @lines;
 my @headerCols = split /\t/, $headerLine;
 my ($trialCol, $xHandCol, $yHandCol, $timeCol);

@@ -16,10 +16,13 @@ $startTime =~ s/^(\d\d\d\d).*/$1/;
 (my $hour = $startTime) =~ s/\d\d$//;
 (my $earliestMinute = $startTime) =~ s/^\d\d//;
 
-# open file, print header line, then re-print data lines with timestamp fixed
+# open file, print header lines, then re-print data lines with timestamp fixed
 open my $IN, '<', $file or die $!;
-my $header = <$IN>;
-print $header;
+while (my $line = <$IN>) {
+	print $line;
+	last if ($line !~ /^#/);
+}
+
 while (my $line = <$IN>) {
 	next if ($line = ~/^#/);
 	my @fields = split /\t/, $line;
