@@ -1,6 +1,6 @@
 Psychopy manual install for OS X / MacOS (based off of instructions on Psychopy website: http://psychopy.org/installation.html)
 
-Note: Order for steps 1-3 doesn't matter, but steps 4-5 must come in order at the end
+Note: Order for steps 1-3 doesn't matter, but steps 4-6 must come in order at the end
 
 1. Pip (for installing python packages)
 	Go to Pip website, download and then install pip (if you don't already have it)
@@ -26,6 +26,10 @@ Note: Order for steps 1-3 doesn't matter, but steps 4-5 must come in order at th
 	git clone https://github.com/labjack/LabJackPython
 	cd LabJackPython
 	sudo python setup.py install
+	# Note: substitute "python" with the path given for Python in your local_config if you have a specific Python version you want to use
+6. Labjack Exodriver
+	If using a Mac, download the Exodriver pre-built installer from here: https://labjack.com/support/software/installers/exodriver
+	Then, open the downloaded installer and follow instructions to install.
 
 Two More Things:
 The module should now be correctly installed, but you need to make sure that your Psychopy scripts use the correct audio driver (portaudio). If you build your scripts using the Builder interface of the Psychopy application, you need to change a setting in the application before generating your scripts. Go to Preferences (click the button with the screwdriver/wrench), and replace the contents of the audio driver field with the following: ['portaudio']
