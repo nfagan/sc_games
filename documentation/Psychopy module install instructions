@@ -1,34 +1,40 @@
-Psychopy manual install for OS X / MacOS (based off of instructions on Psychopy website: http://psychopy.org/installation.html)
+Psychopy manual install for MacOS 
+Based off of instructions on Psychopy website (http://psychopy.org/installation.html), but with some important changes.
+Note that Steps 5-6 are only necessary if you will be using a Labjack.
 
-Note: Order for steps 1-3 doesn't matter, but steps 4-6 must come in order at the end
-
-1. Pip (for installing python packages)
-	Go to Pip website, download and then install pip (if you don't already have it)
+1. Install Homebrew, if you haven't already done so. The Homebrew website provides the necessary installation command.
+2. Using Homebrew, install new, standalone versions of Python/Pip using the command "brew install python". Homebrew should 
+automatically install Python version 2.7 and make this the default Python on your user account. To test this, run the 
+commands "which python" and "which pip". The output should show that Python/pip are both located in 
+/usr/local/bin, not /usr/bin.
 2. WxPython
 	Download the cocoa/python2.7 version of wxPython (link on Psychopy page)
-	To install, temporarily change security settings in System Preferences (Security and Privacy) to allow apps downloaded from "anywhere"
+	To install, temporarily change security settings in System Preferences (Security and Privacy) to allow apps 
+	downloaded from "anywhere."
 	If you don't do this, you'll get a message that the package is damaged when you try to open the installer
-	Change security settings back right after installing
-3. pyo
-	First, install homebrew. The homebrew website provides the necessary installation command.
-	Then, run the following commands:
+	When you finish installing WxPython, change your security settings back.
+3. pyo 
+	Run the following commands to install pyo prerequisites and then pyo itself.
 		brew install liblo libsndfile portaudio portmidi --universal
 		# cd into a suitable installation directory for pyo
 		git clone https://github.com/belangeo/pyo.git
 		cd pyo
 		sudo python setup.py install --use-coreaudio --use-double
-	If you get warnings/errors during the brew step, you may have to follow homebrew's advice and run some "force overwrite" link commmands
+	If you get warnings/errors during the brew step, you may have to follow homebrew's advice and run some
+	"force overwrite" link commmands.
 4. Run the following commands to install Python modules
-	sudo pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
-	sudo pip install pyserial pyparallel
+	pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
+	pip install pyserial pyparallel
+	(If either of these commands fail due to permissions errors, try re-running with sudo)
 5. LabJackPython (make sure link is still correct, should be listed on Psychopy page)
 	# cd into a good installation directory
 	git clone https://github.com/labjack/LabJackPython
 	cd LabJackPython
 	sudo python setup.py install
-	# Note: substitute "python" with the path given for Python in your local_config if you have a specific Python version you want to use
+	# Note: substitute "python" with the path given for Python in your local_config if you have a specific Python 
+	version you want to use.
 6. Labjack Exodriver
-	If using a Mac, download the Exodriver pre-built installer from here: https://labjack.com/support/software/installers/exodriver
+	Download the Exodriver pre-built installer from here: https://labjack.com/support/software/installers/exodriver
 	Then, open the downloaded installer and follow instructions to install.
 
 Two More Things:
@@ -38,6 +44,8 @@ This is optional, but to stop the pointless "ApplePersistenceIgnoreState" messag
 	defaults write org.python.python ApplePersistenceIgnoreState NO
 
 Troubleshooting:
-1. If you've done the above and you're getting an error related related to an "unknown encoding" in matplotlib, there's a known problem that sometimes appears on MacOS. The solution is to downgrade matplotlib to version 1.4.3 using pip. If you don't know how to do this, ask for help.
+1. If you've done the above and you're getting an error related related to an "unknown encoding" in matplotlib, there's a known problem that sometimes appears on MacOS. The solution is to downgrade matplotlib to version 1.4.3 using pip, like this: "pip install version==1.4.3" (use sudo if you get a permissions error).
+2. If you don't use Homebrew to get a local version of Python, you may experience problems where Exodriver cannot find the
+libraries it needs to function. The only solution that has been found so far is to do the Homebrew installation.
 
 
