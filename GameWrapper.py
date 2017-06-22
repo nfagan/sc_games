@@ -193,10 +193,35 @@ while True:
 		break
 	new_id = raw_input("Invalid ID. Legal characters are letters, numbers, hyphens, and underscores. Choose a new ID: ")
 
+
+button_box_mode = False
+if chosen_game_info['ShortName'] is 'Balloon Game' or chosen_game_info['ShortName'] is 'Egg Game':
+	response = raw_input("Are we playing with 1) keyboard input or 2) button box input? ")
+	while True:
+		try:
+			response = int(response)
+		except ValueError:
+			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input: ")
+			continue
+		if response == 1:
+			print "Okay, we'll play with keyboard input."
+			break
+		elif response == 2:
+			print "Okay, we'll play with button box input."
+			button_box_mode = True
+			break
+		else:
+			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input: ")
+	
+
+
 print "\nHere are the options that have been chosen: "
 print "Game: %s" %(chosen_game_info['ShortName'])
 print "Run type: %s" % run_type
 print "Participant ID: %s" %(participant_id)
+input_mode = "button box" if button_box_mode else "keyboard"
+if chosen_game_info['ShortName'] == 'Balloon Game' or chosen_game_info['ShortName'] == 'Egg Game':
+	print "Input mode: %s" % input_mode
 if chosen_game_info['ShortName'] == 'Balloon Game':
 	print "Stress type: %s" %(stress_type)
 	if current_participant_is_yoked:
@@ -220,5 +245,6 @@ timestamp = '{:%Y-%b-%d_%H:%M:%S}'.format(datetime.datetime.now())
 script_with_args = python_bin + " '%s' --source=%s --output=%s --id=%s --version=%s" %(chosen_game_info['Script'], source_dir, output_directory, participant_id, version)
 if yoking_source_file: script_with_args += " --yoke_source=%s" % yoking_source_file
 if is_boring: script_with_args += " --boring_mode"
+if button_box_mode: script_with_args += " --button_box"
 print "Running this: %s" % script_with_args
 call(script_with_args, shell=True)

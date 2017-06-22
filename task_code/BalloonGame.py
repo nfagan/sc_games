@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Sun Jun 11 09:22:29 2017
+    on Wed Jun 21 23:18:22 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -73,6 +73,7 @@ parser.add_option("-i", "--id", metavar="ID", dest="id", help="the participant I
 parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output/logs should be saved")
 parser.add_option("-y", "--yoke_source", metavar="YOKE_SOURCE", dest="yoke_source", help="a yoking file to which the current participant should be yoked")
 parser.add_option("-b", "--boring_mode", action="store_true", dest="is_boring", help="invokes non-stress version of game")
+parser.add_option("-B", "--button_box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
 parser.add_option("-v", "--version", metavar="VERSION", dest="version", help=SUPPRESS_HELP, default="unknown")
 (options, args) = parser.parse_args()
 projectDir = options.source_dir
@@ -81,6 +82,18 @@ id = options.id
 yokeSourceFile = options.yoke_source
 boringMode = options.is_boring
 version = options.version
+button_box_mode = options.button_box_mode
+
+if button_box_mode:
+    right_key = "1"
+    down_key = "2"
+    left_key = "3"
+    up_key = "4"
+else:
+    right_key = "right"
+    down_key = "down"
+    left_key = "left"
+    up_key = "up"
 
 if not projectDir or not outputDir or not id:
     parser.print_help()
@@ -585,16 +598,16 @@ while continueRoutine:
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
     # moving hand when arrow keys are clicked during the main part of the trial
-    if event.getKeys(['right']):
+    if event.getKeys([right_key]):
         if handPosition[0] < .8:
             handPosition = (handPosition[0] + .1, handPosition[1])
-    if event.getKeys(['left']):
+    if event.getKeys([left_key]):
         if handPosition[0] > -.8:
             handPosition = (handPosition[0] - .1, handPosition[1])
-    if event.getKeys(['up']):
+    if event.getKeys([up_key]):
         if handPosition[1] < .8:
             handPosition = (handPosition[0], handPosition[1] + .1)
-    if event.getKeys(['down']):
+    if event.getKeys([down_key]):
         if handPosition[1] > -.8:
             handPosition = (handPosition[0], handPosition[1] - .1)
     
@@ -812,7 +825,7 @@ for thisTrial in trials:
         # moving hand when arrow keys are clicked during the main part of the trial
         # in controllable stress condition, hand freezes when balloon is saved (success), but not in uncontrollable condition
         if startedTrial and (not success or isYokedParticipant) and not timeToPop:
-            if event.getKeys(['right']):
+            if event.getKeys([right_key]):
                 updateLog = 1
                 keyJustPressed = 'right'
                 totalKeyPresses += 1
@@ -821,7 +834,7 @@ for thisTrial in trials:
                     handPosition = (handPosition[0] + .1, handPosition[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
-            elif event.getKeys(['left']):
+            elif event.getKeys([left_key]):
                 updateLog = 1
                 keyJustPressed = 'left'
                 totalKeyPresses += 1
@@ -830,7 +843,7 @@ for thisTrial in trials:
                     handPosition = (handPosition[0] - .1, handPosition[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
-            elif event.getKeys(['up']):
+            elif event.getKeys([up_key]):
                 updateLog = 1
                 keyJustPressed = 'up'
                 totalKeyPresses += 1
@@ -839,7 +852,7 @@ for thisTrial in trials:
                     handPosition = (handPosition[0], handPosition[1] + .1)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
-            elif event.getKeys(['down']):
+            elif event.getKeys([down_key]):
                 updateLog = 1
                 keyJustPressed = 'down'
                 totalKeyPresses += 1
