@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Wed Jun 21 23:18:22 2017
+    on Thu Jun 22 13:51:00 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -282,9 +282,6 @@ balloonSettings = [(.4, -1, xSpeed6, ySpeed1, [-.8, .8, -.8, .8, -.8, .8, -.8]),
 (.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),
 (-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), 
 (-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
-    
-# define starting hand positions
-handPositions = (0, -.8)
 
 # log info
 currentTrial = 0
@@ -768,6 +765,7 @@ for thisTrial in trials:
     startedTrial = 0
     timeSinceSuccess = 0
     
+    handPosition = (0, -.8)
     currentBalloonSettings = balloonSettings.pop(0)
     balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])
     print str(currentTrial) + "\t" + str(balloonPosition)
