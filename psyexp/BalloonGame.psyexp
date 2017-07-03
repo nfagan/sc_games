@@ -1,26 +1,29 @@
 <?xml version="1.0" ?>
-<PsychoPy2experiment encoding="utf-8" version="1.84.2">
+<PsychoPy2experiment encoding="utf-8" version="1.85.2">
   <Settings>
-    <Param name="Show mouse" updates="None" val="False" valType="bool"/>
-    <Param name="Data filename" updates="None" val="&quot;BalloonGame_%s&quot; % expInfo['date']" valType="code"/>
     <Param name="Monitor" updates="None" val="testMonitor" valType="str"/>
-    <Param name="Enable Escape" updates="None" val="False" valType="bool"/>
     <Param name="color" updates="None" val="$[0,0,0]" valType="str"/>
-    <Param name="Window size (pixels)" updates="None" val="[1440, 900]" valType="code"/>
-    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
     <Param name="colorSpace" updates="None" val="rgb" valType="str"/>
     <Param name="Experiment info" updates="None" val="{u'dont_use': u''}" valType="code"/>
-    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
-    <Param name="Show info dlg" updates="None" val="False" valType="bool"/>
-    <Param name="Save wide csv file" updates="None" val="False" valType="bool"/>
+    <Param name="JS libs" updates="None" val="packaged" valType="str"/>
+    <Param name="Units" updates="None" val="norm" valType="str"/>
+    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
+    <Param name="Enable Escape" updates="None" val="False" valType="bool"/>
     <Param name="Save psydat file" updates="None" val="True" valType="bool"/>
+    <Param name="Window size (pixels)" updates="None" val="[1440, 900]" valType="code"/>
+    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
+    <Param name="blendMode" updates="None" val="avg" valType="str"/>
+    <Param name="Use version" updates="None" val="" valType="str"/>
+    <Param name="HTML path" updates="None" val="html" valType="str"/>
+    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
+    <Param name="OSF Project ID" updates="None" val="" valType="str"/>
+    <Param name="Save log file" updates="None" val="True" valType="bool"/>
+    <Param name="Save wide csv file" updates="None" val="False" valType="bool"/>
+    <Param name="Show mouse" updates="None" val="False" valType="bool"/>
+    <Param name="Data filename" updates="None" val="&quot;BalloonGame_%s&quot; % expInfo['date']" valType="code"/>
+    <Param name="Show info dlg" updates="None" val="False" valType="bool"/>
     <Param name="expName" updates="None" val="balloon_game" valType="str"/>
     <Param name="logging level" updates="None" val="exp" valType="code"/>
-    <Param name="blendMode" updates="None" val="avg" valType="str"/>
-    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
-    <Param name="Units" updates="None" val="norm" valType="str"/>
-    <Param name="Use version" updates="None" val="" valType="str"/>
-    <Param name="Save log file" updates="None" val="True" valType="bool"/>
     <Param name="Screen" updates="None" val="1" valType="num"/>
   </Settings>
   <Routines>
