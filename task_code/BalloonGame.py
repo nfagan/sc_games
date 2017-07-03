@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Thu Jun 22 13:51:00 2017
+    on Mon Jul  3 14:52:26 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -11,7 +11,7 @@ If you publish work using this script please cite the PsychoPy publications:
 """
 
 from __future__ import absolute_import, division
-from psychopy import locale_setup, gui, visual, core, data, event, logging, sound
+from psychopy import locale_setup, sound, gui, visual, core, data, event, logging
 from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 import numpy as np  # whole numpy lib is available, prepend 'np.'
@@ -37,7 +37,7 @@ filename = _thisDir + os.sep + "BalloonGame_%s" % expInfo['date']
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/Jeff/stressor_controllability/psyexp/BalloonGame.psyexp',
+    originPath=u'/Users/Jeff/sc_magic/psyexp/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -192,14 +192,14 @@ instruction = visual.ImageStim(
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 
-# Initialize components for Routine "hand_practice"
-hand_practiceClock = core.Clock()
-handPosition = (0, 0)
+# Initialize components for Routine "wand_practice"
+wand_practiceClock = core.Clock()
+wand_position = (0, 0)
 
-theHand = visual.ImageStim(
-    win=win, name='theHand',units='norm', 
-    image=media + "hand.png", mask=None,
-    ori=0, pos=[0,0], size=(0.15, 0.15),
+magic_wand = visual.ImageStim(
+    win=win, name='magic_wand',units='norm', 
+    image=media + "magic_wand.png", mask=None,
+    ori=0, pos=[0,0], size=(0.2, 0.2),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
@@ -293,7 +293,7 @@ f.write("# Version: %s\n" % version)
 f.write("# Condition: %s\n" % condition)
 if condition != "controllable_stress":
     f.write("# Yoked to: %s\n" % yokeSourceFile)
-f.write("ID\tTime\tTrial\tRel_time\tX_balloon\tY_balloon\tX_hand\tY_hand\tkey_just_pressed\tvalid_key_press\t" +
+f.write("ID\tTime\tTrial\tRel_time\tX_balloon\tY_balloon\tX_wand\tY_wand\tkey_just_pressed\tvalid_key_press\t" +
 "total_key_presses\ttotal_valid_key_presses\tjust_popped_balloon\tjust_saved_balloon\ttotal_popped\ttotal_saved\n")
 
 # write yoking file headers
@@ -332,15 +332,15 @@ success_background = visual.ImageStim(
     texRes=128, interpolate=True, depth=-3.0)
 balloon = visual.ImageStim(
     win=win, name='balloon',units='norm', 
-    image=media + "Balloons.png", mask=None,
-    ori=0, pos=[0,0], size=1.0,
+    image=media + "pink_balloon.png", mask=None,
+    ori=45, pos=[0,0], size=1.0,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-4.0)
-the_hand = visual.ImageStim(
-    win=win, name='the_hand',units='norm', 
-    image=media + "hand.png", mask=None,
-    ori=0, pos=[0,0], size=(0.1, 0.1),
+wand = visual.ImageStim(
+    win=win, name='wand',units='norm', 
+    image=media + "magic_wand.png", mask=None,
+    ori=0, pos=[0,0], size=(0.2, 0.2),
     color=[1,1,1], colorSpace='rgb', opacity=1.0,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-5.0)
@@ -573,9 +573,9 @@ for thisComponent in boring_instrComponents:
 # the Routine "boring_instr" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
-# ------Prepare to start Routine "hand_practice"-------
+# ------Prepare to start Routine "wand_practice"-------
 t = 0
-hand_practiceClock.reset()  # clock
+wand_practiceClock.reset()  # clock
 frameN = -1
 continueRoutine = True
 # update component parameters for each repeat
@@ -583,42 +583,42 @@ if trialDebugMode or boringMode:
     continueRoutine = False
 key_resp_15 = event.BuilderKeyResponse()
 # keep track of which components have finished
-hand_practiceComponents = [theHand, key_resp_15]
-for thisComponent in hand_practiceComponents:
+wand_practiceComponents = [magic_wand, key_resp_15]
+for thisComponent in wand_practiceComponents:
     if hasattr(thisComponent, 'status'):
         thisComponent.status = NOT_STARTED
 
-# -------Start Routine "hand_practice"-------
+# -------Start Routine "wand_practice"-------
 while continueRoutine:
     # get current time
-    t = hand_practiceClock.getTime()
+    t = wand_practiceClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    # moving hand when arrow keys are clicked during the main part of the trial
+    # moving wand when arrow keys are clicked during the main part of the trial
     if event.getKeys([right_key]):
-        if handPosition[0] < .8:
-            handPosition = (handPosition[0] + .1, handPosition[1])
+        if wand_position[0] < .8:
+            wand_position = (wand_position[0] + .1, wand_position[1])
     if event.getKeys([left_key]):
-        if handPosition[0] > -.8:
-            handPosition = (handPosition[0] - .1, handPosition[1])
+        if wand_position[0] > -.8:
+            wand_position = (wand_position[0] - .1, wand_position[1])
     if event.getKeys([up_key]):
-        if handPosition[1] < .8:
-            handPosition = (handPosition[0], handPosition[1] + .1)
+        if wand_position[1] < .8:
+            wand_position = (wand_position[0], wand_position[1] + .1)
     if event.getKeys([down_key]):
-        if handPosition[1] > -.8:
-            handPosition = (handPosition[0], handPosition[1] - .1)
+        if wand_position[1] > -.8:
+            wand_position = (wand_position[0], wand_position[1] - .1)
     
-    # *theHand* updates
-    if t >= 0 and theHand.status == NOT_STARTED:
+    # *magic_wand* updates
+    if t >= 0 and magic_wand.status == NOT_STARTED:
         # keep track of start time/frame for later
-        theHand.tStart = t
-        theHand.frameNStart = frameN  # exact frame index
-        theHand.setAutoDraw(True)
+        magic_wand.tStart = t
+        magic_wand.frameNStart = frameN  # exact frame index
+        magic_wand.setAutoDraw(True)
     frameRemains = 0 + 20- win.monitorFramePeriod * 0.75  # most of one frame period left
-    if theHand.status == STARTED and t >= frameRemains:
-        theHand.setAutoDraw(False)
-    if theHand.status == STARTED:  # only update if drawing
-        theHand.setPos(handPosition, log=False)
+    if magic_wand.status == STARTED and t >= frameRemains:
+        magic_wand.setAutoDraw(False)
+    if magic_wand.status == STARTED:  # only update if drawing
+        magic_wand.setPos(wand_position, log=False)
     
     # *key_resp_15* updates
     if t >= 0.0 and key_resp_15.status == NOT_STARTED:
@@ -641,7 +641,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in hand_practiceComponents:
+    for thisComponent in wand_practiceComponents:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -650,8 +650,8 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "hand_practice"-------
-for thisComponent in hand_practiceComponents:
+# -------Ending Routine "wand_practice"-------
+for thisComponent in wand_practiceComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
 
@@ -662,7 +662,7 @@ thisExp.addData('key_resp_15.keys',key_resp_15.keys)
 if key_resp_15.keys != None:  # we had a response
     thisExp.addData('key_resp_15.rt', key_resp_15.rt)
 thisExp.nextEntry()
-# the Routine "hand_practice" was not non-slip safe, so reset the non-slip timer
+# the Routine "wand_practice" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # ------Prepare to start Routine "get_ready"-------
@@ -765,7 +765,7 @@ for thisTrial in trials:
     startedTrial = 0
     timeSinceSuccess = 0
     
-    handPosition = (0, -.8)
+    wand_position = (0, -.8)
     currentBalloonSettings = balloonSettings.pop(0)
     balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])
     print str(currentTrial) + "\t" + str(balloonPosition)
@@ -773,10 +773,10 @@ for thisTrial in trials:
     zigs = currentBalloonSettings[4]
     
     if boringMode:
-        handOpacity = 0
+        wand_opacity = 0
         popVolume = 0
     else:
-        handOpacity = 1
+        wand_opacity = 1
     
     if isYokedParticipant:
         trialInfo = previousParticipantOutcomes.pop(0).rstrip().split("\t")
@@ -801,10 +801,10 @@ for thisTrial in trials:
     
     antic_background.setImage(media + "Anticipatory_period_background.jpg")
     success_background.setImage(media + "Success_background.jpg")
-    the_hand.setOpacity(handOpacity)
+    wand.setOpacity(wand_opacity)
     aversive_pop.setVolume(popVolume)
     # keep track of which components have finished
-    balloonsComponents = [antic_background, avoid_background, success_background, balloon, the_hand, aversive_pop, ITI]
+    balloonsComponents = [antic_background, avoid_background, success_background, balloon, wand, aversive_pop, ITI]
     for thisComponent in balloonsComponents:
         if hasattr(thisComponent, 'status'):
             thisComponent.status = NOT_STARTED
@@ -820,16 +820,16 @@ for thisTrial in trials:
         validKeyPress = 'NA'
         
         
-        # moving hand when arrow keys are clicked during the main part of the trial
-        # in controllable stress condition, hand freezes when balloon is saved (success), but not in uncontrollable condition
+        # moving wand when arrow keys are clicked during the main part of the trial
+        # in controllable stress condition, wand freezes when balloon is saved (success), but not in uncontrollable condition
         if startedTrial and (not success or isYokedParticipant) and not timeToPop:
             if event.getKeys([right_key]):
                 updateLog = 1
                 keyJustPressed = 'right'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if handPosition[0] < .8:
-                    handPosition = (handPosition[0] + .1, handPosition[1])
+                if wand_position[0] < .8:
+                    wand_position = (wand_position[0] + .1, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([left_key]):
@@ -837,8 +837,8 @@ for thisTrial in trials:
                 keyJustPressed = 'left'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if handPosition[0] > -.8:
-                    handPosition = (handPosition[0] - .1, handPosition[1])
+                if wand_position[0] > -.8:
+                    wand_position = (wand_position[0] - .1, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([up_key]):
@@ -846,8 +846,8 @@ for thisTrial in trials:
                 keyJustPressed = 'up'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if handPosition[1] < .8:
-                    handPosition = (handPosition[0], handPosition[1] + .1)
+                if wand_position[1] < .8:
+                    wand_position = (wand_position[0], wand_position[1] + .1)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([down_key]):
@@ -855,8 +855,8 @@ for thisTrial in trials:
                 keyJustPressed = 'down'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if handPosition[1] > -.8:
-                    handPosition = (handPosition[0], handPosition[1] - .1)
+                if wand_position[1] > -.8:
+                    wand_position = (wand_position[0], wand_position[1] - .1)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             else:
@@ -880,9 +880,9 @@ for thisTrial in trials:
             startedTrial = 1
         
         
-        # testing if the hand has reached the balloon (for controllable stress condition) or if it's time for a yoked participant to be saved
-        xDist = abs(the_hand.pos[0] - balloon.pos[0])
-        yDist = abs(the_hand.pos[1] - balloon.pos[1])
+        # testing if the wand has reached the balloon (for controllable stress condition) or if it's time for a yoked participant to be saved
+        xDist = abs(wand.pos[0] - balloon.pos[0])
+        yDist = abs(wand.pos[1] - balloon.pos[1])
         
         # if balloon reaches top, balloon will pop (so don't need the success component)
         if balloon.pos[1] > .9 and success == 0:
@@ -898,7 +898,7 @@ for thisTrial in trials:
                 justPoppedBalloon = 0
             timeToPop = 1
         elif ((t > anticipatoryPeriod + .1 and xDist < .05 and yDist < .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t >= safetySignalTime)):
-            # note that you need the .1 second buffer so the hand is initialized before the test
+            # note that you need the .1 second buffer so the wand is initialized before the test
             if success == 0:
                 successClock.reset()
                 justSavedBalloon = 1
@@ -917,7 +917,7 @@ for thisTrial in trials:
         
         # logging
         logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(balloon.pos[0]), str(balloon.pos[1]), 
-            str(the_hand.pos[0]), str(the_hand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), 
+            str(wand.pos[0]), str(wand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), 
             str(justPoppedBalloon), str(justSavedBalloon), str(totalPopped), str(totalSaved)]
         
         if updateLog == 1:
@@ -962,18 +962,18 @@ for thisTrial in trials:
             balloon.setAutoDraw(False)
         if balloon.status == STARTED:  # only update if drawing
             balloon.setPos(balloonPosition, log=False)
-            balloon.setSize((0.2, 0.2), log=False)
+            balloon.setSize((0.25, 0.25), log=False)
         
-        # *the_hand* updates
-        if t >= t>=anticipatoryPeriod and the_hand.status == NOT_STARTED:
+        # *wand* updates
+        if t >= t>=anticipatoryPeriod and wand.status == NOT_STARTED:
             # keep track of start time/frame for later
-            the_hand.tStart = t
-            the_hand.frameNStart = frameN  # exact frame index
-            the_hand.setAutoDraw(True)
-        if the_hand.status == STARTED and bool(timeToPop or t>endTrialTime):
-            the_hand.setAutoDraw(False)
-        if the_hand.status == STARTED:  # only update if drawing
-            the_hand.setPos(handPosition, log=False)
+            wand.tStart = t
+            wand.frameNStart = frameN  # exact frame index
+            wand.setAutoDraw(True)
+        if wand.status == STARTED and bool(timeToPop or t>endTrialTime):
+            wand.setAutoDraw(False)
+        if wand.status == STARTED:  # only update if drawing
+            wand.setPos(wand_position, log=False)
         # start/stop aversive_pop
         if (timeToPop and not success) and aversive_pop.status == NOT_STARTED:
             # keep track of start time/frame for later

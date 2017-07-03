@@ -1,26 +1,29 @@
 <?xml version="1.0" ?>
-<PsychoPy2experiment encoding="utf-8" version="1.84.2">
+<PsychoPy2experiment encoding="utf-8" version="1.85.2">
   <Settings>
-    <Param name="Show mouse" updates="None" val="False" valType="bool"/>
-    <Param name="Data filename" updates="None" val="&quot;BalloonGame_%s&quot; % expInfo['date']" valType="code"/>
     <Param name="Monitor" updates="None" val="testMonitor" valType="str"/>
-    <Param name="Enable Escape" updates="None" val="False" valType="bool"/>
     <Param name="color" updates="None" val="$[0,0,0]" valType="str"/>
-    <Param name="Window size (pixels)" updates="None" val="[1440, 900]" valType="code"/>
-    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
     <Param name="colorSpace" updates="None" val="rgb" valType="str"/>
     <Param name="Experiment info" updates="None" val="{u'dont_use': u''}" valType="code"/>
-    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
-    <Param name="Show info dlg" updates="None" val="False" valType="bool"/>
-    <Param name="Save wide csv file" updates="None" val="False" valType="bool"/>
+    <Param name="JS libs" updates="None" val="packaged" valType="str"/>
+    <Param name="Units" updates="None" val="norm" valType="str"/>
+    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
+    <Param name="Enable Escape" updates="None" val="False" valType="bool"/>
     <Param name="Save psydat file" updates="None" val="True" valType="bool"/>
+    <Param name="Window size (pixels)" updates="None" val="[1440, 900]" valType="code"/>
+    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
+    <Param name="blendMode" updates="None" val="avg" valType="str"/>
+    <Param name="Use version" updates="None" val="" valType="str"/>
+    <Param name="HTML path" updates="None" val="html" valType="str"/>
+    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
+    <Param name="OSF Project ID" updates="None" val="" valType="str"/>
+    <Param name="Save log file" updates="None" val="True" valType="bool"/>
+    <Param name="Save wide csv file" updates="None" val="False" valType="bool"/>
+    <Param name="Show mouse" updates="None" val="False" valType="bool"/>
+    <Param name="Data filename" updates="None" val="&quot;BalloonGame_%s&quot; % expInfo['date']" valType="code"/>
+    <Param name="Show info dlg" updates="None" val="False" valType="bool"/>
     <Param name="expName" updates="None" val="balloon_game" valType="str"/>
     <Param name="logging level" updates="None" val="exp" valType="code"/>
-    <Param name="blendMode" updates="None" val="avg" valType="str"/>
-    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
-    <Param name="Units" updates="None" val="norm" valType="str"/>
-    <Param name="Use version" updates="None" val="" valType="str"/>
-    <Param name="Save log file" updates="None" val="True" valType="bool"/>
     <Param name="Screen" updates="None" val="1" valType="num"/>
   </Settings>
   <Routines>
@@ -55,54 +58,6 @@
         <Param name="image" updates="set every frame" val="$currentInstructionFile" valType="str"/>
         <Param name="size" updates="constant" val="(2, 2)" valType="code"/>
       </ImageComponent>
-    </Routine>
-    <Routine name="hand_practice">
-      <CodeComponent name="code_3">
-        <Param name="Begin Experiment" updates="constant" val="handPosition = (0, 0)&amp;#10;" valType="extendedCode"/>
-        <Param name="name" updates="None" val="code_3" valType="code"/>
-        <Param name="Begin Routine" updates="constant" val="if trialDebugMode or boringMode:&amp;#10;    continueRoutine = False" valType="extendedCode"/>
-        <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
-        <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
-        <Param name="Each Frame" updates="constant" val="# moving hand when arrow keys are clicked during the main part of the trial&amp;#10;if event.getKeys([right_key]):&amp;#10;    if handPosition[0] &lt; .8:&amp;#10;        handPosition = (handPosition[0] + .1, handPosition[1])&amp;#10;if event.getKeys([left_key]):&amp;#10;    if handPosition[0] &gt; -.8:&amp;#10;        handPosition = (handPosition[0] - .1, handPosition[1])&amp;#10;if event.getKeys([up_key]):&amp;#10;    if handPosition[1] &lt; .8:&amp;#10;        handPosition = (handPosition[0], handPosition[1] + .1)&amp;#10;if event.getKeys([down_key]):&amp;#10;    if handPosition[1] &gt; -.8:&amp;#10;        handPosition = (handPosition[0], handPosition[1] - .1)" valType="extendedCode"/>
-      </CodeComponent>
-      <ImageComponent name="theHand">
-        <Param name="opacity" updates="constant" val="1" valType="code"/>
-        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
-        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
-        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
-        <Param name="name" updates="None" val="theHand" valType="code"/>
-        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
-        <Param name="stopVal" updates="constant" val="20" valType="code"/>
-        <Param name="durationEstim" updates="None" val="" valType="code"/>
-        <Param name="mask" updates="constant" val="None" valType="str"/>
-        <Param name="pos" updates="set every frame" val="handPosition" valType="code"/>
-        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
-        <Param name="startEstim" updates="None" val="" valType="code"/>
-        <Param name="units" updates="None" val="norm" valType="str"/>
-        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
-        <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="ori" updates="constant" val="0" valType="code"/>
-        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
-        <Param name="startVal" updates="None" val="0" valType="code"/>
-        <Param name="image" updates="constant" val="$media + &quot;hand.png&quot;" valType="str"/>
-        <Param name="size" updates="constant" val="(0.15, 0.15)" valType="code"/>
-      </ImageComponent>
-      <KeyboardComponent name="key_resp_15">
-        <Param name="correctAns" updates="constant" val="" valType="str"/>
-        <Param name="storeCorrect" updates="constant" val="False" valType="bool"/>
-        <Param name="name" updates="None" val="key_resp_15" valType="code"/>
-        <Param name="stopVal" updates="constant" val="" valType="code"/>
-        <Param name="durationEstim" updates="None" val="" valType="code"/>
-        <Param name="forceEndRoutine" updates="constant" val="True" valType="bool"/>
-        <Param name="startEstim" updates="None" val="" valType="code"/>
-        <Param name="discard previous" updates="constant" val="True" valType="bool"/>
-        <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="allowedKeys" updates="constant" val="'space'" valType="code"/>
-        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
-        <Param name="startVal" updates="None" val="0.0" valType="code"/>
-        <Param name="store" updates="constant" val="last key" valType="str"/>
-        <Param name="syncScreenRefresh" updates="constant" val="True" valType="bool"/>
-      </KeyboardComponent>
     </Routine>
     <Routine name="instructions_boring">
       <CodeComponent name="instr_logic">
@@ -244,14 +199,62 @@
         <Param name="Each Frame" updates="constant" val="# all slides advance with a space&amp;#10;if event.getKeys('space') and currentInstructionNumber != 18:&amp;#10;    currentInstructionNumber += 1&amp;#10;&amp;#10;if event.getKeys('right') and currentInstructionNumber == 18:&amp;#10;    currentInstructionNumber +=1&amp;#10;&amp;#10;if currentInstructionNumber == 19:&amp;#10;    break&amp;#10;&amp;#10;currentInstructionString = str(currentInstructionNumber)&amp;#10;if currentInstructionNumber &lt; 10:&amp;#10;    currentInstructionString = &quot;0&quot; + currentInstructionString&amp;#10;currentInstructionFile = instructionSlides + &quot;Slide&quot; + currentInstructionString + &quot;.jpg&quot;&amp;#10;" valType="extendedCode"/>
       </CodeComponent>
     </Routine>
+    <Routine name="wand_practice">
+      <CodeComponent name="code_3">
+        <Param name="Begin Experiment" updates="constant" val="wand_position = (0, 0)&amp;#10;" valType="extendedCode"/>
+        <Param name="name" updates="None" val="code_3" valType="code"/>
+        <Param name="Begin Routine" updates="constant" val="if trialDebugMode or boringMode:&amp;#10;    continueRoutine = False" valType="extendedCode"/>
+        <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
+        <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="# moving wand when arrow keys are clicked during the main part of the trial&amp;#10;if event.getKeys([right_key]):&amp;#10;    if wand_position[0] &lt; .8:&amp;#10;        wand_position = (wand_position[0] + .1, wand_position[1])&amp;#10;if event.getKeys([left_key]):&amp;#10;    if wand_position[0] &gt; -.8:&amp;#10;        wand_position = (wand_position[0] - .1, wand_position[1])&amp;#10;if event.getKeys([up_key]):&amp;#10;    if wand_position[1] &lt; .8:&amp;#10;        wand_position = (wand_position[0], wand_position[1] + .1)&amp;#10;if event.getKeys([down_key]):&amp;#10;    if wand_position[1] &gt; -.8:&amp;#10;        wand_position = (wand_position[0], wand_position[1] - .1)" valType="extendedCode"/>
+      </CodeComponent>
+      <ImageComponent name="magic_wand">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="name" updates="None" val="magic_wand" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="20" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="set every frame" val="wand_position" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="units" updates="None" val="norm" valType="str"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
+        <Param name="startVal" updates="None" val="0" valType="code"/>
+        <Param name="image" updates="constant" val="$media + &quot;magic_wand.png&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(0.2, 0.2)" valType="code"/>
+      </ImageComponent>
+      <KeyboardComponent name="key_resp_15">
+        <Param name="correctAns" updates="constant" val="" valType="str"/>
+        <Param name="storeCorrect" updates="constant" val="False" valType="bool"/>
+        <Param name="name" updates="None" val="key_resp_15" valType="code"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="forceEndRoutine" updates="constant" val="True" valType="bool"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="discard previous" updates="constant" val="True" valType="bool"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="allowedKeys" updates="constant" val="'space'" valType="code"/>
+        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
+        <Param name="startVal" updates="None" val="0.0" valType="code"/>
+        <Param name="store" updates="constant" val="last key" valType="str"/>
+        <Param name="syncScreenRefresh" updates="constant" val="True" valType="bool"/>
+      </KeyboardComponent>
+    </Routine>
     <Routine name="balloons">
       <CodeComponent name="code">
-        <Param name="Begin Experiment" updates="constant" val="&amp;#10;&amp;#10;# signals when the user has successfully halted the balloon&amp;#10;success = 0&amp;#10;&amp;#10;# time when trial ends (regardless of catching balloon)&amp;#10;endTrialTime = anticipatoryPeriod + 4&amp;#10;&amp;#10;# will be used to keep track of time after halting balloon&amp;#10;successClock = core.Clock()&amp;#10;&amp;#10;# set balloon speed (x direction)&amp;#10;xSpeed1 = .008&amp;#10;xSpeed2 = .009&amp;#10;xSpeed3 = .01&amp;#10;xSpeed4 = -.008&amp;#10;xSpeed5 = -.009&amp;#10;xSpeed6 = -.01&amp;#10;&amp;#10;# set balloon speed (y direction)&amp;#10;ySpeed1 = .01&amp;#10;ySpeed2 = .01&amp;#10;ySpeed3 = .01&amp;#10;&amp;#10;&amp;#10;# different balloon starting X/Y positions and per-frame X/Y movements&amp;#10;balloonSettings = [(.4, -1, xSpeed6, ySpeed1, [-.8, .8, -.8, .8, -.8, .8, -.8]), &amp;#10;(.8, -1, xSpeed4, ySpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),&amp;#10;(-.7, -1, xSpeed2, ySpeed2, [0, -.5, .9, -.6, .7, -.5]), &amp;#10;(-.4, -1, xSpeed2, ySpeed2, [.8, -.8, .8, -.8, 0, -.5]),&amp;#10;(-.6, -1, xSpeed2, ySpeed3, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), &amp;#10;(.7, -1, xSpeed4, ySpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), &amp;#10;(.1,-1, xSpeed2,ySpeed3, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), &amp;#10;(-.3, -1, xSpeed2, ySpeed2, [0, -.8, .6, -.8, .6]),     &amp;#10;(.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),&amp;#10;(-.8, -1, xSpeed1, ySpeed1, [-.3, -.7, -.2, -.8, -.1]), &amp;#10;(.4, -1, xSpeed4, ySpeed2, [0, .8, -.3, .3, -.7, .8, -.6, 0]),&amp;#10;(.5, -1, xSpeed6, ySpeed2, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), &amp;#10;(.5, -1, xSpeed4, ySpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), &amp;#10;(-.6, -1, xSpeed3, ySpeed1, [0, -.5, .9, -.7, .7, -.6]),     &amp;#10;(-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15&amp;#10;(-.5, -1, xSpeed3, ySpeed1, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), &amp;#10;(.3, -1, xSpeed5, ySpeed3, [0, .7, -.2, .3, -.6, .7, -.8]),     &amp;#10;(.2,-1, xSpeed3,ySpeed1, [.4, .2, .8, .1, .8, .4, .6]),&amp;#10;(-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     &amp;#10;(-.5, -1, xSpeed1, ySpeed2, [-.1, -.2, .2, -.4, .4,-.7]), &amp;#10;(.8, -1, xSpeed4, ySpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),&amp;#10;(-.7, -1, xSpeed2, ySpeed2, [0, -.5, .9, -.6, .7, -.5]), &amp;#10;(-.4, -1, xSpeed2, ySpeed2, [.8, -.8, .8, -.8, 0, -.5]),&amp;#10;(-.6, -1, xSpeed2, ySpeed3, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), &amp;#10;(.7, -1, xSpeed4, ySpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), &amp;#10;(.5,-1, xSpeed2,ySpeed3, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), &amp;#10;(-.8, -1, xSpeed1, ySpeed1, [-.3, -.7, -.2, -.8, -.1]), &amp;#10;(.4, -1, xSpeed4, ySpeed2, [0, .8, -.3, .3, -.7, .8, -.6, 0]),&amp;#10;(.8, -1, xSpeed6, ySpeed2, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), &amp;#10;(.5, -1, xSpeed4, ySpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), &amp;#10;(-.6, -1, xSpeed3, ySpeed1, [0, -.5, .9, -.7, .7, -.6]), &amp;#10;(-.2, -1, xSpeed1, ySpeed2, [0, -.2, .2, -.4, .4,-.7]),     &amp;#10;(-.5, -1, xSpeed3, ySpeed1, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), &amp;#10;(-.3, -1, xSpeed2, ySpeed2, [0, -.8, .6, -.8, .6]),  &amp;#10;(.2, -1, xSpeed5, ySpeed3, [0, .7, -.2, .3, -.6, .7, -.8]),     &amp;#10;(.2,-1, xSpeed3,ySpeed1, [.4, .2, .8, .1, .8, .4, .6]),&amp;#10;(.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),&amp;#10;(-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), &amp;#10;(-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]&amp;#10;&amp;#10;# log info&amp;#10;currentTrial = 0&amp;#10;totalPopped = 0&amp;#10;totalSaved = 0&amp;#10;&amp;#10;# write data file headers&amp;#10;f.write(&quot;# Version: %s\n&quot; % version)&amp;#10;f.write(&quot;# Condition: %s\n&quot; % condition)&amp;#10;if condition != &quot;controllable_stress&quot;:&amp;#10;    f.write(&quot;# Yoked to: %s\n&quot; % yokeSourceFile)&amp;#10;f.write(&quot;ID\tTime\tTrial\tRel_time\tX_balloon\tY_balloon\tX_hand\tY_hand\tkey_just_pressed\tvalid_key_press\t&quot; +&amp;#10;&quot;total_key_presses\ttotal_valid_key_presses\tjust_popped_balloon\tjust_saved_balloon\ttotal_popped\ttotal_saved\n&quot;)&amp;#10;&amp;#10;# write yoking file headers&amp;#10;if (not isYokedParticipant):&amp;#10;    y.write(&quot;ID\tTrial\tBalloon_saved\tSuccess_time\n&quot;)&amp;#10;else:&amp;#10;    y.readline() # skip header line&amp;#10;    previousParticipantOutcomes = y.readlines()&amp;#10;    if len(previousParticipantOutcomes) != 30:&amp;#10;        print &quot;Error: Yoking file &quot; + yokeSourceFile + &quot; doesn't appear to have one line per trial.&quot;&amp;#10;        core.quit()&amp;#10;&amp;#10;# volume of aversive pop (gets changed to 0 in nonstressed condition)&amp;#10;popVolume = 1&amp;#10;" valType="extendedCode"/>
+        <Param name="Begin Experiment" updates="constant" val="&amp;#10;&amp;#10;# signals when the user has successfully halted the balloon&amp;#10;success = 0&amp;#10;&amp;#10;# time when trial ends (regardless of catching balloon)&amp;#10;endTrialTime = anticipatoryPeriod + 4&amp;#10;&amp;#10;# will be used to keep track of time after halting balloon&amp;#10;successClock = core.Clock()&amp;#10;&amp;#10;# set balloon speed (x direction)&amp;#10;xSpeed1 = .008&amp;#10;xSpeed2 = .009&amp;#10;xSpeed3 = .01&amp;#10;xSpeed4 = -.008&amp;#10;xSpeed5 = -.009&amp;#10;xSpeed6 = -.01&amp;#10;&amp;#10;# set balloon speed (y direction)&amp;#10;ySpeed1 = .01&amp;#10;ySpeed2 = .01&amp;#10;ySpeed3 = .01&amp;#10;&amp;#10;&amp;#10;# different balloon starting X/Y positions and per-frame X/Y movements&amp;#10;balloonSettings = [(.4, -1, xSpeed6, ySpeed1, [-.8, .8, -.8, .8, -.8, .8, -.8]), &amp;#10;(.8, -1, xSpeed4, ySpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),&amp;#10;(-.7, -1, xSpeed2, ySpeed2, [0, -.5, .9, -.6, .7, -.5]), &amp;#10;(-.4, -1, xSpeed2, ySpeed2, [.8, -.8, .8, -.8, 0, -.5]),&amp;#10;(-.6, -1, xSpeed2, ySpeed3, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), &amp;#10;(.7, -1, xSpeed4, ySpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), &amp;#10;(.1,-1, xSpeed2,ySpeed3, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), &amp;#10;(-.3, -1, xSpeed2, ySpeed2, [0, -.8, .6, -.8, .6]),     &amp;#10;(.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),&amp;#10;(-.8, -1, xSpeed1, ySpeed1, [-.3, -.7, -.2, -.8, -.1]), &amp;#10;(.4, -1, xSpeed4, ySpeed2, [0, .8, -.3, .3, -.7, .8, -.6, 0]),&amp;#10;(.5, -1, xSpeed6, ySpeed2, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), &amp;#10;(.5, -1, xSpeed4, ySpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), &amp;#10;(-.6, -1, xSpeed3, ySpeed1, [0, -.5, .9, -.7, .7, -.6]),     &amp;#10;(-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15&amp;#10;(-.5, -1, xSpeed3, ySpeed1, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), &amp;#10;(.3, -1, xSpeed5, ySpeed3, [0, .7, -.2, .3, -.6, .7, -.8]),     &amp;#10;(.2,-1, xSpeed3,ySpeed1, [.4, .2, .8, .1, .8, .4, .6]),&amp;#10;(-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     &amp;#10;(-.5, -1, xSpeed1, ySpeed2, [-.1, -.2, .2, -.4, .4,-.7]), &amp;#10;(.8, -1, xSpeed4, ySpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),&amp;#10;(-.7, -1, xSpeed2, ySpeed2, [0, -.5, .9, -.6, .7, -.5]), &amp;#10;(-.4, -1, xSpeed2, ySpeed2, [.8, -.8, .8, -.8, 0, -.5]),&amp;#10;(-.6, -1, xSpeed2, ySpeed3, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), &amp;#10;(.7, -1, xSpeed4, ySpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), &amp;#10;(.5,-1, xSpeed2,ySpeed3, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), &amp;#10;(-.8, -1, xSpeed1, ySpeed1, [-.3, -.7, -.2, -.8, -.1]), &amp;#10;(.4, -1, xSpeed4, ySpeed2, [0, .8, -.3, .3, -.7, .8, -.6, 0]),&amp;#10;(.8, -1, xSpeed6, ySpeed2, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), &amp;#10;(.5, -1, xSpeed4, ySpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), &amp;#10;(-.6, -1, xSpeed3, ySpeed1, [0, -.5, .9, -.7, .7, -.6]), &amp;#10;(-.2, -1, xSpeed1, ySpeed2, [0, -.2, .2, -.4, .4,-.7]),     &amp;#10;(-.5, -1, xSpeed3, ySpeed1, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), &amp;#10;(-.3, -1, xSpeed2, ySpeed2, [0, -.8, .6, -.8, .6]),  &amp;#10;(.2, -1, xSpeed5, ySpeed3, [0, .7, -.2, .3, -.6, .7, -.8]),     &amp;#10;(.2,-1, xSpeed3,ySpeed1, [.4, .2, .8, .1, .8, .4, .6]),&amp;#10;(.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),&amp;#10;(-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), &amp;#10;(-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]&amp;#10;&amp;#10;# log info&amp;#10;currentTrial = 0&amp;#10;totalPopped = 0&amp;#10;totalSaved = 0&amp;#10;&amp;#10;# write data file headers&amp;#10;f.write(&quot;# Version: %s\n&quot; % version)&amp;#10;f.write(&quot;# Condition: %s\n&quot; % condition)&amp;#10;if condition != &quot;controllable_stress&quot;:&amp;#10;    f.write(&quot;# Yoked to: %s\n&quot; % yokeSourceFile)&amp;#10;f.write(&quot;ID\tTime\tTrial\tRel_time\tX_balloon\tY_balloon\tX_wand\tY_wand\tkey_just_pressed\tvalid_key_press\t&quot; +&amp;#10;&quot;total_key_presses\ttotal_valid_key_presses\tjust_popped_balloon\tjust_saved_balloon\ttotal_popped\ttotal_saved\n&quot;)&amp;#10;&amp;#10;# write yoking file headers&amp;#10;if (not isYokedParticipant):&amp;#10;    y.write(&quot;ID\tTrial\tBalloon_saved\tSuccess_time\n&quot;)&amp;#10;else:&amp;#10;    y.readline() # skip header line&amp;#10;    previousParticipantOutcomes = y.readlines()&amp;#10;    if len(previousParticipantOutcomes) != 30:&amp;#10;        print &quot;Error: Yoking file &quot; + yokeSourceFile + &quot; doesn't appear to have one line per trial.&quot;&amp;#10;        core.quit()&amp;#10;&amp;#10;# volume of aversive pop (gets changed to 0 in nonstressed condition)&amp;#10;popVolume = 1&amp;#10;" valType="extendedCode"/>
         <Param name="name" updates="None" val="code" valType="code"/>
-        <Param name="Begin Routine" updates="constant" val="# indicator variable to track if it's time to pop the balloon&amp;#10;timeToPop = 0&amp;#10;success = 0&amp;#10;startedTrial = 0&amp;#10;timeSinceSuccess = 0&amp;#10;&amp;#10;handPosition = (0, -.8)&amp;#10;currentBalloonSettings = balloonSettings.pop(0)&amp;#10;balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])&amp;#10;print str(currentTrial) + &quot;\t&quot; + str(balloonPosition)&amp;#10;balloonShift = (currentBalloonSettings[2], currentBalloonSettings[3])&amp;#10;zigs = currentBalloonSettings[4]&amp;#10;&amp;#10;if boringMode:&amp;#10;    handOpacity = 0&amp;#10;    popVolume = 0&amp;#10;else:&amp;#10;    handOpacity = 1&amp;#10;&amp;#10;if isYokedParticipant:&amp;#10;    trialInfo = previousParticipantOutcomes.pop(0).rstrip().split(&quot;\t&quot;)&amp;#10;    print &quot;Using this line from yoke source file: &quot; + &quot;\t&quot;.join(trialInfo)&amp;#10;    balloonToBeSaved = False&amp;#10;    if trialInfo[-2] == &quot;1&quot;:&amp;#10;        balloonToBeSaved = True&amp;#10;        safetySignalTime = float(trialInfo[-1])&amp;#10;&amp;#10;# log info&amp;#10;currentTrial += 1&amp;#10;totalKeyPresses = 0&amp;#10;totalValidKeyPresses = 0&amp;#10;justPoppedBalloon = 0&amp;#10;justSavedBalloon = 0&amp;#10;updateLog = 0&amp;#10;&amp;#10;if trialDebugMode:&amp;#10;    if currentTrial != debugTrial:&amp;#10;        print &quot;This trial is &quot; + str(currentTrial) + &quot;, debug trial is &quot; + str(debugTrial)&amp;#10;        continue&amp;#10;" valType="extendedCode"/>
+        <Param name="Begin Routine" updates="constant" val="# indicator variable to track if it's time to pop the balloon&amp;#10;timeToPop = 0&amp;#10;success = 0&amp;#10;startedTrial = 0&amp;#10;timeSinceSuccess = 0&amp;#10;&amp;#10;wand_position = (0, -.8)&amp;#10;currentBalloonSettings = balloonSettings.pop(0)&amp;#10;balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])&amp;#10;print str(currentTrial) + &quot;\t&quot; + str(balloonPosition)&amp;#10;balloonShift = (currentBalloonSettings[2], currentBalloonSettings[3])&amp;#10;zigs = currentBalloonSettings[4]&amp;#10;&amp;#10;if boringMode:&amp;#10;    wand_opacity = 0&amp;#10;    popVolume = 0&amp;#10;else:&amp;#10;    wand_opacity = 1&amp;#10;&amp;#10;if isYokedParticipant:&amp;#10;    trialInfo = previousParticipantOutcomes.pop(0).rstrip().split(&quot;\t&quot;)&amp;#10;    print &quot;Using this line from yoke source file: &quot; + &quot;\t&quot;.join(trialInfo)&amp;#10;    balloonToBeSaved = False&amp;#10;    if trialInfo[-2] == &quot;1&quot;:&amp;#10;        balloonToBeSaved = True&amp;#10;        safetySignalTime = float(trialInfo[-1])&amp;#10;&amp;#10;# log info&amp;#10;currentTrial += 1&amp;#10;totalKeyPresses = 0&amp;#10;totalValidKeyPresses = 0&amp;#10;justPoppedBalloon = 0&amp;#10;justSavedBalloon = 0&amp;#10;updateLog = 0&amp;#10;&amp;#10;if trialDebugMode:&amp;#10;    if currentTrial != debugTrial:&amp;#10;        print &quot;This trial is &quot; + str(currentTrial) + &quot;, debug trial is &quot; + str(debugTrial)&amp;#10;        continue&amp;#10;" valType="extendedCode"/>
         <Param name="End Routine" updates="constant" val="# to make clear that start of next routine in loop is not immediate victory&amp;#10;balloon.pos[1] = 0" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="f.close()&amp;#10;y.close()" valType="extendedCode"/>
-        <Param name="Each Frame" updates="constant" val="# initializing defaults for logs&amp;#10;keyJustPressed = '0'&amp;#10;validKeyPress = 'NA'&amp;#10;&amp;#10;&amp;#10;# moving hand when arrow keys are clicked during the main part of the trial&amp;#10;# in controllable stress condition, hand freezes when balloon is saved (success), but not in uncontrollable condition&amp;#10;if startedTrial and (not success or isYokedParticipant) and not timeToPop:&amp;#10;    if event.getKeys([right_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'right'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if handPosition[0] &lt; .8:&amp;#10;            handPosition = (handPosition[0] + .1, handPosition[1])&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    elif event.getKeys([left_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'left'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if handPosition[0] &gt; -.8:&amp;#10;            handPosition = (handPosition[0] - .1, handPosition[1])&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    elif event.getKeys([up_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'up'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if handPosition[1] &lt; .8:&amp;#10;            handPosition = (handPosition[0], handPosition[1] + .1)&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    elif event.getKeys([down_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'down'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if handPosition[1] &gt; -.8:&amp;#10;            handPosition = (handPosition[0], handPosition[1] - .1)&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    else:&amp;#10;        keyJustPressed = ''.join(event.getKeys())&amp;#10;        if keyJustPressed != '':&amp;#10;            updateLog = 1&amp;#10;            validKeyPress = '0'&amp;#10;            totalKeyPresses += 1&amp;#10;&amp;#10;&amp;#10;# moving the balloon during the main part of the trial&amp;#10;if (not success or isYokedParticipant) and not timeToPop and startedTrial:&amp;#10;    balloonPosition = (balloon.pos[0] + balloonShift[0], balloon.pos[1] + balloonShift[1]) # starting just off screen&amp;#10;    if len(zigs) &gt; 0:&amp;#10;        if abs(balloon.pos[0] - zigs[0]) &lt; .01:&amp;#10;            balloonShift = (-balloonShift[0], balloonShift[1])&amp;#10;            zigs.pop(0)&amp;#10;&amp;#10;# signaling when the main part of the trial has started&amp;#10;if t &gt; anticipatoryPeriod:&amp;#10;    startedTrial = 1&amp;#10;&amp;#10;&amp;#10;# testing if the hand has reached the balloon (for controllable stress condition) or if it's time for a yoked participant to be saved&amp;#10;xDist = abs(the_hand.pos[0] - balloon.pos[0])&amp;#10;yDist = abs(the_hand.pos[1] - balloon.pos[1])&amp;#10;&amp;#10;# if balloon reaches top, balloon will pop (so don't need the success component)&amp;#10;if balloon.pos[1] &gt; .9 and success == 0:&amp;#10;    success_background.status = FINISHED&amp;#10;    if timeToPop == 0:&amp;#10;        justPoppedBalloon = 1&amp;#10;        totalPopped += 1&amp;#10;        updateLog = 1&amp;#10;        if not isYokedParticipant:&amp;#10;            yokingParams = [id, str(currentTrial), &quot;0&quot;, &quot;NA&quot;] # 0 means balloon not saved (and saving time is NA)&amp;#10;            y.write(&quot;\t&quot;.join(yokingParams + [&quot;\n&quot;]))&amp;#10;    else:&amp;#10;        justPoppedBalloon = 0&amp;#10;    timeToPop = 1&amp;#10;elif ((t &gt; anticipatoryPeriod + .1 and xDist &lt; .05 and yDist &lt; .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t &gt;= safetySignalTime)):&amp;#10;    # note that you need the .1 second buffer so the hand is initialized before the test&amp;#10;    if success == 0:&amp;#10;        successClock.reset()&amp;#10;        justSavedBalloon = 1&amp;#10;        totalSaved += 1&amp;#10;        updateLog = 1&amp;#10;        if not isYokedParticipant:&amp;#10;            yokingParams = [id, str(currentTrial), str(justSavedBalloon), str(t)]&amp;#10;            y.write(&quot;\t&quot;.join(yokingParams + [&quot;\n&quot;]))&amp;#10;    else:&amp;#10;        justSavedBalloon = 0&amp;#10;    success = 1&amp;#10;    aversive_pop.status = FINISHED&amp;#10;&amp;#10;if (success):&amp;#10;    timeSinceSuccess = successClock.getTime()&amp;#10;&amp;#10;# logging&amp;#10;logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(balloon.pos[0]), str(balloon.pos[1]), &amp;#10;    str(the_hand.pos[0]), str(the_hand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), &amp;#10;    str(justPoppedBalloon), str(justSavedBalloon), str(totalPopped), str(totalSaved)]&amp;#10;&amp;#10;if updateLog == 1:&amp;#10;    f.write(&quot;\t&quot;.join(logInfo + [&quot;\n&quot;]))&amp;#10;    updateLog = 0" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="# initializing defaults for logs&amp;#10;keyJustPressed = '0'&amp;#10;validKeyPress = 'NA'&amp;#10;&amp;#10;&amp;#10;# moving wand when arrow keys are clicked during the main part of the trial&amp;#10;# in controllable stress condition, wand freezes when balloon is saved (success), but not in uncontrollable condition&amp;#10;if startedTrial and (not success or isYokedParticipant) and not timeToPop:&amp;#10;    if event.getKeys([right_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'right'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if wand_position[0] &lt; .8:&amp;#10;            wand_position = (wand_position[0] + .1, wand_position[1])&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    elif event.getKeys([left_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'left'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if wand_position[0] &gt; -.8:&amp;#10;            wand_position = (wand_position[0] - .1, wand_position[1])&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    elif event.getKeys([up_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'up'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if wand_position[1] &lt; .8:&amp;#10;            wand_position = (wand_position[0], wand_position[1] + .1)&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    elif event.getKeys([down_key]):&amp;#10;        updateLog = 1&amp;#10;        keyJustPressed = 'down'&amp;#10;        totalKeyPresses += 1&amp;#10;        validKeyPress = '0'&amp;#10;        if wand_position[1] &gt; -.8:&amp;#10;            wand_position = (wand_position[0], wand_position[1] - .1)&amp;#10;            validKeyPress = '1'&amp;#10;            totalValidKeyPresses += 1&amp;#10;    else:&amp;#10;        keyJustPressed = ''.join(event.getKeys())&amp;#10;        if keyJustPressed != '':&amp;#10;            updateLog = 1&amp;#10;            validKeyPress = '0'&amp;#10;            totalKeyPresses += 1&amp;#10;&amp;#10;&amp;#10;# moving the balloon during the main part of the trial&amp;#10;if (not success or isYokedParticipant) and not timeToPop and startedTrial:&amp;#10;    balloonPosition = (balloon.pos[0] + balloonShift[0], balloon.pos[1] + balloonShift[1]) # starting just off screen&amp;#10;    if len(zigs) &gt; 0:&amp;#10;        if abs(balloon.pos[0] - zigs[0]) &lt; .01:&amp;#10;            balloonShift = (-balloonShift[0], balloonShift[1])&amp;#10;            zigs.pop(0)&amp;#10;&amp;#10;# signaling when the main part of the trial has started&amp;#10;if t &gt; anticipatoryPeriod:&amp;#10;    startedTrial = 1&amp;#10;&amp;#10;&amp;#10;# testing if the wand has reached the balloon (for controllable stress condition) or if it's time for a yoked participant to be saved&amp;#10;xDist = abs(wand.pos[0] - balloon.pos[0])&amp;#10;yDist = abs(wand.pos[1] - balloon.pos[1])&amp;#10;&amp;#10;# if balloon reaches top, balloon will pop (so don't need the success component)&amp;#10;if balloon.pos[1] &gt; .9 and success == 0:&amp;#10;    success_background.status = FINISHED&amp;#10;    if timeToPop == 0:&amp;#10;        justPoppedBalloon = 1&amp;#10;        totalPopped += 1&amp;#10;        updateLog = 1&amp;#10;        if not isYokedParticipant:&amp;#10;            yokingParams = [id, str(currentTrial), &quot;0&quot;, &quot;NA&quot;] # 0 means balloon not saved (and saving time is NA)&amp;#10;            y.write(&quot;\t&quot;.join(yokingParams + [&quot;\n&quot;]))&amp;#10;    else:&amp;#10;        justPoppedBalloon = 0&amp;#10;    timeToPop = 1&amp;#10;elif ((t &gt; anticipatoryPeriod + .1 and xDist &lt; .05 and yDist &lt; .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t &gt;= safetySignalTime)):&amp;#10;    # note that you need the .1 second buffer so the wand is initialized before the test&amp;#10;    if success == 0:&amp;#10;        successClock.reset()&amp;#10;        justSavedBalloon = 1&amp;#10;        totalSaved += 1&amp;#10;        updateLog = 1&amp;#10;        if not isYokedParticipant:&amp;#10;            yokingParams = [id, str(currentTrial), str(justSavedBalloon), str(t)]&amp;#10;            y.write(&quot;\t&quot;.join(yokingParams + [&quot;\n&quot;]))&amp;#10;    else:&amp;#10;        justSavedBalloon = 0&amp;#10;    success = 1&amp;#10;    aversive_pop.status = FINISHED&amp;#10;&amp;#10;if (success):&amp;#10;    timeSinceSuccess = successClock.getTime()&amp;#10;&amp;#10;# logging&amp;#10;logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(balloon.pos[0]), str(balloon.pos[1]), &amp;#10;    str(wand.pos[0]), str(wand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), &amp;#10;    str(justPoppedBalloon), str(justSavedBalloon), str(totalPopped), str(totalSaved)]&amp;#10;&amp;#10;if updateLog == 1:&amp;#10;    f.write(&quot;\t&quot;.join(logInfo + [&quot;\n&quot;]))&amp;#10;    updateLog = 0" valType="extendedCode"/>
       </CodeComponent>
       <ImageComponent name="antic_background">
         <Param name="opacity" updates="constant" val="1" valType="code"/>
@@ -335,23 +338,23 @@
         <Param name="units" updates="None" val="norm" valType="str"/>
         <Param name="texture resolution" updates="constant" val="128" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="ori" updates="constant" val="45" valType="code"/>
         <Param name="stopType" updates="None" val="condition" valType="str"/>
         <Param name="startVal" updates="None" val="t&gt;=anticipatoryPeriod" valType="code"/>
-        <Param name="image" updates="constant" val="$media + &quot;Balloons.png&quot;" valType="str"/>
-        <Param name="size" updates="set every frame" val="(0.2, 0.2)" valType="code"/>
+        <Param name="image" updates="constant" val="$media + &quot;pink_balloon.png&quot;" valType="str"/>
+        <Param name="size" updates="set every frame" val="(0.25, 0.25)" valType="code"/>
       </ImageComponent>
-      <ImageComponent name="the_hand">
-        <Param name="opacity" updates="set every repeat" val="$handOpacity" valType="code"/>
+      <ImageComponent name="wand">
+        <Param name="opacity" updates="set every repeat" val="$wand_opacity" valType="code"/>
         <Param name="flipVert" updates="constant" val="False" valType="bool"/>
         <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
         <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
-        <Param name="name" updates="None" val="the_hand" valType="code"/>
+        <Param name="name" updates="None" val="wand" valType="code"/>
         <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
         <Param name="stopVal" updates="constant" val="timeToPop or t&gt;endTrialTime" valType="code"/>
         <Param name="durationEstim" updates="None" val="4" valType="code"/>
         <Param name="mask" updates="constant" val="None" valType="str"/>
-        <Param name="pos" updates="set every frame" val="handPosition" valType="code"/>
+        <Param name="pos" updates="set every frame" val="wand_position" valType="code"/>
         <Param name="interpolate" updates="constant" val="linear" valType="str"/>
         <Param name="startEstim" updates="None" val="" valType="code"/>
         <Param name="units" updates="None" val="norm" valType="str"/>
@@ -360,8 +363,8 @@
         <Param name="ori" updates="constant" val="0" valType="code"/>
         <Param name="stopType" updates="None" val="condition" valType="str"/>
         <Param name="startVal" updates="None" val="t&gt;=anticipatoryPeriod" valType="code"/>
-        <Param name="image" updates="constant" val="$media + &quot;hand.png&quot;" valType="str"/>
-        <Param name="size" updates="constant" val="(0.1, 0.1)" valType="code"/>
+        <Param name="image" updates="constant" val="$media + &quot;magic_wand.png&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(0.2, 0.2)" valType="code"/>
       </ImageComponent>
       <SoundComponent name="aversive_pop">
         <Param name="sound" updates="constant" val="$media + &quot;Balloon_Pop.wav&quot;" valType="str"/>
@@ -402,7 +405,7 @@
     <Routine name="initialize"/>
     <Routine name="game_instr"/>
     <Routine name="boring_instr"/>
-    <Routine name="hand_practice"/>
+    <Routine name="wand_practice"/>
     <Routine name="get_ready"/>
     <LoopInitiator loopType="TrialHandler" name="trials">
       <Param name="conditionsFile" updates="None" val="" valType="str"/>
