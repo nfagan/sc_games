@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy2 Experiment Builder (v1.84.2),
-    on Mon Jul  3 14:52:26 2017
+This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
+    on Mon Jul  3 17:02:07 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -37,7 +37,7 @@ filename = _thisDir + os.sep + "BalloonGame_%s" % expInfo['date']
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/Jeff/sc_magic/psyexp/BalloonGame.psyexp',
+    originPath=u'/Users/ecohodes/sc_magic/psyexp/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
