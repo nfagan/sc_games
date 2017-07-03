@@ -23,9 +23,9 @@ commands "which python" and "which pip". The output should show that Python/pip 
 	If you get warnings/errors during the brew step, you may have to follow homebrew's advice and run some
 	"force overwrite" link commmands.
 4. Run the following commands to install Python modules
-	pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
+	pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj
 	pip install pyserial pyparallel
-	(If either of these commands fail due to permissions errors, try re-running with sudo)
+	(If either of these commands fails due to permissions errors, try re-running with sudo.)
 5. LabJackPython (make sure link is still correct, should be listed on Psychopy page)
 	# cd into a good installation directory
 	git clone https://github.com/labjack/LabJackPython
@@ -36,9 +36,22 @@ commands "which python" and "which pip". The output should show that Python/pip 
 6. Labjack Exodriver
 	Download the Exodriver pre-built installer from here: https://labjack.com/support/software/installers/exodriver
 	Then, open the downloaded installer and follow instructions to install.
+7. Create a folder inside your home folder called "progs". (Or, use an existing folder where you store your local installtions). On the
+	command line, cd into that directory and run the following commands:
+		wget https://github.com/psychopy/psychopy/archive/1.85.2.tar.gz
+		tar -xzvf 1.85.2.tar.gz
+		cd psychopy-1.85.2
+		python setup.py install
+		[If the command fails due to a permissions error, retry with sudo.]
+
+	Note: Normally, you could simply install psychopy with pip along with its prerequisites, but the current version of
+	Psychopy is not yet available through pip, hence the manual install. When this changes, these instructions should be updated.
 
 Two More Things:
-The module should now be correctly installed, but you need to make sure that your Psychopy scripts use the correct audio driver (portaudio). If you build your scripts using the Builder interface of the Psychopy application, you need to change a setting in the application before generating your scripts. Go to Preferences (click the button with the screwdriver/wrench), and replace the contents of the audio driver field with the following: ['portaudio']
+The module should now be correctly installed. However, if you are building your own scripts using the Psychopy desktop application,
+you need to make sure that your Psychopy scripts use the correct audio driver (portaudio). Open your project's .psyexp file, go to
+Preferences (click the button with the screwdriver/wrench), and replace the contents of the audio driver field with the following:
+['portaudio']
 
 This is optional, but to stop the pointless "ApplePersistenceIgnoreState" message from appearing every time you run, execute the following command from the Terminal.
 	defaults write org.python.python ApplePersistenceIgnoreState NO
