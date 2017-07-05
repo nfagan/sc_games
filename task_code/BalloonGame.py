@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Mon Jul  3 17:02:07 2017
+    on Wed Jul  5 09:04:09 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -37,7 +37,7 @@ filename = _thisDir + os.sep + "BalloonGame_%s" % expInfo['date']
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/ecohodes/sc_magic/psyexp/BalloonGame.psyexp',
+    originPath=u'/Users/Jeff/sc_magic/psyexp/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -203,6 +203,12 @@ magic_wand = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
+time_left = visual.TextStim(win=win, name='time_left',
+    text=None,
+    font='Arial',
+    units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, ori=0, 
+    color='#053270', colorSpace='rgb', opacity=1,
+    depth=-2.0);
 
 # Initialize components for Routine "get_ready"
 get_readyClock = core.Clock()
@@ -223,7 +229,7 @@ balloonsClock = core.Clock()
 success = 0
 
 # time when trial ends (regardless of catching balloon)
-endTrialTime = anticipatoryPeriod + 4
+endTrialTime = anticipatoryPeriod + 4.5
 
 # will be used to keep track of time after halting balloon
 successClock = core.Clock()
@@ -332,7 +338,7 @@ success_background = visual.ImageStim(
     texRes=128, interpolate=True, depth=-3.0)
 balloon = visual.ImageStim(
     win=win, name='balloon',units='norm', 
-    image=media + "pink_balloon.png", mask=None,
+    image='sin', mask=None,
     ori=45, pos=[0,0], size=1.0,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
@@ -341,7 +347,7 @@ wand = visual.ImageStim(
     win=win, name='wand',units='norm', 
     image=media + "magic_wand.png", mask=None,
     ori=0, pos=[0,0], size=(0.2, 0.2),
-    color=[1,1,1], colorSpace='rgb', opacity=1.0,
+    color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-5.0)
 aversive_pop = sound.Sound(media + "Balloon_Pop.wav", secs=-1)
@@ -578,35 +584,54 @@ t = 0
 wand_practiceClock.reset()  # clock
 frameN = -1
 continueRoutine = True
+routineTimer.add(20.000000)
 # update component parameters for each repeat
 if trialDebugMode or boringMode:
     continueRoutine = False
-key_resp_15 = event.BuilderKeyResponse()
+
+practice_length = 20.0
+rounded_seconds_remaining = practice_length
+time_left.setText(str(int(rounded_seconds_remaining)))
+
 # keep track of which components have finished
-wand_practiceComponents = [magic_wand, key_resp_15]
+wand_practiceComponents = [magic_wand, time_left]
 for thisComponent in wand_practiceComponents:
     if hasattr(thisComponent, 'status'):
         thisComponent.status = NOT_STARTED
 
 # -------Start Routine "wand_practice"-------
-while continueRoutine:
+while continueRoutine and routineTimer.getTime() > 0:
     # get current time
     t = wand_practiceClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
     # moving wand when arrow keys are clicked during the main part of the trial
+    new_wand_position = wand_position
     if event.getKeys([right_key]):
         if wand_position[0] < .8:
-            wand_position = (wand_position[0] + .1, wand_position[1])
+            new_wand_position = (wand_position[0] + .1, wand_position[1])
     if event.getKeys([left_key]):
-        if wand_position[0] > -.8:
-            wand_position = (wand_position[0] - .1, wand_position[1])
+        if wand_position[0] > -.8: 
+            new_wand_position = (wand_position[0] - .1, wand_position[1])
     if event.getKeys([up_key]):
         if wand_position[1] < .8:
-            wand_position = (wand_position[0], wand_position[1] + .1)
+            new_wand_position = (wand_position[0], wand_position[1] + .1)
     if event.getKeys([down_key]):
         if wand_position[1] > -.8:
-            wand_position = (wand_position[0], wand_position[1] - .1)
+            new_wand_position = (wand_position[0], wand_position[1] - .1)
+    
+    # moving wand unless it would cover the counter
+    rounded_pos = (round(new_wand_position[0], 1), round(new_wand_position[1], 1))
+    if rounded_pos != (.9, -.8):   
+        wand_position = new_wand_position
+    
+    seconds_remaining = practice_length - t
+    if seconds_remaining < rounded_seconds_remaining - 1:
+        rounded_seconds_remaining -= 1
+        time_left.setText(str(int(rounded_seconds_remaining)))
+    
+    if event.getKeys("escape"):
+        continueRoutine=False
     
     # *magic_wand* updates
     if t >= 0 and magic_wand.status == NOT_STARTED:
@@ -620,22 +645,15 @@ while continueRoutine:
     if magic_wand.status == STARTED:  # only update if drawing
         magic_wand.setPos(wand_position, log=False)
     
-    # *key_resp_15* updates
-    if t >= 0.0 and key_resp_15.status == NOT_STARTED:
+    # *time_left* updates
+    if t >= 0.0 and time_left.status == NOT_STARTED:
         # keep track of start time/frame for later
-        key_resp_15.tStart = t
-        key_resp_15.frameNStart = frameN  # exact frame index
-        key_resp_15.status = STARTED
-        # keyboard checking is just starting
-        win.callOnFlip(key_resp_15.clock.reset)  # t=0 on next screen flip
-        event.clearEvents(eventType='keyboard')
-    if key_resp_15.status == STARTED:
-        theseKeys = event.getKeys(keyList=['space'])
-        if len(theseKeys) > 0:  # at least one key was pressed
-            key_resp_15.keys = theseKeys[-1]  # just the last key pressed
-            key_resp_15.rt = key_resp_15.clock.getTime()
-            # a response ends the routine
-            continueRoutine = False
+        time_left.tStart = t
+        time_left.frameNStart = frameN  # exact frame index
+        time_left.setAutoDraw(True)
+    frameRemains = 0.0 + 20- win.monitorFramePeriod * 0.75  # most of one frame period left
+    if time_left.status == STARTED and t >= frameRemains:
+        time_left.setAutoDraw(False)
     
     # check if all components have finished
     if not continueRoutine:  # a component has requested a forced-end of Routine
@@ -655,15 +673,6 @@ for thisComponent in wand_practiceComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
 
-# check responses
-if key_resp_15.keys in ['', [], None]:  # No response was made
-    key_resp_15.keys=None
-thisExp.addData('key_resp_15.keys',key_resp_15.keys)
-if key_resp_15.keys != None:  # we had a response
-    thisExp.addData('key_resp_15.rt', key_resp_15.rt)
-thisExp.nextEntry()
-# the Routine "wand_practice" was not non-slip safe, so reset the non-slip timer
-routineTimer.reset()
 
 # ------Prepare to start Routine "get_ready"-------
 t = 0
@@ -766,6 +775,7 @@ for thisTrial in trials:
     timeSinceSuccess = 0
     
     wand_position = (0, -.8)
+    balloonImage = media + "pink_balloon.png"
     currentBalloonSettings = balloonSettings.pop(0)
     balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])
     print str(currentTrial) + "\t" + str(balloonPosition)
@@ -773,10 +783,7 @@ for thisTrial in trials:
     zigs = currentBalloonSettings[4]
     
     if boringMode:
-        wand_opacity = 0
         popVolume = 0
-    else:
-        wand_opacity = 1
     
     if isYokedParticipant:
         trialInfo = previousParticipantOutcomes.pop(0).rstrip().split("\t")
@@ -801,7 +808,6 @@ for thisTrial in trials:
     
     antic_background.setImage(media + "Anticipatory_period_background.jpg")
     success_background.setImage(media + "Success_background.jpg")
-    wand.setOpacity(wand_opacity)
     aversive_pop.setVolume(popVolume)
     # keep track of which components have finished
     balloonsComponents = [antic_background, avoid_background, success_background, balloon, wand, aversive_pop, ITI]
@@ -885,17 +891,20 @@ for thisTrial in trials:
         yDist = abs(wand.pos[1] - balloon.pos[1])
         
         # if balloon reaches top, balloon will pop (so don't need the success component)
-        if balloon.pos[1] > .9 and success == 0:
+        if balloon.pos[1] > .85 and success == 0:
             success_background.status = FINISHED
             if timeToPop == 0:
                 justPoppedBalloon = 1
                 totalPopped += 1
+                balloonImage = media + "pop_1.png"
                 updateLog = 1
                 if not isYokedParticipant:
                     yokingParams = [id, str(currentTrial), "0", "NA"] # 0 means balloon not saved (and saving time is NA)
                     y.write("\t".join(yokingParams + ["\n"]))
             else:
                 justPoppedBalloon = 0
+                core.wait(.2)
+                balloonImage = media + "pop_2.png"
             timeToPop = 1
         elif ((t > anticipatoryPeriod + .1 and xDist < .05 and yDist < .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t >= safetySignalTime)):
             # note that you need the .1 second buffer so the wand is initialized before the test
@@ -958,10 +967,11 @@ for thisTrial in trials:
             balloon.tStart = t
             balloon.frameNStart = frameN  # exact frame index
             balloon.setAutoDraw(True)
-        if balloon.status == STARTED and bool(timeToPop or t>=endTrialTime):
+        if balloon.status == STARTED and bool(t>=endTrialTime):
             balloon.setAutoDraw(False)
         if balloon.status == STARTED:  # only update if drawing
             balloon.setPos(balloonPosition, log=False)
+            balloon.setImage(balloonImage, log=False)
             balloon.setSize((0.25, 0.25), log=False)
         
         # *wand* updates
