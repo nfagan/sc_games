@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Wed Jul  5 13:56:32 2017
+    on Mon Jul 17 23:46:20 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -206,15 +206,15 @@ wand_position = (0, 0)
 magic_wand = visual.ImageStim(
     win=win, name='magic_wand',units='pix', 
     image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(135, 115),
+    ori=0, pos=[0,0], size=(121, 103),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 time_left = visual.TextStim(win=win, name='time_left',
     text=None,
-    font='Arial',
+    font=u'Arial',
     units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, ori=0, 
-    color='#053270', colorSpace='rgb', opacity=1,
+    color=u'#053270', colorSpace='rgb', opacity=1,
     depth=-2.0);
 
 # Initialize components for Routine "get_ready"
@@ -242,59 +242,58 @@ endTrialTime = anticipatoryPeriod + 4.5
 successClock = core.Clock()
 
 # set balloon speed (x direction)
-xSpeed1 = .008
-xSpeed2 = .009
-xSpeed3 = .01
-xSpeed4 = -.008
-xSpeed5 = -.009
-xSpeed6 = -.01
+xSpeed1 = 3
+xSpeed2 = 4
+xSpeed3 = 5
+xSpeed4 = -3
+xSpeed5 = -4
+xSpeed6 = -5
 
 # set balloon speed (y direction)
-ySpeed1 = .01
-ySpeed2 = .01
-ySpeed3 = .01
+yStartPos = -screen_height/2
+ySpeed = 4
 
-
-# different balloon starting X/Y positions and per-frame X/Y movements
-balloonSettings = [(.4, -1, xSpeed6, ySpeed1, [-.8, .8, -.8, .8, -.8, .8, -.8]), 
-(.8, -1, xSpeed4, ySpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
-(-.7, -1, xSpeed2, ySpeed2, [0, -.5, .9, -.6, .7, -.5]), 
-(-.4, -1, xSpeed2, ySpeed2, [.8, -.8, .8, -.8, 0, -.5]),
-(-.6, -1, xSpeed2, ySpeed3, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
-(.7, -1, xSpeed4, ySpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
-(.1,-1, xSpeed2,ySpeed3, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
-(-.3, -1, xSpeed2, ySpeed2, [0, -.8, .6, -.8, .6]),     
-(.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),
-(-.8, -1, xSpeed1, ySpeed1, [-.3, -.7, -.2, -.8, -.1]), 
-(.4, -1, xSpeed4, ySpeed2, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
-(.5, -1, xSpeed6, ySpeed2, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(.5, -1, xSpeed4, ySpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
-(-.6, -1, xSpeed3, ySpeed1, [0, -.5, .9, -.7, .7, -.6]),     
-(-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15
-(-.5, -1, xSpeed3, ySpeed1, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
-(.3, -1, xSpeed5, ySpeed3, [0, .7, -.2, .3, -.6, .7, -.8]),     
-(.2,-1, xSpeed3,ySpeed1, [.4, .2, .8, .1, .8, .4, .6]),
-(-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     
-(-.5, -1, xSpeed1, ySpeed2, [-.1, -.2, .2, -.4, .4,-.7]), 
-(.8, -1, xSpeed4, ySpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
-(-.7, -1, xSpeed2, ySpeed2, [0, -.5, .9, -.6, .7, -.5]), 
-(-.4, -1, xSpeed2, ySpeed2, [.8, -.8, .8, -.8, 0, -.5]),
-(-.6, -1, xSpeed2, ySpeed3, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
-(.7, -1, xSpeed4, ySpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
-(.5,-1, xSpeed2,ySpeed3, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
-(-.8, -1, xSpeed1, ySpeed1, [-.3, -.7, -.2, -.8, -.1]), 
-(.4, -1, xSpeed4, ySpeed2, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
-(.8, -1, xSpeed6, ySpeed2, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(.5, -1, xSpeed4, ySpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
-(-.6, -1, xSpeed3, ySpeed1, [0, -.5, .9, -.7, .7, -.6]), 
-(-.2, -1, xSpeed1, ySpeed2, [0, -.2, .2, -.4, .4,-.7]),     
-(-.5, -1, xSpeed3, ySpeed1, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
-(-.3, -1, xSpeed2, ySpeed2, [0, -.8, .6, -.8, .6]),  
-(.2, -1, xSpeed5, ySpeed3, [0, .7, -.2, .3, -.6, .7, -.8]),     
-(.2,-1, xSpeed3,ySpeed1, [.4, .2, .8, .1, .8, .4, .6]),
-(.9, -1, xSpeed6, ySpeed2, [0, .9, .3, .5, -.2,.8]),
-(-.9, -1, xSpeed2, ySpeed3, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), 
-(-.3,-1, xSpeed2, ySpeed1, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
+# different balloon starting X/Y positions and per-frame X/Y movements (in "norm" coordinates)
+balloonSettings = [
+(int(.4 * screen_width/2), yStartPos, xSpeed6, ySpeed, [-.8, .8, -.8, .8, -.8, .8, -.8]), 
+(int(.8 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .7, -.2, .3, -.7, .7, -.8]),
+(int(-.7 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.5, .9, -.6, .7, -.5]), 
+(int(-.4 * screen_width/2), yStartPos, xSpeed2, ySpeed, [.8, -.8, .8, -.8, 0, -.5]),
+(int(-.6 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
+(int(.7 * screen_width/2), yStartPos, xSpeed4, ySpeed, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
+(int(.1 * screen_width/2), yStartPos, xSpeed2,ySpeed, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
+(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.8, .6, -.8, .6]),     
+(int(.9 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .9, .3, .5, -.2,.8]),
+(int(-.8 * screen_width/2), yStartPos, xSpeed1, ySpeed, [-.3, -.7, -.2, -.8, -.1]), 
+(int(.4 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
+(int(.5 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
+(int(.5 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
+(int(-.6 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.5, .9, -.7, .7, -.6]),     
+(int(-.9 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15
+(int(-.5 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
+(int(.3 * screen_width/2), yStartPos, xSpeed5, ySpeed, [0, .7, -.2, .3, -.6, .7, -.8]),     
+(int(.2 * screen_width/2), yStartPos, xSpeed3,ySpeed, [.4, .2, .8, .1, .8, .4, .6]),
+(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     
+(int(-.5 * screen_width/2), yStartPos, xSpeed1, ySpeed, [-.1, -.2, .2, -.4, .4,-.7]), 
+(int(.8 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .7, -.2, .3, -.7, .7, -.8]),
+(int(-.7 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.5, .9, -.6, .7, -.5]), 
+(int(-.4 * screen_width/2), yStartPos, xSpeed2, ySpeed, [.8, -.8, .8, -.8, 0, -.5]),
+(int(-.6 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
+(int(.7 * screen_width/2), yStartPos, xSpeed4, ySpeed, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
+(int(.5 * screen_width/2), yStartPos, xSpeed2,ySpeed, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
+(int(-.8 * screen_width/2), yStartPos, xSpeed1, ySpeed, [-.3, -.7, -.2, -.8, -.1]), 
+(int(.4 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
+(int(.8 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
+(int(.5 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
+(int(-.6 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.5, .9, -.7, .7, -.6]), 
+(int(-.2 * screen_width/2), yStartPos, xSpeed1, ySpeed, [0, -.2, .2, -.4, .4,-.7]),     
+(int(-.5 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
+(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.8, .6, -.8, .6]),  
+(int(.2 * screen_width/2), yStartPos, xSpeed5, ySpeed, [0, .7, -.2, .3, -.6, .7, -.8]),     
+(int(.2 * screen_width/2), yStartPos, xSpeed3,ySpeed, [.4, .2, .8, .1, .8, .4, .6]),
+(int(.9 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .9, .3, .5, -.2,.8]),
+(int(-.9 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), 
+(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
 
 # log info
 currentTrial = 0
@@ -322,6 +321,8 @@ else:
 # volume of aversive pop (gets changed to 0 in nonstressed condition)
 popVolume = 1
 
+
+
 antic_background = visual.ImageStim(
     win=win, name='antic_background',units='pix', 
     image='sin', mask=None,
@@ -336,27 +337,20 @@ avoid_background = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
-success_background = visual.ImageStim(
-    win=win, name='success_background',units='pix', 
-    image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(screen_width, screen_height),
-    color=[1,1,1], colorSpace='rgb', opacity=1,
-    flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-3.0)
 balloon = visual.ImageStim(
     win=win, name='balloon',units='pix', 
     image='sin', mask=None,
     ori=45, pos=[0,0], size=1.0,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-4.0)
+    texRes=128, interpolate=True, depth=-3.0)
 wand = visual.ImageStim(
     win=win, name='wand',units='pix', 
     image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(147, 125),
+    ori=0, pos=[0,0], size=(121, 103),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-5.0)
+    texRes=128, interpolate=True, depth=-4.0)
 aversive_pop = sound.Sound(media + "Balloon_Pop.wav", secs=-1)
 aversive_pop.setVolume(1.0)
 ITI = visual.ImageStim(
@@ -365,7 +359,22 @@ ITI = visual.ImageStim(
     ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-7.0)
+    texRes=128, interpolate=True, depth=-6.0)
+counter = visual.TextStim(win=win, name='counter',
+    text=None,
+    font=u'Arial',
+    units='norm', pos=(.8, -.95), height=0.075, wrapWidth=None, ori=0, 
+    color=u'#d63b3b', colorSpace='rgb', opacity=1,
+    depth=-7.0);
+magic = visual.ImageStim(
+    win=win, name='magic',units='pix', 
+    image=media + "magic-effect.png", mask=None,
+    ori=0, pos=[0,0], size=(200, 200),
+    color=[1,1,1], colorSpace='rgb', opacity=.75,
+    flipHoriz=False, flipVert=False,
+    texRes=128, interpolate=True, depth=-8.0)
+magic_sound = sound.Sound(media + "magic-sound-trimmed.wav", secs=-1)
+magic_sound.setVolume(.75)
 
 # Initialize components for Routine "thanks"
 thanksClock = core.Clock()
@@ -612,7 +621,7 @@ while continueRoutine and routineTimer.getTime() > 0:
     t = wand_practiceClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    # moving wand when arrow keys are clicked during the main part of the trial
+    # moving wand when arrow keys are clicked
     new_wand_position = wand_position
     if event.getKeys([right_key]):
         if wand_position[0] + wand.size[0]/2 + wand_step_size < screen_width/2:
@@ -627,12 +636,8 @@ while continueRoutine and routineTimer.getTime() > 0:
         if wand_position[1] - wand.size[1]/2 - wand_step_size > -1 * screen_height/2:
             new_wand_position = (wand_position[0], wand_position[1] - wand_step_size)
     
-    # moving wand unless it would cover the counter
-    #rounded_pos = (round(new_wand_position[0], 1), round(new_wand_position[1], 1))
-    #if rounded_pos != (.9, -.8):   
     if wand_position != new_wand_position:
         wand_position = new_wand_position
-        print wand_position
     
     seconds_remaining = practice_length - t
     if seconds_remaining < rounded_seconds_remaining - 1:
@@ -783,7 +788,7 @@ for thisTrial in trials:
     startedTrial = 0
     timeSinceSuccess = 0
     
-    wand_position = (0, -.8)
+    wand_position = (0, -.8 * screen_height/2)
     balloonImage = media + "pink_balloon.png"
     currentBalloonSettings = balloonSettings.pop(0)
     balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])
@@ -800,7 +805,6 @@ for thisTrial in trials:
         balloonToBeSaved = False
         if trialInfo[-2] == "1":
             balloonToBeSaved = True
-            safetySignalTime = float(trialInfo[-1])
     
     # log info
     currentTrial += 1
@@ -810,16 +814,17 @@ for thisTrial in trials:
     justSavedBalloon = 0
     updateLog = 0
     
+    counter.setText("Spells cast: %d" % totalSaved)
+    
     if trialDebugMode:
         if currentTrial != debugTrial:
             print "This trial is " + str(currentTrial) + ", debug trial is " + str(debugTrial)
             continue
     
     antic_background.setImage(media + "Anticipatory_period_background.jpg")
-    success_background.setImage(media + "Success_background.jpg")
     aversive_pop.setVolume(popVolume)
     # keep track of which components have finished
-    balloonsComponents = [antic_background, avoid_background, success_background, balloon, wand, aversive_pop, ITI]
+    balloonsComponents = [antic_background, avoid_background, balloon, wand, aversive_pop, ITI, counter, magic, magic_sound]
     for thisComponent in balloonsComponents:
         if hasattr(thisComponent, 'status'):
             thisComponent.status = NOT_STARTED
@@ -837,13 +842,14 @@ for thisTrial in trials:
         
         # moving wand when arrow keys are clicked during the main part of the trial
         if startedTrial:
+            new_wand_position = wand_position
             if event.getKeys([right_key]):
                 updateLog = 1
                 keyJustPressed = 'right'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[0] < .8:
-                    wand_position = (wand_position[0] + wand_step_size, wand_position[1])
+                if wand_position[0] + wand.size[0]/2 + wand_step_size < screen_width/2:
+                    new_wand_position = (wand_position[0] + wand_step_size, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([left_key]):
@@ -851,8 +857,8 @@ for thisTrial in trials:
                 keyJustPressed = 'left'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[0] > -.8:
-                    wand_position = (wand_position[0] - wand_step_size, wand_position[1])
+                if wand_position[0] - wand.size[0]/2 - wand_step_size > -screen_width/2: 
+                    new_wand_position = (wand_position[0] - wand_step_size, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([up_key]):
@@ -860,8 +866,8 @@ for thisTrial in trials:
                 keyJustPressed = 'up'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[1] < .8:
-                    wand_position = (wand_position[0], wand_position[1] + wand_step_size)
+                if wand_position[1] + wand.size[1]/2 + wand_step_size < screen_height/2:
+                    new_wand_position = (wand_position[0], wand_position[1] + wand_step_size)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([down_key]):
@@ -869,8 +875,8 @@ for thisTrial in trials:
                 keyJustPressed = 'down'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[1] > -.8:
-                    wand_position = (wand_position[0], wand_position[1] - wand_step_size)
+                if wand_position[1] - wand.size[1]/2 - wand_step_size > -screen_height/2:
+                    new_wand_position = (wand_position[0], wand_position[1] - wand_step_size)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             else:
@@ -879,6 +885,8 @@ for thisTrial in trials:
                     updateLog = 1
                     validKeyPress = '0'
                     totalKeyPresses += 1
+            if wand_position != new_wand_position:
+                wand_position = new_wand_position
         
         
         # moving the balloon during the main part of the trial
@@ -893,29 +901,29 @@ for thisTrial in trials:
         if t > anticipatoryPeriod:
             startedTrial = 1
         
-        
         # testing if the wand has reached the balloon
         xDist = abs(wand.pos[0] + wand.size[0]/2 - (balloon.pos[0] - balloon.size[0]/4))
         yDist = abs(wand.pos[1] + wand.size[1]/2 - (balloon.pos[1] + balloon.size[1]/2))
         
-        # if balloon reaches top, balloon will pop (so don't need the success component)
-        if balloon.pos[1] > .85 and success == 0:
-            success_background.status = FINISHED
+        # if balloon reaches top, balloon will pop
+        if balloon.pos[1] > .85 * screen_height/2 and success == 0:
             if timeToPop == 0:
                 justPoppedBalloon = 1
                 totalPopped += 1
                 balloonImage = media + "pop_1.png"
                 updateLog = 1
+                magic_sound.status = FINISHED
+                magic.status = FINISHED
                 if not isYokedParticipant:
-                    yokingParams = [id, str(currentTrial), "0", "NA"] # 0 means balloon not saved (and saving time is NA)
+                    yokingParams = [id, str(currentTrial), "0", "NA"] # 0 means balloon not touched (and touching time is NA)
                     y.write("\t".join(yokingParams + ["\n"]))
             else:
                 justPoppedBalloon = 0
                 core.wait(.2)
                 balloonImage = media + "pop_2.png"
             timeToPop = 1
-        elif ((t > anticipatoryPeriod + .2 and xDist < .05 and yDist < .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t >= safetySignalTime)):
-            # note that you need the .2 second buffer to guarantee initialized before the test
+        elif (t > anticipatoryPeriod + .2 and xDist < 75 and yDist < 75):
+            # note that you need the .2 second buffer to guarantee objects are initialized before the test
             if success == 0:
                 successClock.reset()
                 justSavedBalloon = 1
@@ -924,10 +932,11 @@ for thisTrial in trials:
                 if not isYokedParticipant:
                     yokingParams = [id, str(currentTrial), str(justSavedBalloon), str(t)]
                     y.write("\t".join(yokingParams + ["\n"]))
+                counter.setText("Spells cast: %d" % totalSaved)
             else:
                 justSavedBalloon = 0
             success = 1
-            aversive_pop.status = FINISHED
+            if not isYokedParticipant: aversive_pop.status = FINISHED
         
         if (success):
             timeSinceSuccess = successClock.getTime()
@@ -957,17 +966,8 @@ for thisTrial in trials:
             avoid_background.tStart = t
             avoid_background.frameNStart = frameN  # exact frame index
             avoid_background.setAutoDraw(True)
-        if avoid_background.status == STARTED and bool(success==1 or t>=endTrialTime):
+        if avoid_background.status == STARTED and bool(t>=endTrialTime):
             avoid_background.setAutoDraw(False)
-        
-        # *success_background* updates
-        if (success==1) and success_background.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            success_background.tStart = t
-            success_background.frameNStart = frameN  # exact frame index
-            success_background.setAutoDraw(True)
-        if success_background.status == STARTED and bool(t>=endTrialTime):
-            success_background.setAutoDraw(False)
         
         # *balloon* updates
         if t >= t>=anticipatoryPeriod and balloon.status == NOT_STARTED:
@@ -980,7 +980,7 @@ for thisTrial in trials:
         if balloon.status == STARTED:  # only update if drawing
             balloon.setPos(balloonPosition, log=False)
             balloon.setImage(balloonImage, log=False)
-            balloon.setSize((200, 250), log=False)
+            balloon.setSize((150, 187), log=False)
         
         # *wand* updates
         if t >= t>=anticipatoryPeriod and wand.status == NOT_STARTED:
@@ -1008,6 +1008,32 @@ for thisTrial in trials:
         if ITI.status == STARTED and t >= (ITI.tStart + itiLength):
             ITI.setAutoDraw(False)
         
+        # *counter* updates
+        if t >= 0.0 and counter.status == NOT_STARTED:
+            # keep track of start time/frame for later
+            counter.tStart = t
+            counter.frameNStart = frameN  # exact frame index
+            counter.setAutoDraw(True)
+        if counter.status == STARTED and bool(t >= endTrialTime):
+            counter.setAutoDraw(False)
+        
+        # *magic* updates
+        if (justSavedBalloon == 1) and magic.status == NOT_STARTED:
+            # keep track of start time/frame for later
+            magic.tStart = t
+            magic.frameNStart = frameN  # exact frame index
+            magic.setAutoDraw(True)
+        if magic.status == STARTED and t >= (magic.tStart + 1.5):
+            magic.setAutoDraw(False)
+        if magic.status == STARTED:  # only update if drawing
+            magic.setPos((balloon.pos[0], balloon.pos[1] + 50), log=False)
+        # start/stop magic_sound
+        if t >= justSavedBalloon == 1 and magic_sound.status == NOT_STARTED:
+            # keep track of start time/frame for later
+            magic_sound.tStart = t
+            magic_sound.frameNStart = frameN  # exact frame index
+            magic_sound.play()  # start the sound (it finishes automatically)
+        
         # check if all components have finished
         if not continueRoutine:  # a component has requested a forced-end of Routine
             break
@@ -1028,6 +1054,7 @@ for thisTrial in trials:
     # to make clear that start of next routine in loop is not immediate victory
     balloon.pos[1] = 0
     aversive_pop.stop()  # ensure sound has stopped at end of routine
+    magic_sound.stop()  # ensure sound has stopped at end of routine
     # the Routine "balloons" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     thisExp.nextEntry()
