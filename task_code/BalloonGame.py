@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Wed Jul  5 09:04:09 2017
+    on Wed Jul  5 13:56:32 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -156,6 +156,13 @@ anticipatoryPeriod = 4
 # length of time between trials (for MRI synching)
 itiLength = 10
 
+# distance wand moves per step (in pixels)
+wand_step_size = 120
+
+# screen size (these values just reflect what is already set by Psychopy)
+screen_width = 1440
+screen_height = 900
+
 # allowing a mode for debugging specific trials
 trialDebugMode = False
 debugTrial = 0
@@ -174,9 +181,9 @@ if id == "test":
 game_instrClock = core.Clock()
 
 slides = visual.ImageStim(
-    win=win, name='slides',units='norm', 
+    win=win, name='slides',units='pix', 
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(2, 2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
@@ -185,9 +192,9 @@ slides = visual.ImageStim(
 boring_instrClock = core.Clock()
 
 instruction = visual.ImageStim(
-    win=win, name='instruction',units='norm', 
+    win=win, name='instruction',units='pix', 
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(2, 2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
@@ -197,9 +204,9 @@ wand_practiceClock = core.Clock()
 wand_position = (0, 0)
 
 magic_wand = visual.ImageStim(
-    win=win, name='magic_wand',units='norm', 
+    win=win, name='magic_wand',units='pix', 
     image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(0.2, 0.2),
+    ori=0, pos=[0,0], size=(135, 115),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
@@ -213,9 +220,9 @@ time_left = visual.TextStim(win=win, name='time_left',
 # Initialize components for Routine "get_ready"
 get_readyClock = core.Clock()
 InstructSlide14 = visual.ImageStim(
-    win=win, name='InstructSlide14',
+    win=win, name='InstructSlide14',units='pix', 
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(2,2),
+    ori=0, pos=(0, 0), size=(screen_width,screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=0.0)
@@ -316,46 +323,46 @@ else:
 popVolume = 1
 
 antic_background = visual.ImageStim(
-    win=win, name='antic_background',units='norm', 
+    win=win, name='antic_background',units='pix', 
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(2,2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 avoid_background = visual.ImageStim(
-    win=win, name='avoid_background',units='norm', 
+    win=win, name='avoid_background',units='pix', 
     image=media + "Avoidance_period_background.jpg", mask=None,
-    ori=0, pos=(0, 0), size=(2, 2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
 success_background = visual.ImageStim(
-    win=win, name='success_background',units='norm', 
+    win=win, name='success_background',units='pix', 
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(2, 2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-3.0)
 balloon = visual.ImageStim(
-    win=win, name='balloon',units='norm', 
+    win=win, name='balloon',units='pix', 
     image='sin', mask=None,
     ori=45, pos=[0,0], size=1.0,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-4.0)
 wand = visual.ImageStim(
-    win=win, name='wand',units='norm', 
+    win=win, name='wand',units='pix', 
     image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(0.2, 0.2),
+    ori=0, pos=[0,0], size=(147, 125),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-5.0)
 aversive_pop = sound.Sound(media + "Balloon_Pop.wav", secs=-1)
 aversive_pop.setVolume(1.0)
 ITI = visual.ImageStim(
-    win=win, name='ITI',units='norm', 
+    win=win, name='ITI',units='pix', 
     image=media + "iti_background.jpg", mask=None,
-    ori=0, pos=(0, 0), size=(2, 2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-7.0)
@@ -363,9 +370,9 @@ ITI = visual.ImageStim(
 # Initialize components for Routine "thanks"
 thanksClock = core.Clock()
 Thankyo = visual.ImageStim(
-    win=win, name='Thankyo',
+    win=win, name='Thankyo',units='pix', 
     image=instructionSlides + "Slide19.jpg", mask=None,
-    ori=0, pos=(0, 0), size=(2,2),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=0.0)
@@ -608,22 +615,24 @@ while continueRoutine and routineTimer.getTime() > 0:
     # moving wand when arrow keys are clicked during the main part of the trial
     new_wand_position = wand_position
     if event.getKeys([right_key]):
-        if wand_position[0] < .8:
-            new_wand_position = (wand_position[0] + .1, wand_position[1])
+        if wand_position[0] + wand.size[0]/2 + wand_step_size < screen_width/2:
+            new_wand_position = (wand_position[0] + wand_step_size, wand_position[1])
     if event.getKeys([left_key]):
-        if wand_position[0] > -.8: 
-            new_wand_position = (wand_position[0] - .1, wand_position[1])
+        if wand_position[0] - wand.size[0]/2 - wand_step_size > -1 * screen_width/2: 
+            new_wand_position = (wand_position[0] - wand_step_size, wand_position[1])
     if event.getKeys([up_key]):
-        if wand_position[1] < .8:
-            new_wand_position = (wand_position[0], wand_position[1] + .1)
+        if wand_position[1] + wand.size[1]/2 + wand_step_size < screen_height/2:
+            new_wand_position = (wand_position[0], wand_position[1] + wand_step_size)
     if event.getKeys([down_key]):
-        if wand_position[1] > -.8:
-            new_wand_position = (wand_position[0], wand_position[1] - .1)
+        if wand_position[1] - wand.size[1]/2 - wand_step_size > -1 * screen_height/2:
+            new_wand_position = (wand_position[0], wand_position[1] - wand_step_size)
     
     # moving wand unless it would cover the counter
-    rounded_pos = (round(new_wand_position[0], 1), round(new_wand_position[1], 1))
-    if rounded_pos != (.9, -.8):   
+    #rounded_pos = (round(new_wand_position[0], 1), round(new_wand_position[1], 1))
+    #if rounded_pos != (.9, -.8):   
+    if wand_position != new_wand_position:
         wand_position = new_wand_position
+        print wand_position
     
     seconds_remaining = practice_length - t
     if seconds_remaining < rounded_seconds_remaining - 1:
@@ -827,15 +836,14 @@ for thisTrial in trials:
         
         
         # moving wand when arrow keys are clicked during the main part of the trial
-        # in controllable stress condition, wand freezes when balloon is saved (success), but not in uncontrollable condition
-        if startedTrial and (not success or isYokedParticipant) and not timeToPop:
+        if startedTrial:
             if event.getKeys([right_key]):
                 updateLog = 1
                 keyJustPressed = 'right'
                 totalKeyPresses += 1
                 validKeyPress = '0'
                 if wand_position[0] < .8:
-                    wand_position = (wand_position[0] + .1, wand_position[1])
+                    wand_position = (wand_position[0] + wand_step_size, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([left_key]):
@@ -844,7 +852,7 @@ for thisTrial in trials:
                 totalKeyPresses += 1
                 validKeyPress = '0'
                 if wand_position[0] > -.8:
-                    wand_position = (wand_position[0] - .1, wand_position[1])
+                    wand_position = (wand_position[0] - wand_step_size, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([up_key]):
@@ -853,7 +861,7 @@ for thisTrial in trials:
                 totalKeyPresses += 1
                 validKeyPress = '0'
                 if wand_position[1] < .8:
-                    wand_position = (wand_position[0], wand_position[1] + .1)
+                    wand_position = (wand_position[0], wand_position[1] + wand_step_size)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             elif event.getKeys([down_key]):
@@ -862,7 +870,7 @@ for thisTrial in trials:
                 totalKeyPresses += 1
                 validKeyPress = '0'
                 if wand_position[1] > -.8:
-                    wand_position = (wand_position[0], wand_position[1] - .1)
+                    wand_position = (wand_position[0], wand_position[1] - wand_step_size)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
             else:
@@ -874,7 +882,7 @@ for thisTrial in trials:
         
         
         # moving the balloon during the main part of the trial
-        if (not success or isYokedParticipant) and not timeToPop and startedTrial:
+        if not timeToPop and startedTrial:
             balloonPosition = (balloon.pos[0] + balloonShift[0], balloon.pos[1] + balloonShift[1]) # starting just off screen
             if len(zigs) > 0:
                 if abs(balloon.pos[0] - zigs[0]) < .01:
@@ -886,9 +894,9 @@ for thisTrial in trials:
             startedTrial = 1
         
         
-        # testing if the wand has reached the balloon (for controllable stress condition) or if it's time for a yoked participant to be saved
-        xDist = abs(wand.pos[0] - balloon.pos[0])
-        yDist = abs(wand.pos[1] - balloon.pos[1])
+        # testing if the wand has reached the balloon
+        xDist = abs(wand.pos[0] + wand.size[0]/2 - (balloon.pos[0] - balloon.size[0]/4))
+        yDist = abs(wand.pos[1] + wand.size[1]/2 - (balloon.pos[1] + balloon.size[1]/2))
         
         # if balloon reaches top, balloon will pop (so don't need the success component)
         if balloon.pos[1] > .85 and success == 0:
@@ -906,8 +914,8 @@ for thisTrial in trials:
                 core.wait(.2)
                 balloonImage = media + "pop_2.png"
             timeToPop = 1
-        elif ((t > anticipatoryPeriod + .1 and xDist < .05 and yDist < .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t >= safetySignalTime)):
-            # note that you need the .1 second buffer so the wand is initialized before the test
+        elif ((t > anticipatoryPeriod + .2 and xDist < .05 and yDist < .05 and not isYokedParticipant) or (isYokedParticipant and balloonToBeSaved and t >= safetySignalTime)):
+            # note that you need the .2 second buffer to guarantee initialized before the test
             if success == 0:
                 successClock.reset()
                 justSavedBalloon = 1
@@ -972,7 +980,7 @@ for thisTrial in trials:
         if balloon.status == STARTED:  # only update if drawing
             balloon.setPos(balloonPosition, log=False)
             balloon.setImage(balloonImage, log=False)
-            balloon.setSize((0.25, 0.25), log=False)
+            balloon.setSize((200, 250), log=False)
         
         # *wand* updates
         if t >= t>=anticipatoryPeriod and wand.status == NOT_STARTED:
