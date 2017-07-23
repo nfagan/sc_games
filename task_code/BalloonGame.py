@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Mon Jul 17 23:46:20 2017
+    on Sun Jul 23 14:16:26 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -85,10 +85,10 @@ version = options.version
 button_box_mode = options.button_box_mode
 
 if button_box_mode:
-    right_key = "1"
-    down_key = "2"
-    left_key = "3"
-    up_key = "4"
+    down_key = "1" # green
+    left_key = "2" # red
+    up_key = "3" # blue
+    right_key = "4" # yellow
 else:
     right_key = "right"
     down_key = "down"
@@ -212,9 +212,9 @@ magic_wand = visual.ImageStim(
     texRes=128, interpolate=True, depth=-1.0)
 time_left = visual.TextStim(win=win, name='time_left',
     text=None,
-    font=u'Arial',
+    font='Arial',
     units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, ori=0, 
-    color=u'#053270', colorSpace='rgb', opacity=1,
+    color='#053270', colorSpace='rgb', opacity=1,
     depth=-2.0);
 
 # Initialize components for Routine "get_ready"
@@ -362,9 +362,9 @@ ITI = visual.ImageStim(
     texRes=128, interpolate=True, depth=-6.0)
 counter = visual.TextStim(win=win, name='counter',
     text=None,
-    font=u'Arial',
+    font='Arial',
     units='norm', pos=(.8, -.95), height=0.075, wrapWidth=None, ori=0, 
-    color=u'#d63b3b', colorSpace='rgb', opacity=1,
+    color='#d63b3b', colorSpace='rgb', opacity=1,
     depth=-7.0);
 magic = visual.ImageStim(
     win=win, name='magic',units='pix', 
