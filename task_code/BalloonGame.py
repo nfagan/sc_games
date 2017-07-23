@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sun Jul 23 14:16:26 2017
+    on Sun Jul 23 16:17:40 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -157,7 +157,7 @@ anticipatoryPeriod = 4
 itiLength = 10
 
 # distance wand moves per step (in pixels)
-wand_step_size = 120
+wand_step_size = 80
 
 # screen size (these values just reflect what is already set by Psychopy)
 screen_width = 1440
@@ -206,15 +206,15 @@ wand_position = (0, 0)
 magic_wand = visual.ImageStim(
     win=win, name='magic_wand',units='pix', 
     image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(121, 103),
+    ori=0, pos=[0,0], size=(80, 70),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 time_left = visual.TextStim(win=win, name='time_left',
     text=None,
-    font='Arial',
+    font=u'Arial',
     units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, ori=0, 
-    color='#053270', colorSpace='rgb', opacity=1,
+    color=u'#053270', colorSpace='rgb', opacity=1,
     depth=-2.0);
 
 # Initialize components for Routine "get_ready"
@@ -241,59 +241,58 @@ endTrialTime = anticipatoryPeriod + 4.5
 # will be used to keep track of time after halting balloon
 successClock = core.Clock()
 
-# set balloon speed (x direction)
-xSpeed1 = 3
-xSpeed2 = 4
-xSpeed3 = 5
-xSpeed4 = -3
-xSpeed5 = -4
-xSpeed6 = -5
+# set x-axis balloon speed (pixels per frame)
+xSpeed1 = 4
+xSpeed2 = 5
+xSpeed3 = 6
 
-# set balloon speed (y direction)
-yStartPos = -screen_height/2
-ySpeed = 4
+# Balloon's y-axis start position and y-axis speed are always the same
+yStartPos = -screen_height/2 
+ySpeed = 5
 
-# different balloon starting X/Y positions and per-frame X/Y movements (in "norm" coordinates)
+
+
+# Each trial, the balloon has different starting x-position, x-speed, and a different zigzag pattern
 balloonSettings = [
-(int(.4 * screen_width/2), yStartPos, xSpeed6, ySpeed, [-.8, .8, -.8, .8, -.8, .8, -.8]), 
-(int(.8 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .7, -.2, .3, -.7, .7, -.8]),
-(int(-.7 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.5, .9, -.6, .7, -.5]), 
-(int(-.4 * screen_width/2), yStartPos, xSpeed2, ySpeed, [.8, -.8, .8, -.8, 0, -.5]),
-(int(-.6 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
-(int(.7 * screen_width/2), yStartPos, xSpeed4, ySpeed, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
-(int(.1 * screen_width/2), yStartPos, xSpeed2,ySpeed, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
-(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.8, .6, -.8, .6]),     
-(int(.9 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .9, .3, .5, -.2,.8]),
-(int(-.8 * screen_width/2), yStartPos, xSpeed1, ySpeed, [-.3, -.7, -.2, -.8, -.1]), 
-(int(.4 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
-(int(.5 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(int(.5 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
-(int(-.6 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.5, .9, -.7, .7, -.6]),     
-(int(-.9 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15
-(int(-.5 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
-(int(.3 * screen_width/2), yStartPos, xSpeed5, ySpeed, [0, .7, -.2, .3, -.6, .7, -.8]),     
-(int(.2 * screen_width/2), yStartPos, xSpeed3,ySpeed, [.4, .2, .8, .1, .8, .4, .6]),
-(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     
-(int(-.5 * screen_width/2), yStartPos, xSpeed1, ySpeed, [-.1, -.2, .2, -.4, .4,-.7]), 
-(int(.8 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .7, -.2, .3, -.7, .7, -.8]),
-(int(-.7 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.5, .9, -.6, .7, -.5]), 
-(int(-.4 * screen_width/2), yStartPos, xSpeed2, ySpeed, [.8, -.8, .8, -.8, 0, -.5]),
-(int(-.6 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
-(int(.7 * screen_width/2), yStartPos, xSpeed4, ySpeed, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
-(int(.5 * screen_width/2), yStartPos, xSpeed2,ySpeed, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
-(int(-.8 * screen_width/2), yStartPos, xSpeed1, ySpeed, [-.3, -.7, -.2, -.8, -.1]), 
-(int(.4 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
-(int(.8 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(int(.5 * screen_width/2), yStartPos, xSpeed4, ySpeed, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
-(int(-.6 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.5, .9, -.7, .7, -.6]), 
-(int(-.2 * screen_width/2), yStartPos, xSpeed1, ySpeed, [0, -.2, .2, -.4, .4,-.7]),     
-(int(-.5 * screen_width/2), yStartPos, xSpeed3, ySpeed, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
-(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.8, .6, -.8, .6]),  
-(int(.2 * screen_width/2), yStartPos, xSpeed5, ySpeed, [0, .7, -.2, .3, -.6, .7, -.8]),     
-(int(.2 * screen_width/2), yStartPos, xSpeed3,ySpeed, [.4, .2, .8, .1, .8, .4, .6]),
-(int(.9 * screen_width/2), yStartPos, xSpeed6, ySpeed, [0, .9, .3, .5, -.2,.8]),
-(int(-.9 * screen_width/2), yStartPos, xSpeed2, ySpeed, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), 
-(int(-.3 * screen_width/2), yStartPos, xSpeed2, ySpeed, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
+(int(.4 * screen_width/2), -xSpeed3, [-.8, .8, -.8, .8, -.8, .8, -.8]), 
+(int(.8 * screen_width/2), -xSpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
+(int(-.7 * screen_width/2), xSpeed2, [0, -.5, .9, -.6, .7, -.5]), 
+(int(-.4 * screen_width/2), xSpeed2, [.8, -.8, .8, -.8, 0, -.5]),
+(int(-.6 * screen_width/2), xSpeed2, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
+(int(.7 * screen_width/2), -xSpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
+(int(.1 * screen_width/2), xSpeed1, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
+(int(-.3 * screen_width/2), xSpeed2, [0, -.8, .6, -.8, .6]),  
+(int(.9 * screen_width/2), -xSpeed3, [0, .9, .3, .5, -.2,.8]),
+(int(-.8 * screen_width/2), xSpeed1, [-.3, -.7, -.2, -.8, -.1]), 
+(int(.4 * screen_width/2), -xSpeed1, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
+(int(.5 * screen_width/2), -xSpeed3, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
+(int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
+(int(-.6 * screen_width/2), xSpeed3, [0, -.5, .9, -.7, .7, -.6]),     
+(int(-.9 * screen_width/2), xSpeed2, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15
+(int(-.5 * screen_width/2), xSpeed3, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
+(int(.3 * screen_width/2), -xSpeed2, [0, .7, -.2, .3, -.6, .7, -.8]),     
+(int(.2 * screen_width/2), xSpeed1, [.4, .2, .8, .1, .8, .4, .6]),
+(int(-.3 * screen_width/2), xSpeed2, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     
+(int(-.5 * screen_width/2), xSpeed1, [-.1, -.2, .2, -.4, .4,-.7]), 
+(int(.8 * screen_width/2), -xSpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
+(int(-.7 * screen_width/2), xSpeed2, [0, -.5, .9, -.6, .7, -.5]), 
+(int(-.4 * screen_width/2), xSpeed2, [.8, -.8, .8, -.8, 0, -.5]),
+(int(-.6 * screen_width/2), xSpeed2, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
+(int(.7 * screen_width/2), -xSpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
+(int(.5 * screen_width/2), xSpeed1, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
+(int(-.8 * screen_width/2), xSpeed1, [-.3, -.7, -.2, -.8, -.1]), 
+(int(.4 * screen_width/2), -xSpeed1, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
+(int(.8 * screen_width/2), -xSpeed3, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
+(int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
+(int(-.6 * screen_width/2), xSpeed3, [0, -.5, .9, -.7, .7, -.6]), 
+(int(-.2 * screen_width/2), xSpeed1, [0, -.2, .2, -.4, .4,-.7]),     
+(int(-.5 * screen_width/2), xSpeed3, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
+(int(-.3 * screen_width/2), xSpeed2, [0, -.8, .6, -.8, .6]),  
+(int(.2 * screen_width/2), -xSpeed2, [0, .7, -.2, .3, -.6, .7, -.8]),     
+(int(.2 * screen_width/2), xSpeed1, [.4, .2, .8, .1, .8, .4, .6]),
+(int(.9 * screen_width/2), -xSpeed3, [0, .9, .3, .5, -.2,.8]),
+(int(-.9 * screen_width/2), xSpeed2, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), 
+(int(-.3 * screen_width/2), xSpeed2, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
 
 # log info
 currentTrial = 0
@@ -347,7 +346,7 @@ balloon = visual.ImageStim(
 wand = visual.ImageStim(
     win=win, name='wand',units='pix', 
     image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(121, 103),
+    ori=0, pos=[0,0], size=(80, 70),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-4.0)
@@ -360,21 +359,28 @@ ITI = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-6.0)
+counter_background = visual.ImageStim(
+    win=win, name='counter_background',units='pix', 
+    image=media + "label_background.png", mask=None,
+    ori=0, pos=(550, -435), size=(175, 45),
+    color=[1,1,1], colorSpace='rgb', opacity=1,
+    flipHoriz=False, flipVert=False,
+    texRes=128, interpolate=True, depth=-7.0)
 counter = visual.TextStim(win=win, name='counter',
     text=None,
-    font='Arial',
-    units='norm', pos=(.8, -.95), height=0.075, wrapWidth=None, ori=0, 
-    color='#d63b3b', colorSpace='rgb', opacity=1,
-    depth=-7.0);
+    font=u'Arial',
+    units='pix', pos=(550, -432), height=24, wrapWidth=None, ori=0, 
+    color=u'#053270', colorSpace='rgb', opacity=1,
+    depth=-8.0);
 magic = visual.ImageStim(
     win=win, name='magic',units='pix', 
     image=media + "magic-effect.png", mask=None,
-    ori=0, pos=[0,0], size=(200, 200),
+    ori=0, pos=[0,0], size=(150, 150),
     color=[1,1,1], colorSpace='rgb', opacity=.75,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-8.0)
+    texRes=128, interpolate=True, depth=-9.0)
 magic_sound = sound.Sound(media + "magic-sound-trimmed.wav", secs=-1)
-magic_sound.setVolume(.75)
+magic_sound.setVolume(.5)
 
 # Initialize components for Routine "thanks"
 thanksClock = core.Clock()
@@ -791,10 +797,9 @@ for thisTrial in trials:
     wand_position = (0, -.8 * screen_height/2)
     balloonImage = media + "pink_balloon.png"
     currentBalloonSettings = balloonSettings.pop(0)
-    balloonPosition = (currentBalloonSettings[0], currentBalloonSettings[1])
-    print str(currentTrial) + "\t" + str(balloonPosition)
-    balloonShift = (currentBalloonSettings[2], currentBalloonSettings[3])
-    zigs = currentBalloonSettings[4]
+    balloonPosition = (currentBalloonSettings[0], yStartPos)
+    balloonShift = (currentBalloonSettings[1], ySpeed)
+    zigs = currentBalloonSettings[2]
     
     if boringMode:
         popVolume = 0
@@ -824,7 +829,7 @@ for thisTrial in trials:
     antic_background.setImage(media + "Anticipatory_period_background.jpg")
     aversive_pop.setVolume(popVolume)
     # keep track of which components have finished
-    balloonsComponents = [antic_background, avoid_background, balloon, wand, aversive_pop, ITI, counter, magic, magic_sound]
+    balloonsComponents = [antic_background, avoid_background, balloon, wand, aversive_pop, ITI, counter_background, counter, magic, magic_sound]
     for thisComponent in balloonsComponents:
         if hasattr(thisComponent, 'status'):
             thisComponent.status = NOT_STARTED
@@ -892,8 +897,10 @@ for thisTrial in trials:
         # moving the balloon during the main part of the trial
         if not timeToPop and startedTrial:
             balloonPosition = (balloon.pos[0] + balloonShift[0], balloon.pos[1] + balloonShift[1]) # starting just off screen
+            # reverse x-speed whenever a "zigzag line" is crossed
             if len(zigs) > 0:
-                if abs(balloon.pos[0] - zigs[0]) < .01:
+                zig_line_position = zigs[0] * screen_width/2
+                if abs(balloon.pos[0] - zig_line_position) < 6:
                     balloonShift = (-balloonShift[0], balloonShift[1])
                     zigs.pop(0)
         
@@ -902,7 +909,7 @@ for thisTrial in trials:
             startedTrial = 1
         
         # testing if the wand has reached the balloon
-        xDist = abs(wand.pos[0] + wand.size[0]/2 - (balloon.pos[0] - balloon.size[0]/4))
+        xDist = abs(wand.pos[0] + wand.size[0]/2 - (balloon.pos[0]))
         yDist = abs(wand.pos[1] + wand.size[1]/2 - (balloon.pos[1] + balloon.size[1]/2))
         
         # if balloon reaches top, balloon will pop
@@ -922,7 +929,7 @@ for thisTrial in trials:
                 core.wait(.2)
                 balloonImage = media + "pop_2.png"
             timeToPop = 1
-        elif (t > anticipatoryPeriod + .2 and xDist < 75 and yDist < 75):
+        elif (t > anticipatoryPeriod + .2 and xDist < 40 and yDist < 40):
             # note that you need the .2 second buffer to guarantee objects are initialized before the test
             if success == 0:
                 successClock.reset()
@@ -980,7 +987,7 @@ for thisTrial in trials:
         if balloon.status == STARTED:  # only update if drawing
             balloon.setPos(balloonPosition, log=False)
             balloon.setImage(balloonImage, log=False)
-            balloon.setSize((150, 187), log=False)
+            balloon.setSize((120, 150), log=False)
         
         # *wand* updates
         if t >= t>=anticipatoryPeriod and wand.status == NOT_STARTED:
@@ -1008,6 +1015,15 @@ for thisTrial in trials:
         if ITI.status == STARTED and t >= (ITI.tStart + itiLength):
             ITI.setAutoDraw(False)
         
+        # *counter_background* updates
+        if t >= 0.0 and counter_background.status == NOT_STARTED:
+            # keep track of start time/frame for later
+            counter_background.tStart = t
+            counter_background.frameNStart = frameN  # exact frame index
+            counter_background.setAutoDraw(True)
+        if counter_background.status == STARTED and bool(t > endTrialTime):
+            counter_background.setAutoDraw(False)
+        
         # *counter* updates
         if t >= 0.0 and counter.status == NOT_STARTED:
             # keep track of start time/frame for later
@@ -1026,7 +1042,7 @@ for thisTrial in trials:
         if magic.status == STARTED and t >= (magic.tStart + 1.5):
             magic.setAutoDraw(False)
         if magic.status == STARTED:  # only update if drawing
-            magic.setPos((balloon.pos[0], balloon.pos[1] + 50), log=False)
+            magic.setPos((balloon.pos[0] + 20, balloon.pos[1] + 50), log=False)
         # start/stop magic_sound
         if t >= justSavedBalloon == 1 and magic_sound.status == NOT_STARTED:
             # keep track of start time/frame for later
