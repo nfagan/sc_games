@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sun Jul 23 16:17:40 2017
+    on Mon Jul 24 00:01:19 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -212,21 +212,21 @@ magic_wand = visual.ImageStim(
     texRes=128, interpolate=True, depth=-1.0)
 time_left = visual.TextStim(win=win, name='time_left',
     text=None,
-    font=u'Arial',
+    font='Arial',
     units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, ori=0, 
-    color=u'#053270', colorSpace='rgb', opacity=1,
+    color='#053270', colorSpace='rgb', opacity=1,
     depth=-2.0);
 
-# Initialize components for Routine "get_ready"
-get_readyClock = core.Clock()
-InstructSlide14 = visual.ImageStim(
-    win=win, name='InstructSlide14',units='pix', 
+# Initialize components for Routine "game_instr_2"
+game_instr_2Clock = core.Clock()
+
+slides_2 = visual.ImageStim(
+    win=win, name='slides_2',units='pix', 
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(screen_width,screen_height),
+    ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=0.0)
-
+    texRes=128, interpolate=True, depth=-2.0)
 
 # Initialize components for Routine "balloons"
 balloonsClock = core.Clock()
@@ -368,9 +368,9 @@ counter_background = visual.ImageStim(
     texRes=128, interpolate=True, depth=-7.0)
 counter = visual.TextStim(win=win, name='counter',
     text=None,
-    font=u'Arial',
+    font='Arial',
     units='pix', pos=(550, -432), height=24, wrapWidth=None, ori=0, 
-    color=u'#053270', colorSpace='rgb', opacity=1,
+    color='#053270', colorSpace='rgb', opacity=1,
     depth=-8.0);
 magic = visual.ImageStim(
     win=win, name='magic',units='pix', 
@@ -386,7 +386,7 @@ magic_sound.setVolume(.5)
 thanksClock = core.Clock()
 Thankyo = visual.ImageStim(
     win=win, name='Thankyo',units='pix', 
-    image=instructionSlides + "Slide19.jpg", mask=None,
+    image=instructionSlides + "Thank_you.jpg", mask=None,
     ori=0, pos=(0, 0), size=(screen_width, screen_height),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
@@ -463,19 +463,24 @@ while continueRoutine:
     t = game_instrClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    # all slides advance with a space, except slides 9, 10, 11, 12 (arrow key slides)
-    if event.getKeys('space') and (currentInstructionNumber < 9 or currentInstructionNumber > 12):
+    # first slide stays for 2 seconds
+    if (t > 2 and currentInstructionNumber == 1):
         currentInstructionNumber += 1
-    if event.getKeys('left') and currentInstructionNumber == 9:
+        print currentInstructionNumber
+    
+    # most slides advance with the press of the space bar
+    if event.getKeys('space') and currentInstructionNumber in range(2, 11) + [15]: 
         currentInstructionNumber += 1
-    if event.getKeys('right') and currentInstructionNumber == 10:
+    if event.getKeys('left') and currentInstructionNumber == 11:
         currentInstructionNumber += 1
-    if event.getKeys('down') and currentInstructionNumber == 11:
+    if event.getKeys('right') and currentInstructionNumber == 12:
         currentInstructionNumber += 1
-    if event.getKeys('up') and currentInstructionNumber == 12:
+    if event.getKeys('down') and currentInstructionNumber == 13:
+        currentInstructionNumber += 1
+    if event.getKeys('up') and currentInstructionNumber == 14:
         currentInstructionNumber += 1
     
-    if currentInstructionNumber == 14:
+    if currentInstructionNumber == 15:
         continueRoutine = False
     
     currentInstructionString = str(currentInstructionNumber)
@@ -694,59 +699,73 @@ for thisComponent in wand_practiceComponents:
         thisComponent.setAutoDraw(False)
 
 
-# ------Prepare to start Routine "get_ready"-------
+# ------Prepare to start Routine "game_instr_2"-------
 t = 0
-get_readyClock.reset()  # clock
+game_instr_2Clock.reset()  # clock
 frameN = -1
 continueRoutine = True
 # update component parameters for each repeat
-currentInstructionNumber = 14
+currentInstructionNumber = 16
 
 if trialDebugMode or boringMode:
     continueRoutine = False
 
+
+get_key_press_2 = event.BuilderKeyResponse()
 # keep track of which components have finished
-get_readyComponents = [InstructSlide14]
-for thisComponent in get_readyComponents:
+game_instr_2Components = [get_key_press_2, slides_2]
+for thisComponent in game_instr_2Components:
     if hasattr(thisComponent, 'status'):
         thisComponent.status = NOT_STARTED
 
-# -------Start Routine "get_ready"-------
+# -------Start Routine "game_instr_2"-------
 while continueRoutine:
     # get current time
-    t = get_readyClock.getTime()
+    t = game_instr_2Clock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    
-    # *InstructSlide14* updates
-    if t >= 0.0 and InstructSlide14.status == NOT_STARTED:
-        # keep track of start time/frame for later
-        InstructSlide14.tStart = t
-        InstructSlide14.frameNStart = frameN  # exact frame index
-        InstructSlide14.setAutoDraw(True)
-    if InstructSlide14.status == STARTED:  # only update if drawing
-        InstructSlide14.setImage(currentInstructionFile, log=False)
-    # all slides advance with a space
-    if event.getKeys('space') and currentInstructionNumber != 18:
+    if event.getKeys('space'):
         currentInstructionNumber += 1
     
-    if event.getKeys('right') and currentInstructionNumber == 18:
-        currentInstructionNumber +=1
-    
     if currentInstructionNumber == 19:
-        break
+        continueRoutine = False
+    else:
+        currentInstructionString = str(currentInstructionNumber)
+        if currentInstructionNumber < 10:
+            currentInstructionString = "0" + currentInstructionString
+        currentInstructionFile = instructionSlides + "Slide" + currentInstructionString + ".jpg"
     
-    currentInstructionString = str(currentInstructionNumber)
-    if currentInstructionNumber < 10:
-        currentInstructionString = "0" + currentInstructionString
-    currentInstructionFile = instructionSlides + "Slide" + currentInstructionString + ".jpg"
     
+    
+    # *get_key_press_2* updates
+    if t >= 0 and get_key_press_2.status == NOT_STARTED:
+        # keep track of start time/frame for later
+        get_key_press_2.tStart = t
+        get_key_press_2.frameNStart = frameN  # exact frame index
+        get_key_press_2.status = STARTED
+        # keyboard checking is just starting
+        win.callOnFlip(get_key_press_2.clock.reset)  # t=0 on next screen flip
+        event.clearEvents(eventType='keyboard')
+    if get_key_press_2.status == STARTED:
+        theseKeys = event.getKeys(keyList=['space'])
+        if len(theseKeys) > 0:  # at least one key was pressed
+            get_key_press_2.keys = theseKeys[-1]  # just the last key pressed
+            get_key_press_2.rt = get_key_press_2.clock.getTime()
+    
+    # *slides_2* updates
+    if t >= 0.0 and slides_2.status == NOT_STARTED:
+        # keep track of start time/frame for later
+        slides_2.tStart = t
+        slides_2.frameNStart = frameN  # exact frame index
+        slides_2.setAutoDraw(True)
+    if slides_2.status == STARTED:  # only update if drawing
+        slides_2.setImage(currentInstructionFile, log=False)
     
     # check if all components have finished
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in get_readyComponents:
+    for thisComponent in game_instr_2Components:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -755,12 +774,19 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "get_ready"-------
-for thisComponent in get_readyComponents:
+# -------Ending Routine "game_instr_2"-------
+for thisComponent in game_instr_2Components:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
 
-# the Routine "get_ready" was not non-slip safe, so reset the non-slip timer
+# check responses
+if get_key_press_2.keys in ['', [], None]:  # No response was made
+    get_key_press_2.keys=None
+thisExp.addData('get_key_press_2.keys',get_key_press_2.keys)
+if get_key_press_2.keys != None:  # we had a response
+    thisExp.addData('get_key_press_2.rt', get_key_press_2.rt)
+thisExp.nextEntry()
+# the Routine "game_instr_2" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc

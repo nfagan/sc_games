@@ -59,6 +59,54 @@
         <Param name="size" updates="constant" val="(screen_width, screen_height)" valType="code"/>
       </ImageComponent>
     </Routine>
+    <Routine name="game_instr_2">
+      <CodeComponent name="instuction_logic_2">
+        <Param name="Begin Experiment" updates="constant" val="" valType="extendedCode"/>
+        <Param name="name" updates="None" val="instuction_logic_2" valType="code"/>
+        <Param name="Begin Routine" updates="constant" val="currentInstructionNumber = 16&amp;#10;&amp;#10;if trialDebugMode or boringMode:&amp;#10;    continueRoutine = False&amp;#10;&amp;#10;" valType="extendedCode"/>
+        <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
+        <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="if event.getKeys('space'):&amp;#10;    currentInstructionNumber += 1&amp;#10;&amp;#10;if currentInstructionNumber == 19:&amp;#10;    continueRoutine = False&amp;#10;else:&amp;#10;    currentInstructionString = str(currentInstructionNumber)&amp;#10;    if currentInstructionNumber &lt; 10:&amp;#10;        currentInstructionString = &quot;0&quot; + currentInstructionString&amp;#10;    currentInstructionFile = instructionSlides + &quot;Slide&quot; + currentInstructionString + &quot;.jpg&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
+      </CodeComponent>
+      <KeyboardComponent name="get_key_press_2">
+        <Param name="correctAns" updates="constant" val="" valType="str"/>
+        <Param name="storeCorrect" updates="constant" val="False" valType="bool"/>
+        <Param name="name" updates="None" val="get_key_press_2" valType="code"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="forceEndRoutine" updates="constant" val="False" valType="bool"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="discard previous" updates="constant" val="True" valType="bool"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="allowedKeys" updates="constant" val="'space'" valType="code"/>
+        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
+        <Param name="startVal" updates="None" val="0" valType="code"/>
+        <Param name="store" updates="constant" val="last key" valType="str"/>
+        <Param name="syncScreenRefresh" updates="constant" val="True" valType="bool"/>
+      </KeyboardComponent>
+      <ImageComponent name="slides_2">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="name" updates="None" val="slides_2" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
+        <Param name="startVal" updates="None" val="0.0" valType="code"/>
+        <Param name="image" updates="set every frame" val="$currentInstructionFile" valType="str"/>
+        <Param name="size" updates="constant" val="(screen_width, screen_height)" valType="code"/>
+      </ImageComponent>
+    </Routine>
     <Routine name="instructions_boring">
       <CodeComponent name="instr_logic">
         <Param name="Begin Experiment" updates="constant" val="" valType="extendedCode"/>
@@ -76,7 +124,7 @@
         <Param name="Begin Routine" updates="constant" val="currentInstructionNumber = 1&amp;#10;&amp;#10;if trialDebugMode or boringMode:&amp;#10;    continueRoutine = False&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
-        <Param name="Each Frame" updates="constant" val="# all slides advance with a space, except slides 9, 10, 11, 12 (arrow key slides)&amp;#10;if event.getKeys('space') and (currentInstructionNumber &lt; 9 or currentInstructionNumber &gt; 12):&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('left') and currentInstructionNumber == 9:&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('right') and currentInstructionNumber == 10:&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('down') and currentInstructionNumber == 11:&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('up') and currentInstructionNumber == 12:&amp;#10;    currentInstructionNumber += 1&amp;#10;&amp;#10;if currentInstructionNumber == 14:&amp;#10;    continueRoutine = False&amp;#10;&amp;#10;currentInstructionString = str(currentInstructionNumber)&amp;#10;if currentInstructionNumber &lt; 10:&amp;#10;    currentInstructionString = &quot;0&quot; + currentInstructionString&amp;#10;currentInstructionFile = instructionSlides + &quot;Slide&quot; + currentInstructionString + &quot;.jpg&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="# first slide stays for 2 seconds&amp;#10;if (t &gt; 2 and currentInstructionNumber == 1):&amp;#10;    currentInstructionNumber += 1&amp;#10;    print currentInstructionNumber&amp;#10;&amp;#10;# most slides advance with the press of the space bar&amp;#10;if event.getKeys('space') and currentInstructionNumber in range(2, 11) + [15]: &amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('left') and currentInstructionNumber == 11:&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('right') and currentInstructionNumber == 12:&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('down') and currentInstructionNumber == 13:&amp;#10;    currentInstructionNumber += 1&amp;#10;if event.getKeys('up') and currentInstructionNumber == 14:&amp;#10;    currentInstructionNumber += 1&amp;#10;&amp;#10;if currentInstructionNumber == 15:&amp;#10;    continueRoutine = False&amp;#10;&amp;#10;currentInstructionString = str(currentInstructionNumber)&amp;#10;if currentInstructionNumber &lt; 10:&amp;#10;    currentInstructionString = &quot;0&quot; + currentInstructionString&amp;#10;currentInstructionFile = instructionSlides + &quot;Slide&quot; + currentInstructionString + &quot;.jpg&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
       </CodeComponent>
       <KeyboardComponent name="get_key_press">
         <Param name="correctAns" updates="constant" val="" valType="str"/>
@@ -137,7 +185,7 @@
         <Param name="ori" updates="constant" val="0" valType="code"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0.0" valType="code"/>
-        <Param name="image" updates="constant" val="$instructionSlides + &quot;Slide19.jpg&quot;" valType="str"/>
+        <Param name="image" updates="constant" val="$instructionSlides + &quot;Thank_you.jpg&quot;" valType="str"/>
         <Param name="size" updates="constant" val="(screen_width, screen_height)" valType="code"/>
       </ImageComponent>
       <KeyboardComponent name="key_resp_14">
@@ -165,38 +213,6 @@
         <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="print &quot;Finished the game!&quot;&amp;#10;" valType="extendedCode"/>
         <Param name="Each Frame" updates="constant" val="" valType="extendedCode"/>
-      </CodeComponent>
-    </Routine>
-    <Routine name="get_ready">
-      <ImageComponent name="InstructSlide14">
-        <Param name="opacity" updates="constant" val="1" valType="code"/>
-        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
-        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
-        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
-        <Param name="name" updates="None" val="InstructSlide14" valType="code"/>
-        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
-        <Param name="stopVal" updates="constant" val="" valType="code"/>
-        <Param name="durationEstim" updates="None" val="" valType="code"/>
-        <Param name="mask" updates="constant" val="None" valType="str"/>
-        <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
-        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
-        <Param name="startEstim" updates="None" val="" valType="code"/>
-        <Param name="units" updates="None" val="pix" valType="str"/>
-        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
-        <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="ori" updates="constant" val="0" valType="code"/>
-        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
-        <Param name="startVal" updates="None" val="0.0" valType="code"/>
-        <Param name="image" updates="set every frame" val="$currentInstructionFile" valType="str"/>
-        <Param name="size" updates="constant" val="(screen_width,screen_height)" valType="code"/>
-      </ImageComponent>
-      <CodeComponent name="break_logic">
-        <Param name="Begin Experiment" updates="constant" val="" valType="extendedCode"/>
-        <Param name="name" updates="None" val="break_logic" valType="code"/>
-        <Param name="Begin Routine" updates="constant" val="currentInstructionNumber = 14&amp;#10;&amp;#10;if trialDebugMode or boringMode:&amp;#10;    continueRoutine = False&amp;#10;" valType="extendedCode"/>
-        <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
-        <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
-        <Param name="Each Frame" updates="constant" val="# all slides advance with a space&amp;#10;if event.getKeys('space') and currentInstructionNumber != 18:&amp;#10;    currentInstructionNumber += 1&amp;#10;&amp;#10;if event.getKeys('right') and currentInstructionNumber == 18:&amp;#10;    currentInstructionNumber +=1&amp;#10;&amp;#10;if currentInstructionNumber == 19:&amp;#10;    break&amp;#10;&amp;#10;currentInstructionString = str(currentInstructionNumber)&amp;#10;if currentInstructionNumber &lt; 10:&amp;#10;    currentInstructionString = &quot;0&quot; + currentInstructionString&amp;#10;currentInstructionFile = instructionSlides + &quot;Slide&quot; + currentInstructionString + &quot;.jpg&quot;&amp;#10;" valType="extendedCode"/>
       </CodeComponent>
     </Routine>
     <Routine name="wand_practice">
@@ -463,7 +479,7 @@
     <Routine name="game_instr"/>
     <Routine name="boring_instr"/>
     <Routine name="wand_practice"/>
-    <Routine name="get_ready"/>
+    <Routine name="game_instr_2"/>
     <LoopInitiator loopType="TrialHandler" name="trials">
       <Param name="conditionsFile" updates="None" val="" valType="str"/>
       <Param name="name" updates="None" val="trials" valType="code"/>
