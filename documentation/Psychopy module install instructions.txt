@@ -23,42 +23,36 @@ commands "which python" and "which pip". The output should show that Python/pip 
 	If you get warnings/errors during the brew step, you may have to follow homebrew's advice and run some
 	"force overwrite" link commmands.
 4. Run the following commands to install Python modules
-	pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj
-	pip install pyserial pyparallel
-	(If either of these commands fails due to permissions errors, try re-running with sudo.)
-5. LabJackPython (make sure link is still correct, should be listed on Psychopy page)
+	pip install numpy scipy pandas matplotlib pyopengl pyglet pillow moviepy lxml openpyxl configobj pyserial pyparallel psychopy
+	(If this command fails due to permissions errors, try re-running with "sudo".)
+5. For now, a module called "matplotlib" needs to be manually re-installed. From https://pypi.python.org/pypi/matplotlib/1.4.3, find
+	the most recently uploaded Python wheel for matplotlib-1.4.3 that has "macosx" in its name. Download that file, and then run this:
+		pip install [path to downloaded wheel]
+		(If this fails due to a permissions error, re-run with "sudo")
+6. LabJackPython (make sure link is still correct, should be listed on Psychopy page)
 	# cd into a good installation directory
 	git clone https://github.com/labjack/LabJackPython
 	cd LabJackPython
 	sudo python setup.py install
 	# Note: substitute "python" with the path given for Python in your local_config if you have a specific Python 
 	version you want to use.
-6. Labjack Exodriver
+7. Labjack Exodriver
 	Download the Exodriver pre-built installer from here: https://labjack.com/support/software/installers/exodriver
 	Then, open the downloaded installer and follow instructions to install.
-7. Create a folder inside your home folder called "progs". (Or, use an existing folder where you store your local installtions). On the
-	command line, cd into that directory and run the following commands:
-		wget https://github.com/psychopy/psychopy/archive/1.85.2.tar.gz
-		tar -xzvf 1.85.2.tar.gz
-		cd psychopy-1.85.2
-		python setup.py install
-		[If the command fails due to a permissions error, retry with sudo.]
 
-	Note: Normally, you could simply install psychopy with pip along with its prerequisites, but the current version of
-	Psychopy is not yet available through pip, hence the manual install. When this changes, these instructions should be updated.
-
-Two More Things:
-The module should now be correctly installed. However, if you are building your own scripts using the Psychopy desktop application,
-you need to make sure that your Psychopy scripts use the correct audio driver (portaudio). Open your project's .psyexp file, go to
-Preferences (click the button with the screwdriver/wrench), and replace the contents of the audio driver field with the following:
-['portaudio']
-
-This is optional, but to stop the pointless "ApplePersistenceIgnoreState" message from appearing every time you run, execute the following command from the Terminal.
+Notes:
+1. 	This is optional, but to stop a pointless "ApplePersistenceIgnoreState" message from appearing every time you run, execute the
+	following command from the Terminal:
 	defaults write org.python.python ApplePersistenceIgnoreState NO
 
+2. 	The Psychopy module should now be correctly installed. However, if you are building your own scripts using the Psychopy 
+	desktop application, you need to make sure that your Psychopy scripts use the correct audio driver (portaudio). Open your project's
+	.psyexp file, go to Preferences (click the button with the screwdriver/wrench), and replace the contents of the audio driver field
+	with the following, including brackets: ['portaudio']
+
+
 Troubleshooting:
-1. If you've done the above and you're getting an error related related to an "unknown encoding" in matplotlib, there's a known problem that sometimes appears on MacOS. The solution is to downgrade matplotlib to version 1.4.3 using pip, like this: "pip install version==1.4.3" (use sudo if you get a permissions error).
-2. If you don't use Homebrew to get a local version of Python, you may experience problems where Exodriver cannot find the
+1. If you don't use Homebrew to get a local version of Python, you may experience problems where Exodriver cannot find the
 libraries it needs to function. The only solution that has been found so far is to do the Homebrew installation.
 
 
