@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Tue Jul 25 09:29:38 2017
+    on Tue Jul 25 11:52:56 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -37,7 +37,7 @@ filename = _thisDir + os.sep + "BalloonGame_%s" % expInfo['date']
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/ecohodes/sc_magic/psyexp/BalloonGame.psyexp',
+    originPath=u'/Users/Jeff/sc_magic/psyexp/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -83,6 +83,9 @@ parser.add_option("-y", "--yoke_source", metavar="YOKE_SOURCE", dest="yoke_sourc
 parser.add_option("-b", "--boring_mode", action="store_true", dest="is_boring", help="invokes non-stress version of game")
 parser.add_option("-B", "--button_box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
 parser.add_option("-v", "--version", metavar="VERSION", dest="version", help=SUPPRESS_HELP, default="unknown")
+parser.add_option("--short-iti", action="store_true", default=False, dest="short_iti", help="use shortened inter-trial intervals (for test runs only)")
+parser.add_option("--skip-instructions", action="store_true", default=False, dest="skip_instructions", help="skip instructions/practice slides (for test runs only)")
+parser.add_option("--debug-trial", metavar="TRIAL_NUMBER", dest="debug_trial", help="test a specific trial and skip everything else")
 (options, args) = parser.parse_args()
 projectDir = options.source_dir
 outputDir = options.output_dir
@@ -91,6 +94,18 @@ yokeSourceFile = options.yoke_source
 boringMode = options.is_boring
 version = options.version
 button_box_mode = options.button_box_mode
+
+# these modes can be used during test runs for easier debugging
+short_iti_mode = options.short_iti
+skip_instructions = options.skip_instructions
+trial_debug_requested = options.debug_trial
+if trial_debug_requested:
+    trial_debug_mode = True
+    debug_trial = int(trial_debug_requested) # when not None, the option itself indicates trial to test
+    skip_instructions = True
+    short_iti_mode = True
+else:
+    trial_debug_mode = False
 
 if button_box_mode:
     down_key = "1" # green
@@ -163,6 +178,7 @@ anticipatoryPeriod = 4
 
 # length of time between trials (for MRI synching)
 itiLength = 10
+if short_iti_mode: itiLength = 1
 
 # distance wand moves per step (in pixels)
 wand_step_size = 80
@@ -170,19 +186,6 @@ wand_step_size = 80
 # screen size (these values just reflect what is already set by Psychopy)
 screen_width = 1440
 screen_height = 900
-
-# allowing a mode for debugging specific trials
-trialDebugMode = False
-debugTrial = 0
-for i in range(1, 31): # that's python for 1-30!
-    if id == ("test" + str(i)):
-        trialDebugMode = True
-        debugTrial = i
-        itiLength = 1
-
-# allowing a test mode with shortened waiting periods
-if id == "test":
-    itiLength = 1
 
 
 # Initialize components for Routine "game_instr"
@@ -196,20 +199,8 @@ slides = visual.ImageStim(
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
 
-# Initialize components for Routine "boring_instr"
-boring_instrClock = core.Clock()
-
-instruction = visual.ImageStim(
-    win=win, name='instruction',units='pix', 
-    image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(screen_width, screen_height),
-    color=[1,1,1], colorSpace='rgb', opacity=1,
-    flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-1.0)
-
 # Initialize components for Routine "wand_practice"
 wand_practiceClock = core.Clock()
-wand_position = (0, 0)
 
 magic_wand = visual.ImageStim(
     win=win, name='magic_wand',units='pix', 
@@ -452,10 +443,9 @@ game_instrClock.reset()  # clock
 frameN = -1
 continueRoutine = True
 # update component parameters for each repeat
+if skip_instructions: continueRoutine = False
 currentInstructionNumber = 1
 
-if trialDebugMode or boringMode:
-    continueRoutine = False
 
 
 get_key_press = event.BuilderKeyResponse()
@@ -471,21 +461,20 @@ while continueRoutine:
     t = game_instrClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    # first slide stays for 2 seconds
+    # first slide stays for 2 seconds (although user can still skip forward with space bar if they try)
     if (t > 2 and currentInstructionNumber == 1):
         currentInstructionNumber += 1
-        print currentInstructionNumber
     
     # most slides advance with the press of the space bar
-    if event.getKeys('space') and currentInstructionNumber in range(2, 11) + [15]: 
+    if event.getKeys(['space']) and currentInstructionNumber in range(1, 11) + [15]: 
         currentInstructionNumber += 1
-    if event.getKeys('left') and currentInstructionNumber == 11:
+    if event.getKeys([left_key]) and currentInstructionNumber == 11:
         currentInstructionNumber += 1
-    if event.getKeys('right') and currentInstructionNumber == 12:
+    if event.getKeys([right_key]) and currentInstructionNumber == 12:
         currentInstructionNumber += 1
-    if event.getKeys('down') and currentInstructionNumber == 13:
+    if event.getKeys([down_key]) and currentInstructionNumber == 13:
         currentInstructionNumber += 1
-    if event.getKeys('up') and currentInstructionNumber == 14:
+    if event.getKeys([up_key]) and currentInstructionNumber == 14:
         currentInstructionNumber += 1
     
     if currentInstructionNumber == 15:
@@ -550,70 +539,6 @@ thisExp.nextEntry()
 # the Routine "game_instr" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
-# ------Prepare to start Routine "boring_instr"-------
-t = 0
-boring_instrClock.reset()  # clock
-frameN = -1
-continueRoutine = True
-# update component parameters for each repeat
-currentInstructionNumber = 1
-if trialDebugMode or not boringMode:
-    continueRoutine = False
-# keep track of which components have finished
-boring_instrComponents = [instruction]
-for thisComponent in boring_instrComponents:
-    if hasattr(thisComponent, 'status'):
-        thisComponent.status = NOT_STARTED
-
-# -------Start Routine "boring_instr"-------
-while continueRoutine:
-    # get current time
-    t = boring_instrClock.getTime()
-    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-    # update/draw components on each frame
-    # all slides advance with a space
-    if event.getKeys('space'):
-        currentInstructionNumber += 1
-    
-    if currentInstructionNumber == 11:
-        break
-    
-    currentInstructionString = str(currentInstructionNumber)
-    if currentInstructionNumber < 10:
-        currentInstructionString = "0" + currentInstructionString
-    currentInstructionFile = boringInstructionSlides + "Slide" + currentInstructionString + ".jpg"
-    
-    
-    # *instruction* updates
-    if t >= 0.0 and instruction.status == NOT_STARTED:
-        # keep track of start time/frame for later
-        instruction.tStart = t
-        instruction.frameNStart = frameN  # exact frame index
-        instruction.setAutoDraw(True)
-    if instruction.status == STARTED:  # only update if drawing
-        instruction.setImage(currentInstructionFile, log=False)
-    
-    # check if all components have finished
-    if not continueRoutine:  # a component has requested a forced-end of Routine
-        break
-    continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in boring_instrComponents:
-        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-            continueRoutine = True
-            break  # at least one component has not yet finished
-    
-    # refresh the screen
-    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-        win.flip()
-
-# -------Ending Routine "boring_instr"-------
-for thisComponent in boring_instrComponents:
-    if hasattr(thisComponent, "setAutoDraw"):
-        thisComponent.setAutoDraw(False)
-
-# the Routine "boring_instr" was not non-slip safe, so reset the non-slip timer
-routineTimer.reset()
-
 # ------Prepare to start Routine "wand_practice"-------
 t = 0
 wand_practiceClock.reset()  # clock
@@ -621,9 +546,8 @@ frameN = -1
 continueRoutine = True
 routineTimer.add(20.000000)
 # update component parameters for each repeat
-if trialDebugMode or boringMode:
-    continueRoutine = False
-
+if skip_instructions: continueRoutine = False
+wand_position = (0, 0)
 practice_length = 20.0
 rounded_seconds_remaining = practice_length
 time_left.setText(str(int(rounded_seconds_remaining)))
@@ -713,10 +637,9 @@ game_instr_2Clock.reset()  # clock
 frameN = -1
 continueRoutine = True
 # update component parameters for each repeat
+if skip_instructions: continueRoutine = False
 currentInstructionNumber = 16
 
-if trialDebugMode or boringMode:
-    continueRoutine = False
 
 
 get_key_press_2 = event.BuilderKeyResponse()
@@ -732,7 +655,7 @@ while continueRoutine:
     t = game_instr_2Clock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    if event.getKeys('space'):
+    if event.getKeys(['space']):
         currentInstructionNumber += 1
     
     if currentInstructionNumber == 19:
@@ -855,10 +778,11 @@ for thisTrial in trials:
     
     counter.setText("Spells cast: %d" % totalSaved)
     
-    if trialDebugMode:
-        if currentTrial != debugTrial:
-            print "This trial is " + str(currentTrial) + ", debug trial is " + str(debugTrial)
+    if trial_debug_mode:
+        if currentTrial != debug_trial: 
             continue
+        else:
+            print "Testing trial %d now..." % debug_trial
     
     antic_background.setImage(media + "Anticipatory_period_background.jpg")
     aversive_pop.setVolume(popVolume)
@@ -1186,7 +1110,6 @@ thisExp.nextEntry()
 # the Routine "thanks" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 print "Finished the game!"
-
 
 
 

@@ -133,6 +133,38 @@ while True:
 	except:
 		choice = raw_input("Invalid input. Enter 1 for a test run, or 2 for a real experiment: ")
 
+test_options = '' # will be passed on command line to the game script
+if run_type == "Test Run":
+	print "\nTesting options:\n1) Full run\n2) Skip instructions\n3) Short ITI\n4) Skip instructions AND short ITI\n5) Test specific trial\n"
+	choice = raw_input("Which test should be run? ")
+	while True:
+		try:
+			if int(choice) == 1:
+				break
+			elif int(choice) == 2:
+				test_options = "--skip-instructions"
+				break
+			elif int(choice) == 3:
+				test_options = "--short-iti"
+				break
+			elif int(choice) == 4:
+				test_options = "--skip-instructions --short-iti"
+				break
+			elif int(choice) == 5:
+				trial_to_test = raw_input("Which trial number should be tested? ")
+				while True:
+					try:
+						int(trial_to_test) # ensuring conversion to integer is possible
+						print "Okay, we'll test trial %s." % trial_to_test
+						test_options = "--debug-trial %s" % trial_to_test
+						break
+					except:
+						trial_to_test = raw_input("Invalid response. Input the numberical position of the trial to test: ")
+				break
+			else: raise
+		except:
+			choice = raw_input("Invalid response. Enter the number corresponding to the type of test to run: ")
+
 # Create game-specific output directory if needed
 output_directory += "/%s" %chosen_game_info['DirName']
 if not os.path.exists(output_directory): os.mkdir(output_directory)
@@ -242,7 +274,7 @@ while True:
 
 timestamp = '{:%Y-%b-%d_%H:%M:%S}'.format(datetime.datetime.now())
 # all three scripts require the arguments given with "--id", "--source_dir", and "--output_dir"
-script_with_args = python_bin + " '%s' --source=%s --output=%s --id=%s --version=%s" %(chosen_game_info['Script'], source_dir, output_directory, participant_id, version)
+script_with_args = python_bin + " '%s' --source=%s --output=%s --id=%s --version=%s %s" %(chosen_game_info['Script'], source_dir, output_directory, participant_id, version, test_options)
 if yoking_source_file: script_with_args += " --yoke_source=%s" % yoking_source_file
 if is_boring: script_with_args += " --boring_mode"
 if button_box_mode: script_with_args += " --button_box"
