@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Mon Jul 24 00:01:19 2017
+    on Tue Jul 25 09:29:38 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -37,7 +37,7 @@ filename = _thisDir + os.sep + "BalloonGame_%s" % expInfo['date']
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/Jeff/sc_magic/psyexp/BalloonGame.psyexp',
+    originPath=u'/Users/ecohodes/sc_magic/psyexp/BalloonGame.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -65,6 +65,14 @@ initializeClock = core.Clock()
 from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import Popen, call
+
+# immediately reset the frame duration to a smoother value
+ideal_fps = 40.0
+psychopy_calculated_fps = round(expInfo['frameRate'])
+if psychopy_calculated_fps < ideal_fps:
+    print "Warning: Psychopy internally calculated a frame rate of %f fps." % psychopy_calculated_fps
+    print "The system might be having trouble maintaining the necessary framerate (%f fps)." % ideal_fps
+frameDur = 1.0 / ideal_fps # frameDur is the internal value that determines game speed
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
 parser = OptionParser()
@@ -242,13 +250,13 @@ endTrialTime = anticipatoryPeriod + 4.5
 successClock = core.Clock()
 
 # set x-axis balloon speed (pixels per frame)
-xSpeed1 = 4
-xSpeed2 = 5
-xSpeed3 = 6
+xSpeed1 = 6
+xSpeed2 = 8
+xSpeed3 = 10
 
 # Balloon's y-axis start position and y-axis speed are always the same
 yStartPos = -screen_height/2 
-ySpeed = 5
+ySpeed = 8
 
 
 
