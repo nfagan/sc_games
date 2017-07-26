@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Tue Jul 25 11:52:56 2017
+    on Tue Jul 25 23:39:21 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -241,13 +241,13 @@ endTrialTime = anticipatoryPeriod + 4.5
 successClock = core.Clock()
 
 # set x-axis balloon speed (pixels per frame)
-xSpeed1 = 6
-xSpeed2 = 8
-xSpeed3 = 10
+xSpeed1 = 5
+xSpeed2 = 7
+xSpeed3 = 9
 
 # Balloon's y-axis start position and y-axis speed are always the same
 yStartPos = -screen_height/2 
-ySpeed = 8
+ySpeed = 7
 
 
 
