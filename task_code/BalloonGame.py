@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Tue Jul 25 23:39:21 2017
+    on Wed Jul 26 00:19:07 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -65,6 +65,7 @@ initializeClock = core.Clock()
 from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import Popen, call
+from random import shuffle
 
 # immediately reset the frame duration to a smoother value
 ideal_fps = 40.0
@@ -252,7 +253,7 @@ ySpeed = 7
 
 
 # Each trial, the balloon has different starting x-position, x-speed, and a different zigzag pattern
-balloonSettings = [
+balloon_trajectory_info = [
 (int(.4 * screen_width/2), -xSpeed3, [-.8, .8, -.8, .8, -.8, .8, -.8]), 
 (int(.8 * screen_width/2), -xSpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
 (int(-.7 * screen_width/2), xSpeed2, [0, -.5, .9, -.6, .7, -.5]), 
@@ -282,16 +283,12 @@ balloonSettings = [
 (int(-.8 * screen_width/2), xSpeed1, [-.3, -.7, -.2, -.8, -.1]), 
 (int(.4 * screen_width/2), -xSpeed1, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
 (int(.8 * screen_width/2), -xSpeed3, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
-(int(-.6 * screen_width/2), xSpeed3, [0, -.5, .9, -.7, .7, -.6]), 
-(int(-.2 * screen_width/2), xSpeed1, [0, -.2, .2, -.4, .4,-.7]),     
-(int(-.5 * screen_width/2), xSpeed3, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
-(int(-.3 * screen_width/2), xSpeed2, [0, -.8, .6, -.8, .6]),  
-(int(.2 * screen_width/2), -xSpeed2, [0, .7, -.2, .3, -.6, .7, -.8]),     
-(int(.2 * screen_width/2), xSpeed1, [.4, .2, .8, .1, .8, .4, .6]),
-(int(.9 * screen_width/2), -xSpeed3, [0, .9, .3, .5, -.2,.8]),
-(int(-.9 * screen_width/2), xSpeed2, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), 
-(int(-.3 * screen_width/2), xSpeed2, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7])]
+(int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8])] 
+
+# will pull from balloon settings list in random order
+balloon_trajectory_order = range(0, len(balloon_trajectory_info))
+shuffle(balloon_trajectory_order)
+
 
 # log info
 currentTrial = 0
@@ -753,7 +750,9 @@ for thisTrial in trials:
     
     wand_position = (0, -.8 * screen_height/2)
     balloonImage = media + "pink_balloon.png"
-    currentBalloonSettings = balloonSettings.pop(0)
+    current_trajectory_index = balloon_trajectory_order.pop(0)
+    currentBalloonSettings = balloon_trajectory_info[current_trajectory_index]
+    print "Using index %d in balloon trajectory list: " % current_trajectory_index + str(currentBalloonSettings)
     balloonPosition = (currentBalloonSettings[0], yStartPos)
     balloonShift = (currentBalloonSettings[1], ySpeed)
     zigs = currentBalloonSettings[2]
