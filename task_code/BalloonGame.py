@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Wed Jul 26 00:19:07 2017
+    on Thu Jul 27 18:09:36 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -285,9 +285,9 @@ balloon_trajectory_info = [
 (int(.8 * screen_width/2), -xSpeed3, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
 (int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8])] 
 
-# will pull from balloon settings list in random order
+# will pull from balloon settings list in random order (unless testing trials)
 balloon_trajectory_order = range(0, len(balloon_trajectory_info))
-shuffle(balloon_trajectory_order)
+if not trial_debug_mode: shuffle(balloon_trajectory_order)
 
 
 # log info
