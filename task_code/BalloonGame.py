@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Thu Jul 27 18:09:36 2017
+    on Thu Jul 27 19:54:19 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -241,49 +241,45 @@ endTrialTime = anticipatoryPeriod + 4.5
 # will be used to keep track of time after halting balloon
 successClock = core.Clock()
 
-# set x-axis balloon speed (pixels per frame)
-xSpeed1 = 5
-xSpeed2 = 7
-xSpeed3 = 9
-
 # Balloon's y-axis start position and y-axis speed are always the same
 yStartPos = -screen_height/2 
 ySpeed = 7
 
 
 
-# Each trial, the balloon has different starting x-position, x-speed, and a different zigzag pattern
+# Define per-trial balloon starting x-position, x-speed (pixels/frame), and zigzag pattern
 balloon_trajectory_info = [
-(int(.4 * screen_width/2), -xSpeed3, [-.8, .8, -.8, .8, -.8, .8, -.8]), 
-(int(.8 * screen_width/2), -xSpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
-(int(-.7 * screen_width/2), xSpeed2, [0, -.5, .9, -.6, .7, -.5]), 
-(int(-.4 * screen_width/2), xSpeed2, [.8, -.8, .8, -.8, 0, -.5]),
-(int(-.6 * screen_width/2), xSpeed2, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
-(int(.7 * screen_width/2), -xSpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
-(int(.1 * screen_width/2), xSpeed1, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
-(int(-.3 * screen_width/2), xSpeed2, [0, -.8, .6, -.8, .6]),  
-(int(.9 * screen_width/2), -xSpeed3, [0, .9, .3, .5, -.2,.8]),
-(int(-.8 * screen_width/2), xSpeed1, [-.3, -.7, -.2, -.8, -.1]), 
-(int(.4 * screen_width/2), -xSpeed1, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
-(int(.5 * screen_width/2), -xSpeed3, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8]), 
-(int(-.6 * screen_width/2), xSpeed3, [0, -.5, .9, -.7, .7, -.6]),     
-(int(-.9 * screen_width/2), xSpeed2, [0, -.2, .3, -.4, .3, -.5, .7, -.8]), # 15
-(int(-.5 * screen_width/2), xSpeed3, [0, -.4, .3, -.1, .1, -.3, .4, -.5, .5, -.6, .6, -.7]), 
-(int(.3 * screen_width/2), -xSpeed2, [0, .7, -.2, .3, -.6, .7, -.8]),     
-(int(.2 * screen_width/2), xSpeed1, [.4, .2, .8, .1, .8, .4, .6]),
-(int(-.3 * screen_width/2), xSpeed2, [-.2, -.7, .3, 0, .1, -.3, .3, -.5, .7]),     
-(int(-.5 * screen_width/2), xSpeed1, [-.1, -.2, .2, -.4, .4,-.7]), 
-(int(.8 * screen_width/2), -xSpeed1, [0, .7, -.2, .3, -.7, .7, -.8]),
-(int(-.7 * screen_width/2), xSpeed2, [0, -.5, .9, -.6, .7, -.5]), 
-(int(-.4 * screen_width/2), xSpeed2, [.8, -.8, .8, -.8, 0, -.5]),
-(int(-.6 * screen_width/2), xSpeed2, [-.2, -.8, -.6, -.8, -.3, -.5, -.2]), 
-(int(.7 * screen_width/2), -xSpeed1, [-.8, .8, -.8, -.4, -.6, 0, -.3, .8, -.8]), 
-(int(.5 * screen_width/2), xSpeed1, [.7, -.7, .7, 0, -.2, .3, -.7, .7, -.7]), 
-(int(-.8 * screen_width/2), xSpeed1, [-.3, -.7, -.2, -.8, -.1]), 
-(int(.4 * screen_width/2), -xSpeed1, [0, .8, -.3, .3, -.7, .8, -.6, 0]),
-(int(.8 * screen_width/2), -xSpeed3, [0, .7, -.8, .8, 0, .5, -.5, .5, -.1]), 
-(int(.5 * screen_width/2), -xSpeed1, [0, .8, .1, -.1, 0, -.3, .3, -.5, .8])] 
+    (-675, 7, [70, -145]),
+    (-600, 0, []),
+    (-575, 6, [-200, -500, 290]),
+    (-575, -2, [-600, -400]),
+    (-400, 9, [0, -360, 650, -500, 500]),
+    (-400, 6, []),
+    (-400, -7, [-575, 300]),
+    (-360, 9, [0, -300, -150]),
+    (-360, 6, [-75, -150, 150, -290]),
+    (-360, 3, [-75]),
+    (-350, -1, []),
+    (-300, 7, [576, 432]),
+    (-275, 7, [0, -575, -300]),
+    (-250, 8, [-72, -144, -72]),
+    (-225, 8, [-144, -504, 216]),
+    (-150, 0, []),
+    (125, -7, [0, 500, -140, 210, -430]),
+    (200, -7, [0]),
+    (225, -9, [0, 580, -215, 215, -500, 575]),
+    (300, -5, [100, 200, -100]),
+    (300, -9, [-575, 575, -575, 575]),
+    (300, 2, []),
+    (360, -6, [0, 430]),
+    (360, -6, [75]),
+    (360, 6, [510]),
+    (450, -9, [390, 505, 450, 600, 500, 600, 550, 625]),
+    (400, -6, [-580, -290, -325]),
+    (400, -6, [140]),
+    (650, -8, [150]),
+    (650, 0, [])]
+
 
 # will pull from balloon settings list in random order (unless testing trials)
 balloon_trajectory_order = range(0, len(balloon_trajectory_info))
@@ -856,7 +852,8 @@ for thisTrial in trials:
             balloonPosition = (balloon.pos[0] + balloonShift[0], balloon.pos[1] + balloonShift[1]) # starting just off screen
             # reverse x-speed whenever a "zigzag line" is crossed
             if len(zigs) > 0:
-                zig_line_position = zigs[0] * screen_width/2
+                zig_line_position = zigs[0]
+                # if within 6 pixels of zigzag line, x-speed reverses (+/- 6 means condition always triggers since max speed is 9)
                 if abs(balloon.pos[0] - zig_line_position) < 6:
                     balloonShift = (-balloonShift[0], balloonShift[1])
                     zigs.pop(0)
