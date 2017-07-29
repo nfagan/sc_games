@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sat Jul 29 13:49:15 2017
+    on Sat Jul 29 17:00:16 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -26,7 +26,7 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-expName = u'playground'  # from the Builder filename that created this script
+expName = 'playground'  # from the Builder filename that created this script
 expInfo = {u'session': u'001', u'participant': u'test'}
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
@@ -48,7 +48,7 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 win = visual.Window(
     size=(1440, 900), fullscr=True, screen=0,
     allowGUI=False, allowStencil=False,
-    monitor=u'testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True)
 # store frame rate of monitor if we can measure it
 expInfo['frameRate'] = win.getActualFrameRate()
@@ -78,8 +78,8 @@ parser.add_option("-s", "--source", metavar="SOURCE_DIR", dest="source_dir", hel
 (options, args) = parser.parse_args()
 project_dir = options.source_dir
 if not project_dir:
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    project_dir = os.path.dirname(script_dir)
+    cwd = os.getcwd()
+    project_dir = os.path.abspath("%s/.." % cwd)
     print "Project source not indicated with \"-s\" option, so guessing that it's %s..." % project_dir
 
 if not project_dir:
@@ -87,7 +87,7 @@ if not project_dir:
     core.quit()
 
 if not os.access(project_dir, os.R_OK):
-    print "Error: The specified project directory (%s) is either invalid or not readable." % output_base
+    print "Error: The specified project directory (%s) is either invalid or not readable." % project_dir
     sys.exit()
 
 
@@ -144,13 +144,13 @@ label_background = visual.ImageStim(
     ori=0, pos=(550, -435), size=(175, 45),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-7.0)
+    texRes=128, interpolate=True, depth=-5.0)
 label = visual.TextStim(win=win, name='label',
     text=None,
-    font=u'Arial',
+    font='Arial',
     units='pix', pos=(550, -432), height=24, wrapWidth=None, ori=0, 
-    color=u'#053270', colorSpace='rgb', opacity=1,
-    depth=-8.0);
+    color='#053270', colorSpace='rgb', opacity=1,
+    depth=-6.0);
 
 # Create some handy timers
 globalClock = core.Clock()  # to track the time since experiment started
