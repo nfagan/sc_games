@@ -1,0 +1,174 @@
+<?xml version="1.0" ?>
+<PsychoPy2experiment encoding="utf-8" version="1.85.2">
+  <Settings>
+    <Param name="Monitor" updates="None" val="testMonitor" valType="str"/>
+    <Param name="color" updates="None" val="$[0,0,0]" valType="str"/>
+    <Param name="colorSpace" updates="None" val="rgb" valType="str"/>
+    <Param name="Experiment info" updates="None" val="{u'session': u'001', u'participant': u'test'}" valType="code"/>
+    <Param name="JS libs" updates="None" val="packaged" valType="str"/>
+    <Param name="Units" updates="None" val="use prefs" valType="str"/>
+    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
+    <Param name="Enable Escape" updates="None" val="False" valType="bool"/>
+    <Param name="Save psydat file" updates="None" val="True" valType="bool"/>
+    <Param name="Window size (pixels)" updates="None" val="[1440, 900]" valType="code"/>
+    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
+    <Param name="blendMode" updates="None" val="avg" valType="str"/>
+    <Param name="Use version" updates="None" val="" valType="str"/>
+    <Param name="HTML path" updates="None" val="html" valType="str"/>
+    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
+    <Param name="OSF Project ID" updates="None" val="" valType="str"/>
+    <Param name="Save log file" updates="None" val="False" valType="bool"/>
+    <Param name="Save wide csv file" updates="None" val="False" valType="bool"/>
+    <Param name="Show mouse" updates="None" val="False" valType="bool"/>
+    <Param name="Data filename" updates="None" val="u'data/%s_%s_%s' % (expInfo['participant'], expName, expInfo['date'])" valType="code"/>
+    <Param name="Show info dlg" updates="None" val="False" valType="bool"/>
+    <Param name="expName" updates="None" val="playground" valType="str"/>
+    <Param name="logging level" updates="None" val="exp" valType="code"/>
+    <Param name="Screen" updates="None" val="1" valType="num"/>
+  </Settings>
+  <Routines>
+    <Routine name="test_magic">
+      <CodeComponent name="code">
+        <Param name="Begin Experiment" updates="constant" val="from optparse import OptionParser&amp;#10;from subprocess import Popen&amp;#10;import re&amp;#10;&amp;#10;&amp;#10;# immediately reset the frame duration to a smoother value&amp;#10;ideal_fps = 40.0&amp;#10;psychopy_calculated_fps = round(expInfo['frameRate'])&amp;#10;if psychopy_calculated_fps &lt; ideal_fps:&amp;#10;    print &quot;Warning: Psychopy internally calculated a frame rate of %f fps.&quot; % psychopy_calculated_fps&amp;#10;    print &quot;The system might be having trouble maintaining the necessary framerate (%f fps).&quot; % ideal_fps&amp;#10;frameDur = 1.0 / ideal_fps # frameDur is the internal value that determines game speed&amp;#10;&amp;#10;# collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)&amp;#10;parser = OptionParser()&amp;#10;parser.add_option(&quot;-s&quot;, &quot;--source&quot;, metavar=&quot;SOURCE_DIR&quot;, dest=&quot;source_dir&quot;, help=&quot;the local sc task directory&quot;)&amp;#10;(options, args) = parser.parse_args()&amp;#10;project_dir = options.source_dir&amp;#10;if not project_dir:&amp;#10;    script_dir = os.path.abspath(os.path.dirname(__file__))&amp;#10;    project_dir = os.path.dirname(script_dir)&amp;#10;    print &quot;Project source not indicated with \&quot;-s\&quot; option, so guessing that it's %s...&quot; % project_dir&amp;#10;&amp;#10;if not project_dir:&amp;#10;    parser.print_help()&amp;#10;    core.quit()&amp;#10;&amp;#10;if not os.access(project_dir, os.R_OK):&amp;#10;    print &quot;Error: The specified project directory (%s) is either invalid or not readable.&quot; % output_base&amp;#10;    sys.exit()&amp;#10;&amp;#10;&amp;#10;# folder that holds images and sounds used in the experiment&amp;#10;media = project_dir + &quot;/sc_media/&quot;&amp;#10;&amp;#10;# distance wand moves per step (in pixels)&amp;#10;wand_step_size = 80&amp;#10;&amp;#10;# screen size (these values just reflect what is already set by Psychopy)&amp;#10;screen_width = 1440&amp;#10;screen_height = 900&amp;#10;&amp;#10;&amp;#10;balloonImage = media + &quot;pink_balloon.png&quot;&amp;#10;magic_opacity = 0&amp;#10;magic_showing = False&amp;#10;&amp;#10;left_key = 'left'&amp;#10;right_key = 'right'&amp;#10;up_key = 'up'&amp;#10;down_key = 'down'" valType="extendedCode"/>
+        <Param name="name" updates="None" val="code" valType="code"/>
+        <Param name="Each Frame" updates="constant" val="new_wand_position = wand_position&amp;#10;if event.getKeys([right_key]):&amp;#10;    if wand_position[0] + wand.size[0]/2 + wand_step_size &lt; screen_width/2:&amp;#10;        new_wand_position = (wand_position[0] + wand_step_size, wand_position[1])&amp;#10;elif event.getKeys([left_key]):&amp;#10;    if wand_position[0] - wand.size[0]/2 - wand_step_size &gt; -screen_width/2: &amp;#10;        new_wand_position = (wand_position[0] - wand_step_size, wand_position[1])&amp;#10;elif event.getKeys([up_key]):&amp;#10;    if wand_position[1] + wand.size[1]/2 + wand_step_size &lt; screen_height/2:&amp;#10;        new_wand_position = (wand_position[0], wand_position[1] + wand_step_size)&amp;#10;elif event.getKeys([down_key]):&amp;#10;    if wand_position[1] - wand.size[1]/2 - wand_step_size &gt; -screen_height/2:&amp;#10;        new_wand_position = (wand_position[0], wand_position[1] - wand_step_size)&amp;#10;if wand_position != new_wand_position:&amp;#10;    wand_position = new_wand_position&amp;#10;&amp;#10;if event.getKeys(['a']):&amp;#10;    balloon_pos = (balloon.pos[0] - 1, balloon.pos[1])&amp;#10;elif event.getKeys(['d']):&amp;#10;    balloon_pos = (balloon.pos[0] + 1, balloon.pos[1])&amp;#10;elif event.getKeys(['w']):&amp;#10;    balloon_pos = (balloon.pos[0], balloon.pos[1] + 1)&amp;#10;elif event.getKeys(['s']):&amp;#10;    balloon_pos = (balloon.pos[0], balloon.pos[1] - 1)&amp;#10;&amp;#10;# testing if the wand has reached the balloon&amp;#10;xDist = abs(wand.pos[0] - balloon.pos[0])&amp;#10;yDist = abs(wand.pos[1] - balloon.pos[1])&amp;#10;label.setText(&quot;%d, %d&quot; % (int(xDist), int(yDist)))&amp;#10;&amp;#10;if wand.overlaps(balloon):&amp;#10;    if not magic_showing:&amp;#10;        magic_opacity = .75&amp;#10;        magic_showing = True&amp;#10;elif magic_showing:&amp;#10;    magic_opacity = 0&amp;#10;    magic_showing = False" valType="extendedCode"/>
+        <Param name="Begin Routine" updates="constant" val="wand_position = (0, -.8 * screen_height/2)&amp;#10;balloon_pos = (0, 0)" valType="extendedCode"/>
+        <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
+        <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
+      </CodeComponent>
+      <ImageComponent name="avoid_background">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="name" updates="None" val="avoid_background" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="4.5" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="startVal" updates="None" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="time (s)" valType="str"/>
+        <Param name="image" updates="constant" val="$media + &quot;Avoidance_period_background.jpg&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(screen_width, screen_height)" valType="code"/>
+      </ImageComponent>
+      <ImageComponent name="balloon">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="name" updates="None" val="balloon" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="set every frame" val="balloon_pos" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="45" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="startVal" updates="None" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="time (s)" valType="str"/>
+        <Param name="image" updates="constant" val="$balloonImage" valType="str"/>
+        <Param name="size" updates="set every frame" val="(120, 150)" valType="code"/>
+      </ImageComponent>
+      <ImageComponent name="wand">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="name" updates="None" val="wand" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="4" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="set every frame" val="wand_position" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="startVal" updates="None" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="time (s)" valType="str"/>
+        <Param name="image" updates="constant" val="$media + &quot;magic_wand.png&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(80, 70)" valType="code"/>
+      </ImageComponent>
+      <ImageComponent name="magic">
+        <Param name="opacity" updates="set every frame" val="magic_opacity" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="name" updates="None" val="magic" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="set every frame" val="(balloon.pos[0] + 20, balloon.pos[1] + 50)" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="startVal" updates="None" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
+        <Param name="image" updates="constant" val="$media + &quot;magic-effect.png&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(150, 150)" valType="code"/>
+      </ImageComponent>
+      <ImageComponent name="label_background">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="name" updates="None" val="label_background" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="constant" val="(550, -435)" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="startVal" updates="None" val="0.0" valType="code"/>
+        <Param name="stopType" updates="None" val="time (s)" valType="str"/>
+        <Param name="image" updates="constant" val="$media + &quot;label_background.png&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(175, 45)" valType="code"/>
+      </ImageComponent>
+      <TextComponent name="label">
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="name" updates="None" val="label" valType="code"/>
+        <Param name="color" updates="constant" val="#053270" valType="str"/>
+        <Param name="wrapWidth" updates="constant" val="" valType="code"/>
+        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="pos" updates="constant" val="(550, -432)" valType="code"/>
+        <Param name="flip" updates="constant" val="" valType="str"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="text" updates="constant" val="" valType="str"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="stopType" updates="None" val="time (s)" valType="str"/>
+        <Param name="startVal" updates="None" val="0.0" valType="code"/>
+        <Param name="font" updates="constant" val="Arial" valType="str"/>
+        <Param name="letterHeight" updates="constant" val="24" valType="code"/>
+      </TextComponent>
+    </Routine>
+  </Routines>
+  <Flow>
+    <Routine name="test_magic"/>
+  </Flow>
+</PsychoPy2experiment>
