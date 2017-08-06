@@ -69,7 +69,7 @@
         <Param name="durationEstim" updates="None" val="" valType="code"/>
         <Param name="mask" updates="constant" val="None" valType="str"/>
         <Param name="pos" updates="set every frame" val="balloon_pos" valType="code"/>
-        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="interpolate" updates="constant" val="nearest" valType="str"/>
         <Param name="startEstim" updates="None" val="" valType="code"/>
         <Param name="units" updates="None" val="pix" valType="str"/>
         <Param name="texture resolution" updates="constant" val="128" valType="code"/>
@@ -77,8 +77,8 @@
         <Param name="ori" updates="constant" val="45" valType="code"/>
         <Param name="stopType" updates="None" val="time (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
-        <Param name="image" updates="constant" val="$balloonImage" valType="str"/>
-        <Param name="size" updates="set every frame" val="(120, 150)" valType="code"/>
+        <Param name="image" updates="constant" val="$media + &quot;balloon_globe.png&quot;" valType="str"/>
+        <Param name="size" updates="set every frame" val="(75, 68)" valType="code"/>
       </ImageComponent>
       <ImageComponent name="wand">
         <Param name="opacity" updates="constant" val="1" valType="code"/>
@@ -91,7 +91,7 @@
         <Param name="durationEstim" updates="None" val="4" valType="code"/>
         <Param name="mask" updates="constant" val="None" valType="str"/>
         <Param name="pos" updates="set every frame" val="wand_position" valType="code"/>
-        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="interpolate" updates="constant" val="nearest" valType="str"/>
         <Param name="startEstim" updates="None" val="" valType="code"/>
         <Param name="units" updates="None" val="pix" valType="str"/>
         <Param name="texture resolution" updates="constant" val="128" valType="code"/>
@@ -99,8 +99,8 @@
         <Param name="ori" updates="constant" val="0" valType="code"/>
         <Param name="stopType" updates="None" val="time (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
-        <Param name="image" updates="constant" val="$media + &quot;magic_wand.png&quot;" valType="str"/>
-        <Param name="size" updates="constant" val="(80, 70)" valType="code"/>
+        <Param name="image" updates="constant" val="$media + &quot;wand_tip.png&quot;" valType="str"/>
+        <Param name="size" updates="constant" val="(40, 33)" valType="code"/>
       </ImageComponent>
       <ImageComponent name="magic">
         <Param name="opacity" updates="set every frame" val="magic_opacity" valType="code"/>

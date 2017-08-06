@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Thu Jul 27 19:54:19 2017
+    on Sun Aug  6 14:15:32 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -68,7 +68,7 @@ from subprocess import Popen, call
 from random import shuffle
 
 # immediately reset the frame duration to a smoother value
-ideal_fps = 40.0
+ideal_fps = 40
 psychopy_calculated_fps = round(expInfo['frameRate'])
 if psychopy_calculated_fps < ideal_fps:
     print "Warning: Psychopy internally calculated a frame rate of %f fps." % psychopy_calculated_fps

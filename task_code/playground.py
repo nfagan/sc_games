@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sat Jul 29 17:00:16 2017
+    on Sun Jul 30 16:07:22 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -119,18 +119,18 @@ avoid_background = visual.ImageStim(
     texRes=128, interpolate=True, depth=-1.0)
 balloon = visual.ImageStim(
     win=win, name='balloon',units='pix', 
-    image=balloonImage, mask=None,
+    image=media + "balloon_globe.png", mask=None,
     ori=45, pos=[0,0], size=1.0,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-2.0)
+    texRes=128, interpolate=False, depth=-2.0)
 wand = visual.ImageStim(
     win=win, name='wand',units='pix', 
-    image=media + "magic_wand.png", mask=None,
-    ori=0, pos=[0,0], size=(80, 70),
+    image=media + "wand_tip.png", mask=None,
+    ori=0, pos=[0,0], size=(40, 33),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-3.0)
+    texRes=128, interpolate=False, depth=-3.0)
 magic = visual.ImageStim(
     win=win, name='magic',units='pix', 
     image=media + "magic-effect.png", mask=None,
@@ -229,7 +229,7 @@ while continueRoutine:
         balloon.setAutoDraw(True)
     if balloon.status == STARTED:  # only update if drawing
         balloon.setPos(balloon_pos, log=False)
-        balloon.setSize((120, 150), log=False)
+        balloon.setSize((75, 68), log=False)
     
     # *wand* updates
     if t >= 0 and wand.status == NOT_STARTED:
