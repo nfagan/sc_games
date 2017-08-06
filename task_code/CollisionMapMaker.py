@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sun Jul 30 16:07:22 2017
+    on Sun Aug  6 18:52:12 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -37,7 +37,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/Jeff/sc_magic/psyexp/playground.psyexp',
+    originPath=u'/Users/Jeff/sc_magic/psyexp/CollisionMapMaker.psyexp',
     savePickle=True, saveWideText=False,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -62,15 +62,6 @@ test_magicClock = core.Clock()
 from optparse import OptionParser
 from subprocess import Popen
 import re
-
-
-# immediately reset the frame duration to a smoother value
-ideal_fps = 40.0
-psychopy_calculated_fps = round(expInfo['frameRate'])
-if psychopy_calculated_fps < ideal_fps:
-    print "Warning: Psychopy internally calculated a frame rate of %f fps." % psychopy_calculated_fps
-    print "The system might be having trouble maintaining the necessary framerate (%f fps)." % ideal_fps
-frameDur = 1.0 / ideal_fps # frameDur is the internal value that determines game speed
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
 parser = OptionParser()
@@ -104,7 +95,6 @@ screen_height = 900
 
 balloonImage = media + "pink_balloon.png"
 magic_opacity = 0
-magic_showing = False
 
 left_key = 'left'
 right_key = 'right'
@@ -119,15 +109,15 @@ avoid_background = visual.ImageStim(
     texRes=128, interpolate=True, depth=-1.0)
 balloon = visual.ImageStim(
     win=win, name='balloon',units='pix', 
-    image=media + "balloon_globe.png", mask=None,
+    image=media + "pink_balloon.png", mask=None,
     ori=45, pos=[0,0], size=1.0,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=False, depth=-2.0)
 wand = visual.ImageStim(
     win=win, name='wand',units='pix', 
-    image=media + "wand_tip.png", mask=None,
-    ori=0, pos=[0,0], size=(40, 33),
+    image=media + "magic_wand.png", mask=None,
+    ori=0, pos=[0,0], size=(80, 70),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=False, depth=-3.0)
@@ -164,6 +154,11 @@ continueRoutine = True
 # update component parameters for each repeat
 wand_position = (0, -.8 * screen_height/2)
 balloon_pos = (0, 0)
+
+collision_space = set()
+defining_collision = False
+
+
 # keep track of which components have finished
 test_magicComponents = [avoid_background, balloon, wand, magic, label_background, label]
 for thisComponent in test_magicComponents:
@@ -176,6 +171,21 @@ while continueRoutine:
     t = test_magicClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
+    # testing if the wand has reached the balloon
+    xDist = wand.pos[0] - balloon.pos[0]
+    yDist = wand.pos[1] - balloon.pos[1]
+    label.setText("%d, %d" % (int(xDist), int(yDist)))
+    
+    if defining_collision:
+        if (xDist, yDist) not in collision_space:
+            collision_space.add((xDist, yDist))
+        magic_opacity = .75
+    else:
+        if (xDist, yDist) in collision_space:
+            magic_opacity = .75
+        else:
+            magic_opacity = 0
+    
     new_wand_position = wand_position
     if event.getKeys([right_key]):
         if wand_position[0] + wand.size[0]/2 + wand_step_size < screen_width/2:
@@ -200,19 +210,18 @@ while continueRoutine:
         balloon_pos = (balloon.pos[0], balloon.pos[1] + 1)
     elif event.getKeys(['s']):
         balloon_pos = (balloon.pos[0], balloon.pos[1] - 1)
+    elif event.getKeys(['space']):
+        if (xDist, yDist) in collision_space:
+            collision_space.remove((xDist, yDist))
+            defining_collision = False
+        else:
+            defining_collision = True
+        
+    elif event.getKeys(['q']):
+        continueRoutine = False
     
-    # testing if the wand has reached the balloon
-    xDist = abs(wand.pos[0] - balloon.pos[0])
-    yDist = abs(wand.pos[1] - balloon.pos[1])
-    label.setText("%d, %d" % (int(xDist), int(yDist)))
     
-    if wand.overlaps(balloon):
-        if not magic_showing:
-            magic_opacity = .75
-            magic_showing = True
-    elif magic_showing:
-        magic_opacity = 0
-        magic_showing = False
+    
     
     # *avoid_background* updates
     if t >= 0 and avoid_background.status == NOT_STARTED:
@@ -229,7 +238,7 @@ while continueRoutine:
         balloon.setAutoDraw(True)
     if balloon.status == STARTED:  # only update if drawing
         balloon.setPos(balloon_pos, log=False)
-        balloon.setSize((75, 68), log=False)
+        balloon.setSize((120, 150), log=False)
     
     # *wand* updates
     if t >= 0 and wand.status == NOT_STARTED:
@@ -248,7 +257,7 @@ while continueRoutine:
         magic.setAutoDraw(True)
     if magic.status == STARTED:  # only update if drawing
         magic.setOpacity(magic_opacity, log=False)
-        magic.setPos((balloon.pos[0] + 20, balloon.pos[1] + 50), log=False)
+        magic.setPos((balloon.pos[0] + 5, balloon.pos[1] + 30), log=False)
     
     # *label_background* updates
     if t >= 0.0 and label_background.status == NOT_STARTED:
@@ -281,7 +290,15 @@ while continueRoutine:
 for thisComponent in test_magicComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
+collision_space_by_y = {}
+for x, y in collision_space:
+    if y in collision_space_by_y:
+        collision_space_by_y[y].append(x)
+    else:
+        collision_space_by_y[y] = [x]
 
+for y_coord, x_coords in sorted(collision_space_by_y.items()):
+    print "%d\t%d\t%d" % (y_coord, min(x_coords), max(x_coords))
 # the Routine "test_magic" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 

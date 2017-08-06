@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sun Aug  6 14:15:32 2017
+    on Sun Aug  6 18:45:46 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -68,12 +68,10 @@ from subprocess import Popen, call
 from random import shuffle
 
 # immediately reset the frame duration to a smoother value
-ideal_fps = 40
 psychopy_calculated_fps = round(expInfo['frameRate'])
-if psychopy_calculated_fps < ideal_fps:
-    print "Warning: Psychopy internally calculated a frame rate of %f fps." % psychopy_calculated_fps
-    print "The system might be having trouble maintaining the necessary framerate (%f fps)." % ideal_fps
-frameDur = 1.0 / ideal_fps # frameDur is the internal value that determines game speed
+if psychopy_calculated_fps != 60:
+    print "Warning: The graphics of this task are meant to run at 60 frames per second, but your display runs at %d." % psychopy_calculated_fps
+
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
 parser = OptionParser()
@@ -173,7 +171,6 @@ if (boringMode and not isYokedParticipant):
     print "Error: Non-stressed (boring) condition was selected without a yoking source file being specified."
     core.quit()
 
-
 # length of anticipatory period (before each trial starts)
 anticipatoryPeriod = 4
 
@@ -187,6 +184,16 @@ wand_step_size = 80
 # screen size (these values just reflect what is already set by Psychopy)
 screen_width = 1440
 screen_height = 900
+
+# read in balloon-wand collision file
+collision_space_by_y = {}
+collision_file = projectDir + "/balloon_wand_collision_map.txt"
+with open(collision_file) as fp:
+    for line in fp:
+        line = line.strip()
+        if line == "": continue
+        fields = line.split("\t")
+        collision_space_by_y[int(fields[0])] = (int(fields[1]), int(fields[2]))
 
 
 # Initialize components for Routine "game_instr"
@@ -231,7 +238,6 @@ slides_2 = visual.ImageStim(
 # Initialize components for Routine "balloons"
 balloonsClock = core.Clock()
 
-
 # signals when the user has successfully halted the balloon
 success = 0
 
@@ -243,17 +249,17 @@ successClock = core.Clock()
 
 # Balloon's y-axis start position and y-axis speed are always the same
 yStartPos = -screen_height/2 
-ySpeed = 7
+ySpeed = 6
 
 
 
 # Define per-trial balloon starting x-position, x-speed (pixels/frame), and zigzag pattern
 balloon_trajectory_info = [
-    (-675, 7, [70, -145]),
+    (-675, 6, [70, -145]),
     (-600, 0, []),
-    (-575, 6, [-200, -500, 290]),
+    (-575, 5, [-200, -500, 290]),
     (-575, -2, [-600, -400]),
-    (-400, 9, [0, -360, 650, -500, 500]),
+    (-400, 8, [0, -360, 650, -500, 500]),
     (-400, 6, []),
     (-400, -7, [-575, 300]),
     (-360, 9, [0, -300, -150]),
@@ -263,7 +269,7 @@ balloon_trajectory_info = [
     (-300, 7, [576, 432]),
     (-275, 7, [0, -575, -300]),
     (-250, 8, [-72, -144, -72]),
-    (-225, 8, [-144, -504, 216]),
+    (-225, 7, [-144, -504, 216]),
     (-150, 0, []),
     (125, -7, [0, 500, -140, 210, -430]),
     (200, -7, [0]),
@@ -271,8 +277,8 @@ balloon_trajectory_info = [
     (300, -5, [100, 200, -100]),
     (300, -9, [-575, 575, -575, 575]),
     (300, 2, []),
-    (360, -6, [0, 430]),
-    (360, -6, [75]),
+    (360, -5, [0, 430]),
+    (360, -5, [75]),
     (360, 6, [510]),
     (450, -9, [390, 505, 450, 600, 500, 600, 550, 625]),
     (400, -6, [-580, -290, -325]),
@@ -331,7 +337,7 @@ avoid_background = visual.ImageStim(
 balloon = visual.ImageStim(
     win=win, name='balloon',units='pix', 
     image='sin', mask=None,
-    ori=45, pos=[0,0], size=1.0,
+    ori=45, pos=[0,0], size=(120, 150),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-3.0)
@@ -360,9 +366,9 @@ counter_background = visual.ImageStim(
     texRes=128, interpolate=True, depth=-7.0)
 counter = visual.TextStim(win=win, name='counter',
     text=None,
-    font='Arial',
+    font=u'Arial',
     units='pix', pos=(550, -432), height=24, wrapWidth=None, ori=0, 
-    color='#053270', colorSpace='rgb', opacity=1,
+    color=u'#053270', colorSpace='rgb', opacity=1,
     depth=-8.0);
 magic = visual.ImageStim(
     win=win, name='magic',units='pix', 
@@ -862,9 +868,9 @@ for thisTrial in trials:
         if t > anticipatoryPeriod:
             startedTrial = 1
         
-        # testing if the wand has reached the balloon
-        xDist = abs(wand.pos[0] + wand.size[0]/2 - (balloon.pos[0]))
-        yDist = abs(wand.pos[1] + wand.size[1]/2 - (balloon.pos[1] + balloon.size[1]/2))
+        # measuring distance between wand an balloon
+        xDist = wand.pos[0] - balloon.pos[0]
+        yDist = wand.pos[1] - balloon.pos[1]
         
         # if balloon reaches top, balloon will pop
         if balloon.pos[1] > .85 * screen_height/2 and success == 0:
@@ -883,7 +889,7 @@ for thisTrial in trials:
                 core.wait(.2)
                 balloonImage = media + "pop_2.png"
             timeToPop = 1
-        elif (t > anticipatoryPeriod + .2 and xDist < 40 and yDist < 40):
+        elif t > anticipatoryPeriod + .2 and yDist in collision_space_by_y and xDist >= collision_space_by_y[yDist][0] and xDist <= collision_space_by_y[yDist][1]:
             # note that you need the .2 second buffer to guarantee objects are initialized before the test
             if success == 0:
                 successClock.reset()
@@ -941,7 +947,6 @@ for thisTrial in trials:
         if balloon.status == STARTED:  # only update if drawing
             balloon.setPos(balloonPosition, log=False)
             balloon.setImage(balloonImage, log=False)
-            balloon.setSize((120, 150), log=False)
         
         # *wand* updates
         if t >= t>=anticipatoryPeriod and wand.status == NOT_STARTED:
@@ -996,7 +1001,7 @@ for thisTrial in trials:
         if magic.status == STARTED and t >= (magic.tStart + 1.5):
             magic.setAutoDraw(False)
         if magic.status == STARTED:  # only update if drawing
-            magic.setPos((balloon.pos[0] + 20, balloon.pos[1] + 50), log=False)
+            magic.setPos((balloon.pos[0] + 5, balloon.pos[1] + 30), log=False)
         # start/stop magic_sound
         if t >= justSavedBalloon == 1 and magic_sound.status == NOT_STARTED:
             # keep track of start time/frame for later
