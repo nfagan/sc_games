@@ -1,6 +1,6 @@
 Psychopy manual install for MacOS 
 Based off of instructions on Psychopy website (http://psychopy.org/installation.html), but with some important changes.
-Note that Steps 5-6 are only necessary if you will be using a Labjack.
+Note that Steps 6-7 are only necessary if you will be using a Labjack.
 
 1. Install Homebrew, if you haven't already done so. The Homebrew website provides the necessary installation command.
 2. Using Homebrew, install new, standalone versions of Python/Pip using the command "brew install python". Homebrew should 
