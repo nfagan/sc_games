@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.85.2),
-    on Sun Aug  6 18:45:46 2017
+    on Sun Aug  6 23:08:19 2017
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -26,7 +26,7 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Store info about the experiment session
-expName = 'balloon_game'  # from the Builder filename that created this script
+expName = u'balloon_game'  # from the Builder filename that created this script
 expInfo = {u'dont_use': u''}
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
@@ -50,9 +50,9 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 win = visual.Window(
     size=(1440, 900), fullscr=True, screen=0,
     allowGUI=False, allowStencil=False,
-    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor=u'testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True,
-    units='norm')
+    units='pix')
 # store frame rate of monitor if we can measure it
 expInfo['frameRate'] = win.getActualFrameRate()
 if expInfo['frameRate'] != None:
@@ -67,11 +67,15 @@ from datetime import datetime
 from subprocess import Popen, call
 from random import shuffle
 
-# immediately reset the frame duration to a smoother value
+# check frame rate
+expected_fps = 60
 psychopy_calculated_fps = round(expInfo['frameRate'])
-if psychopy_calculated_fps != 60:
-    print "Warning: The graphics of this task are meant to run at 60 frames per second, but your display runs at %d." % psychopy_calculated_fps
+if psychopy_calculated_fps != expected_fps:
+    print "Warning: The graphics of this task are meant to run at %d frames per second, but your display runs at %d." % (expected_fps, psychopy_calculated_fps)
 
+win.recordFrameIntervals = True
+win.refreshThreshold = 1.0/expected_fps + 0.004
+logging.console.setLevel(logging.WARNING) # so dropped frames get reported
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
 parser = OptionParser()
@@ -251,7 +255,7 @@ successClock = core.Clock()
 yStartPos = -screen_height/2 
 ySpeed = 6
 
-
+top_of_catchable_area = .85 * screen_height/2
 
 # Define per-trial balloon starting x-position, x-speed (pixels/frame), and zigzag pattern
 balloon_trajectory_info = [
@@ -751,6 +755,8 @@ for thisTrial in trials:
     timeSinceSuccess = 0
     
     wand_position = (0, -.8 * screen_height/2)
+    wand_width = wand.size[0]
+    wand_height = wand.size[1]
     balloonImage = media + "pink_balloon.png"
     current_trajectory_index = balloon_trajectory_order.pop(0)
     currentBalloonSettings = balloon_trajectory_info[current_trajectory_index]
@@ -812,7 +818,7 @@ for thisTrial in trials:
                 keyJustPressed = 'right'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[0] + wand.size[0]/2 + wand_step_size < screen_width/2:
+                if wand_position[0] + wand_width/2 + wand_step_size < screen_width/2:
                     new_wand_position = (wand_position[0] + wand_step_size, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
@@ -821,7 +827,7 @@ for thisTrial in trials:
                 keyJustPressed = 'left'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[0] - wand.size[0]/2 - wand_step_size > -screen_width/2: 
+                if wand_position[0] - wand_width/2 - wand_step_size > -screen_width/2: 
                     new_wand_position = (wand_position[0] - wand_step_size, wand_position[1])
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
@@ -830,7 +836,7 @@ for thisTrial in trials:
                 keyJustPressed = 'up'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[1] + wand.size[1]/2 + wand_step_size < screen_height/2:
+                if wand_position[1] + wand_height/2 + wand_step_size < screen_height/2:
                     new_wand_position = (wand_position[0], wand_position[1] + wand_step_size)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
@@ -839,7 +845,7 @@ for thisTrial in trials:
                 keyJustPressed = 'down'
                 totalKeyPresses += 1
                 validKeyPress = '0'
-                if wand_position[1] - wand.size[1]/2 - wand_step_size > -screen_height/2:
+                if wand_position[1] - wand_height/2 - wand_step_size > -screen_height/2:
                     new_wand_position = (wand_position[0], wand_position[1] - wand_step_size)
                     validKeyPress = '1'
                     totalValidKeyPresses += 1
@@ -855,26 +861,29 @@ for thisTrial in trials:
         
         # moving the balloon during the main part of the trial
         if not timeToPop and startedTrial:
-            balloonPosition = (balloon.pos[0] + balloonShift[0], balloon.pos[1] + balloonShift[1]) # starting just off screen
+            balloonPosition = (balloonPosition[0] + balloonShift[0], balloonPosition[1] + balloonShift[1]) # starting just off screen
             # reverse x-speed whenever a "zigzag line" is crossed
             if len(zigs) > 0:
                 zig_line_position = zigs[0]
                 # if within 6 pixels of zigzag line, x-speed reverses (+/- 6 means condition always triggers since max speed is 9)
-                if abs(balloon.pos[0] - zig_line_position) < 6:
+                if abs(balloonPosition[0] - zig_line_position) < 6:
                     balloonShift = (-balloonShift[0], balloonShift[1])
                     zigs.pop(0)
         
         # signaling when the main part of the trial has started
         if t > anticipatoryPeriod:
+            if startedTrial == 0:
+                frames_dropped_so_far = win.nDroppedFrames
             startedTrial = 1
         
         # measuring distance between wand an balloon
-        xDist = wand.pos[0] - balloon.pos[0]
-        yDist = wand.pos[1] - balloon.pos[1]
+        xDist = wand_position[0] - balloonPosition[0]
+        yDist = wand_position[1] - balloonPosition[1]
         
         # if balloon reaches top, balloon will pop
-        if balloon.pos[1] > .85 * screen_height/2 and success == 0:
+        if balloonPosition[1] > top_of_catchable_area and success == 0:
             if timeToPop == 0:
+                time_of_popping = t
                 justPoppedBalloon = 1
                 totalPopped += 1
                 balloonImage = media + "pop_1.png"
@@ -886,7 +895,7 @@ for thisTrial in trials:
                     y.write("\t".join(yokingParams + ["\n"]))
             else:
                 justPoppedBalloon = 0
-                core.wait(.2)
+            if t > time_of_popping + .2:
                 balloonImage = media + "pop_2.png"
             timeToPop = 1
         elif t > anticipatoryPeriod + .2 and yDist in collision_space_by_y and xDist >= collision_space_by_y[yDist][0] and xDist <= collision_space_by_y[yDist][1]:
@@ -905,12 +914,9 @@ for thisTrial in trials:
             success = 1
             if not isYokedParticipant: aversive_pop.status = FINISHED
         
-        if (success):
-            timeSinceSuccess = successClock.getTime()
-        
         # logging
-        logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(balloon.pos[0]), str(balloon.pos[1]), 
-            str(wand.pos[0]), str(wand.pos[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), 
+        logInfo = [id, str(datetime.now()), str(currentTrial), str(t), str(balloonPosition[0]), str(balloonPosition[1]), 
+            str(wand_position[0]), str(wand_position[1]), keyJustPressed, validKeyPress, str(totalKeyPresses), str(totalValidKeyPresses), 
             str(justPoppedBalloon), str(justSavedBalloon), str(totalPopped), str(totalSaved)]
         
         if updateLog == 1:
@@ -1028,6 +1034,8 @@ for thisTrial in trials:
             thisComponent.setAutoDraw(False)
     # to make clear that start of next routine in loop is not immediate victory
     balloon.pos[1] = 0
+    dropped_this_trial = win.nDroppedFrames - frames_dropped_so_far
+    print "Trial %d: Overall, %i frames were dropped during the avoidance phase of this trial." % (currentTrial, dropped_this_trial)
     aversive_pop.stop()  # ensure sound has stopped at end of routine
     magic_sound.stop()  # ensure sound has stopped at end of routine
     # the Routine "balloons" was not non-slip safe, so reset the non-slip timer
