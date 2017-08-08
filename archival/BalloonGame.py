@@ -599,7 +599,7 @@ while continueRoutine and routineTimer.getTime() > 0:
         magic_wand.tStart = t
         magic_wand.frameNStart = frameN  # exact frame index
         magic_wand.setAutoDraw(True)
-    frameRemains = 0 + 20- win.monitorFramePeriod * 0.75  # most of one frame period left
+    frameRemains = 0 + 20 - win.monitorFramePeriod * 0.75  # most of one frame period left
     if magic_wand.status == STARTED and t >= frameRemains:
         magic_wand.setAutoDraw(False)
     if magic_wand.status == STARTED:  # only update if drawing
