@@ -21,28 +21,12 @@ from numpy.random import random, randint, normal, shuffle
 import os  # handy system and path functions
 import sys  # to get file system encoding
 
-# Ensure that relative paths start from the same directory as this script
-_thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
-os.chdir(_thisDir)
 
 # Store info about the experiment session
 expName = 'EggGame'  # from the Builder filename that created this script
 expInfo = {u'participantID': u'preselected'}
 expInfo['date'] = data.getDateStr()  # add a simple timestamp
 expInfo['expName'] = expName
-
-# Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = _thisDir + os.sep + "EggGame_%s" % expInfo['date']
-
-# An ExperimentHandler isn't essential but helps with data saving
-thisExp = data.ExperimentHandler(name=expName, version='',
-    extraInfo=expInfo, runtimeInfo=None,
-    originPath=u'/Users/Jeff/sc_magic/psyexp/EggGame.psyexp',
-    savePickle=True, saveWideText=False,
-    dataFileName=filename)
-# save a log file for detail verbose info
-logFile = logging.LogFile(filename+'.log', level=logging.EXP)
-logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
 
 # Start Code - component code to be run before the window creation
 
@@ -64,6 +48,8 @@ else:
 initializeClock = core.Clock()
 from optparse import OptionParser, SUPPRESS_HELP
 from subprocess import Popen, call
+from datetime import datetime
+import re
 
 # collect runtime options (can be supplied via command line, or the wrapper script can do it automatically)
 parser = OptionParser()
@@ -75,10 +61,43 @@ parser.add_option("-v", "--version", metavar="VERSION", dest="version", default=
 
 (options, args) = parser.parse_args()
 projectDir = options.source_dir
-outputDir = options.output_dir
+output_dir = options.output_dir
 id = options.id
 version= options.version
 button_box_mode = options.button_box_mode
+
+game_type = "egg"
+output_dir = re.sub('\/+$', '', output_dir) # strip trailing slashes
+timestamp = datetime.strftime(datetime.now(),  "%b-%d-%y_%H%M")
+if not os.path.isdir(output_dir):
+    print "Error: Output destination %s does not exist." % output_dir
+    sys.exit()
+else:
+    output_dir = os.path.abspath(output_dir)
+    output_dir += "/%s/%s_%s" % (id, game_type, timestamp)
+    if os.path.exists(output_dir):
+        print "Error: Run-specific output directory %s already exists." % output_dir
+        sys.exit()
+    else:
+        try:
+            os.makedirs(output_dir)
+        except:
+            print "Error: Could not create output directory %s." % output_dir
+            print "Are you sure that directory is writeable?"
+            sys.exit()
+
+# Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
+exp_handler_log = "%s/psychopy" % output_dir
+
+# An ExperimentHandler isn't essential but helps with data saving
+thisExp = data.ExperimentHandler(name=expName, version='',
+    extraInfo=expInfo, runtimeInfo=None,
+    savePickle=True, saveWideText=False,
+    dataFileName=exp_handler_log)
+# save a log file for detail verbose info
+logFile = logging.LogFile(exp_handler_log +'.log', level=logging.EXP)
+logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
+
 
 if button_box_mode:
     right_key = "1"
@@ -92,18 +111,9 @@ else:
     up_key = "up"
 
 
-if not projectDir or not outputDir or not id:
-    Popen("sleep 5; rm %s.log %s.psydat" %(filename, filename), shell=True)
+if not projectDir or not output_dir or not id:
     parser.print_help()
     core.quit()
-
-logDir = outputDir + '/logs'
-if not os.path.exists(logDir): os.mkdir(logDir)
-
-# Moving Psychopy's automatic log files to a better location
-new_filename = "%s/NoiseRating_%s_%s" % (logDir, id, expInfo['date'])
-call("mv %s* %s.log" % (filename, new_filename), shell=True)
-filename = new_filename
 
 
 media = projectDir + "/sc_media/"
@@ -114,7 +124,7 @@ from datetime import datetime
 
 
 # define output file
-outputFile = "%s/EggGame_%s_%s_data.txt" %(outputDir, id, expInfo['date'])
+outputFile = "%s/egg_%s_%s_data.txt" %(output_dir, id, timestamp)
 
 
 # length of anticipatory period (before each trial starts)
@@ -877,7 +887,7 @@ print "Finished the game!"
 
 f.close()
 # these shouldn't be strictly necessary (should auto-save)
-thisExp.saveAsPickle(filename)
+thisExp.saveAsPickle(exp_handler_log)
 logging.flush()
 # make sure everything is closed down
 thisExp.abort()  # or data files will save again on exit

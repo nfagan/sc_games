@@ -129,10 +129,6 @@ while True:
 test_options = '' # will be passed on command line to the game script
 
 
-# Create game-specific output directory if needed
-output_directory += "/%s" %chosen_game_info['DirName']
-if not os.path.exists(output_directory): os.mkdir(output_directory)
-
 participant_id = 'Missing'
 new_id = raw_input("Assign an ID for the new participant: ")
 while True:
