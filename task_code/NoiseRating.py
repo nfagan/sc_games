@@ -120,7 +120,7 @@ f.write("Participant\tNoise\tRating\n")
 Slide = visual.ImageStim(
     win=win, name='Slide',
     image='sin', mask=None,
-    ori=0, pos=(0, 0), size=(2, 2),
+    ori=0, pos=(0, 0), size=(1440, 900),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
