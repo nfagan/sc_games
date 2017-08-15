@@ -1,18 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-This is a template for building Psychopy experiments.
-Read carefully to get an understanding of the flow that is required to
-get an experiment working properly.
-
-This template excludes some of the superfluous stuff that the Psychopy desktop
-application includes when it generates Python scripts from .psyexp files. If you
-want to use the app to build an experiment, you'll see that the code that is
-generated will follow a similar but different pattern.
-
-Before you can use a script written off this template, you'll need to 
-have the Psychopy Python package and all prerequisites installed, which
-will be simple if you have the right instructions and hard otherwise.
+This script runs three conditions Magic Balloon Game: Controllable stress, uncontrollable stress, and non-stressed.
+Soon, it will also run the Magic Egg Game.
 """
 
 # Psychopy wants this
@@ -30,7 +20,7 @@ from random import shuffle
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
 # If the balloon/wand collision mapping file can't be found, then maybe the script has been moved out of its project directory
-collision_file = project_dir + "/balloon_wand_collision_map.pickle"
+collision_file = project_dir + "/resources/balloon_wand_collision_map.pickle"
 if not os.path.isfile(collision_file):
     print "Error: Could not find wand/balloon collision file %s." % collision_file
     print "Make sure your copy of this script is located in its proper project directory, which should contain all necessary files."
@@ -114,8 +104,7 @@ parser.add_option("-i", "--participant-id", metavar="ID", dest="participant_id",
 parser.add_option("-o", "--output", metavar="OUTPUT_DIR", dest="output_dir", help="the directory where output data and log files should be saved")
 parser.add_option("-g", "--game-type", metavar="GAME", dest="game_type", choices=all_game_types, help="the type of game to play (choices: %s)" % str(all_game_types))
 parser.add_option("-y", "--yoke-source", metavar="YOKE_FILE", dest="yoke_source", help="For balloon_us and balloon_ns conditions, indicate a yoking file from a balloon_cs run")
-parser.add_option("-B", "--button_box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
-
+parser.add_option("-B", "--button-box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
 # options for testing and development
 parser.add_option("--short-iti", action="store_true", default=False, dest="short_iti", help="use shortened inter-trial intervals (for test runs only)")
 parser.add_option("--skip-instructions", action="store_true", default=False, dest="skip_instructions", help="skip instructions/practice slides (for test runs only)")
@@ -220,7 +209,8 @@ if short_iti_mode: ITI_duration = 1
 
 # will pull from balloon settings list in random order (unless testing trials)
 balloon_trajectory_order = range(0, len(balloon_trajectory_info))
-if not trial_debug_mode and not short_iti_mode and not skip_instructions: shuffle(balloon_trajectory_order)
+if not trial_debug_mode and not short_iti_mode and not skip_instructions: 
+    shuffle(balloon_trajectory_order)
 
 
 ## Now going to start loading Psychopy and setting up the experiment window
@@ -228,9 +218,7 @@ if not trial_debug_mode and not short_iti_mode and not skip_instructions: shuffl
 from psychopy import data
 from psychopy import locale_setup, sound, gui, visual, core, event, logging
 from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED, STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
-import numpy as np  # whole numpy lib is available, prepend 'np.'
 from numpy import (sin, cos, tan, log, log10, pi, average, sqrt, std, deg2rad, rad2deg, linspace, asarray)
-from numpy.random import random, randint, normal, shuffle
 
 # Set up logging using ExperimentHandler
 exp_info = {} # a dict of run information that gets passed to the ExperimentHandler
@@ -257,7 +245,7 @@ win.refreshThreshold = win_refresh_threshold
 # The image component used for instruction slide routines (instructions_1, instructions_2, and the thank you message at the end)
 slides = visual.ImageStim(win = win, name = 'slides', units='pix', image='sin', size=(screen_width, screen_height), interpolate=True, depth=-2.0)
 
-# Components for wand practice routiner
+# Components for wand practice routine
 wand = visual.ImageStim(win=win, name='wand',units='pix', image=media + "magic_wand.png", pos=[0,0], size=(80, 70), interpolate=True, depth=-4.0)
 time_left_label = visual.TextStim(win=win, name='time_left_label', text=None, font='Arial', units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, color='#053270', depth=-2.0);
 
@@ -279,19 +267,24 @@ magic_sparks = visual.ImageStim(win=win, name='magic_sparks',units='pix',
     image=media + "magic-effect.png", pos=[0,0], size=(150, 150), opacity=.75, interpolate=True, depth=-9.0)
 magic_sound = sound.Sound(media + "magic-sound-trimmed.wav", secs=-1, volume = .5)
 
-# a class to simply the process of creating and running routines
+
+# A routine to simplify task flow
 class Routine():
-    # A routine consists of a group of components (ImageStim, TextStim, Sound), a clock, a frame counter, and a marker to
+    # A routine consists of a set of associated components (ImageStim, TextStim, Sound), a clock, a frame counter, and a marker to
     # show whether the routine is "live" (that is, has components that are currently active in window).
     # In addition, a routine can have have custom functions that run on startup, shutdown, and on a frame-by-frame basis
-    def __init__(self, startup = None, run_frame = None, shutdown = None):
+    def __init__(self, window = None, startup = None, run_frame = None, shutdown = None):
         self.startup_func = startup
         self.run_frame_func = run_frame
         self.shutdown_func = shutdown
-        self.components = {}
+        self.components = set()
         self.live = False
         self.clock = core.Clock()
-        self.frameN = -1
+        self.frameN = -1 # frame number will be 0-based, because that's what Psychopy recommends
+        if isinstance(window, visual.Window):
+            self.win = window
+        else:
+            raise ValueError("Window supplied to Routine class is not of type visual.Window")
 
     # When a routine goes live, its clock is set to 0, and then a custom routine-specific startup code runs (if supplied)
     def startup (self, *args):
@@ -305,8 +298,8 @@ class Routine():
         self.frameN += 1
         if self.run_frame_func: self.run_frame_func(self, *args)
         # Flip window if there are components running (if not, mark routine as no longer live)
-        if len(self.components.keys()) > 0:
-            win.flip()
+        if len(self.components) > 0:
+            self.win.flip()
         else:
             self.live = False
 
@@ -314,18 +307,17 @@ class Routine():
     def shutdown(self, *args):
         if self.shutdown_func:
             self.shutdown_func(self, *args)
-        for component in self.components.keys():
-            routine.stop_component(component)
+        self.stop_all_components()
 
     # Method to start components (set images to display, sounds to display, and record start-up information for logging)
     def start_component(self, component):
-        self.components[component] = component
-        self.components[component].tStart = self.clock.getTime()
-        self.components[component].frameNStart = self.frameN  # exact frame index
+        component.frameNStart = self.frameN  # exact frame index
+        component.tStart = self.clock.getTime()
         if isinstance(component, (visual.ImageStim, visual.ShapeStim, visual.TextStim)):
-            self.components[component].setAutoDraw(True)
+            component.setAutoDraw(True)
         elif isinstance (component, sound.Sound):
-            self.components[component].play()
+            component.play()
+        self.components.add(component)
 
     # Method to stop components (stop displaying images, stop playing sounds, and remove component from routine)
     def stop_component(self, component):
@@ -333,12 +325,18 @@ class Routine():
         if component not in self.components:
             return
         if isinstance(component, (visual.ImageStim, visual.ShapeStim, visual.TextStim)):
-            self.components[component].setAutoDraw(False)
+            component.setAutoDraw(False)
         elif isinstance (component, sound.Sound):
-            self.components[component].stop()
+            component.stop()
         else:
             return # don't know how to handle other objects, so doing nothing
-        del self.components[component]
+        self.components.remove(component)
+
+    # Method to stop all components at once
+    def stop_all_components(self):
+        component_list = list(self.components)
+        for component in component_list:
+            self.stop_component(component)
 
     # Simple convenience method that runs a routine in the intended way
     @staticmethod
@@ -351,6 +349,7 @@ class Routine():
         routine.shutdown()
 
 
+## Declare all the functions that control the behavior of each routine in the experiment
 # for each numbered instruction slide, storing which key press is required to advance
 keys_to_advance = {} 
 for slide_num in range (1, 11):
@@ -504,8 +503,7 @@ def trial_run_frame(routine):
     # handling ITI
     if time_in_trial > antic_period_duration + avoidance_period_duration:
         if not routine.started_ITI:
-            for component in routine.components.keys():
-                routine.stop_component(component)
+            routine.stop_all_components()
             routine.start_component(ITI)
             routine.started_ITI = True
             iti_onset = '1'
@@ -625,9 +623,9 @@ def trial_shutdown(routine):
 
 # build a list of routines to run
 routines = []
-instructions_1 = Routine(run_frame = lambda routine: run_slides(routine, 1, 15))
-wand_practice = Routine(startup = wand_practice_startup, run_frame = wand_practice_run_frame)
-instructions_2 = Routine(run_frame = lambda routine: run_slides(routine, 16, 18))
+instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 15))
+wand_practice = Routine(window = win, startup = wand_practice_startup, run_frame = wand_practice_run_frame)
+instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 16, 18))
 
 if not skip_instructions: routines.extend((instructions_1, wand_practice, instructions_2))
 
@@ -638,10 +636,10 @@ for trial_num in range(1, num_trials + 1):
         if trial_num < debug_trial:
             current_trial_num += 1
         continue
-    trial = Routine(startup = trial_startup, run_frame = trial_run_frame, shutdown = trial_shutdown)
+    trial = Routine(window = win, startup = trial_startup, run_frame = trial_run_frame, shutdown = trial_shutdown)
     routines.append(trial)
 
-thanks = Routine(run_frame = lambda routine: run_slides(routine, 19, 19))
+thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 19, 19))
 routines.append(thanks)
 
 
@@ -672,6 +670,7 @@ if game_type == cs:
     with open (yoking_file, 'w') as y:
         pickle.dump(aversive_sound_by_trial_num, y)
 print "Finished the game!"
+print "Output has been written to %s." % output_dir
 
 # Psychopy shutdown code
 this_exp.saveAsPickle(exp_handler_log)
