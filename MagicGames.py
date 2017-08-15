@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+
 """
 This script runs three conditions Magic Balloon Game: Controllable stress, uncontrollable stress, and non-stressed.
 Soon, it will also run the Magic Egg Game.
@@ -257,7 +257,7 @@ avoid_background = visual.ImageStim(win=win, name='avoid_background',units='pix'
 ITI = visual.ImageStim(win=win, name='ITI',units='pix', image=media + "iti_background.jpg", 
     pos=(0, 0), size=(screen_width, screen_height), interpolate=True, depth=-6.0)
 balloon = visual.ImageStim(win=win, name='balloon',units='pix', 
-    image='sin', ori=45, pos=[0,0], size=(120, 150),interpolate=True, depth=-3.0)
+    image='sin', pos=[0,0], size=(120, 150),interpolate=True, depth=-3.0)
 aversive_pop = sound.Sound(media + "Balloon_Pop.wav", secs=-1, volume = 1.0)
 counter_background = visual.ImageStim(win=win, name='counter_background',units='pix', 
     image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0)

@@ -1,8 +1,6 @@
-import sys
-import os
-import re
-import datetime
-import signal
+#!/usr/bin/env python2
+import sys, os
+import re, datetime, signal
 from subprocess import call, check_output
 
 # make it pretty when user quits with Control-C

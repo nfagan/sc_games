@@ -1,6 +1,4 @@
 #!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
 
 # psychopy wants this import, and __future__ must be the first line of code when it's used
 from __future__ import absolute_import, division
