@@ -54,7 +54,7 @@ if existing_map_file:
     starting_collision_space_by_y = pickle.load(m)
     starting_set = set()
     for y_coord in starting_collision_space_by_y.keys():
-        for x_coord in range(starting_collision_space_by_y[y_coord][0], starting_collision_space_by_y[y_coord][1] + 1):
+        for x_coord in range(int(starting_collision_space_by_y[y_coord][0]), int(starting_collision_space_by_y[y_coord][1] + 1)):
             starting_set.add((x_coord, y_coord))
 
 from psychopy import locale_setup, sound, gui, visual, core, data, event, logging
