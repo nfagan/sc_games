@@ -269,7 +269,7 @@ if fast_mode:
 # will pull from balloon/egg settings list in random order (unless testing trials)
 all_trajectory_info = egg_trajectory_info if playing_egg_game else balloon_trajectory_info
 trajectory_order = range(0, len(all_trajectory_info))
-if not trial_debug_mode and fast_mode and not skip_instructions: 
+if not trial_debug_mode and not fast_mode and not skip_instructions: 
     shuffle(trajectory_order)
 
 ## Set task-specific constants depending on whether egg or balloon game is being played
