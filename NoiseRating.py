@@ -25,7 +25,7 @@ rating_slide = media + 'Noise_Rating_Slides/RatingSlide.jpg'
 fixation_slide = media + 'iti_background.jpg'
 
 # The sounds to be played, the order of which is randomized for each run
-sounds_to_rate = [media + 'chime.wav', media + 'Balloon_Pop.wav', media + 'SHAPES_USE.wav', media + 'egg_crack.wav']
+sounds_to_rate = [media + 'Sounds/chime.wav', media + 'Sounds/balloon_pop.wav', media + 'Sounds/shape_task_sound.wav', media + 'Sounds/egg_crack.wav']
 shuffle(sounds_to_rate)
 
 # window size

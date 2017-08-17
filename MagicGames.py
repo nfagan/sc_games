@@ -14,28 +14,42 @@ import re, pickle
 from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import call
-from random import shuffle
+from random import shuffle, choice
 
 # The project source directory is taken to be the directory containing this script
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
-# If the balloon/wand collision mapping file can't be found, then maybe the script has been moved out of its project directory
-collision_file = project_dir + "/resources/balloon_wand_collision_map.pickle"
-if not os.path.isfile(collision_file):
-    print "Error: Could not find wand/balloon collision file %s." % collision_file
-    print "Make sure your copy of this script is located in its proper project directory, which should contain all necessary files."
-
-# Media subdirectories should also be present in project folder    
+# Media subdirectory should be present in project folder    
 media = project_dir + "/sc_media/"
+if not os.path.isdir(media):
+    print "Error: Could not find required directory %s in the project source folder." % media
+    print "Make sure you have a clean copy of this project's source repository."
+    sys.exit()
+
+# Egg media files
+whole_egg_image = media + "egg.png"
+cracking_egg_1_image = media + "cracking_egg_1.png"
+cracking_egg_2_image = media + "cracking_egg_2.png"
+egg_anticipatory_background = media + "Egg_anticipatory_background.jpg"
+egg_avoidance_background =  media + "Egg_avoidance_background.jpg"
+cracking_sound = media + "Sounds/egg_crack.wav"
+egg_slide_dir = media + "Egg_instruction_slides/"
+
+# Balloon media files
+whole_balloon_image = media + "pink_balloon.png"
+pop_1_image = media + "pop_1.png"
+pop_2_image = media + "pop_2.png"
+balloon_anticipatory_background = media + "Balloon_anticipatory_background.jpg"
+balloon_avoidance_background = media + "Balloon_avoidance_background.jpg"
+popping_sound = media + "Sounds/balloon_pop.wav"
 balloon_slide_dir = media + "Balloon_instruction_slides/"
-for directory in (media, balloon_slide_dir):
-    if not os.path.isdir(directory):
-        print "Error: Could not find required directory %s in the project source folder." % directory
-        print "Make sure you have a clean copy of this project's source repository."
-        sys.exit()
+
+# Collision files show which x/y distances between objects should count as collisions
+balloon_collision_file = project_dir + "/resources/balloon_wand_collision_map.pickle"
+egg_collision_file = project_dir + "/resources/egg_wand_collision_map.pickle"
+
 
 # Experiment parameters
-exp_name = 'magic'
 balloon_game_types = (cs, us, ns) = ("balloon_cs", "balloon_us", "balloon_ns")
 all_game_types = balloon_game_types + ("egg",)
 screen_width = 1440
@@ -48,55 +62,98 @@ right_key = "right"
 expected_fps = 60
 win_refresh_threshold = 1.0/expected_fps + 0.004 # defining what counts as a dropped frame (value suggested by Psychopy site)
 
-## Trial constants
+# Constants used across balloon/egg games
 wand_practice_time = 20.0
 antic_period_duration = 4
 avoidance_period_duration = 4.5
 ITI_duration = 10 # need a long inter-trial period for MRI synching
 wand_step_size = 80 # distance wand moves per step (in pixels)
 magic_sparks_duration = 0.75 # duration of magic sparks effect upon touching target object
-balloon_Y_start = -screen_height/2 # Balloon's y-axis start position and y-axis speed are always the same
+
+# Balloon game constants
+balloon_Y_start = int(-screen_height/2)
 balloon_Y_speed = 6
 sparks_balloon_offset_x = 5
 sparks_balloon_offset_y = 30
-top_of_catchable_area = .85 * screen_height/2
+balloon_catch_y_boundary = .85 * screen_height/2
+balloon_catch_boundary_direction = '>'
+balloon_starting_wand_position = (0, -360)
+balloon_rotation_rate = 0 # degrees/frame
 
-# Define per-trial balloon starting x-position, x-speed (pixels/frame), and zigzag pattern
+# Define per-trial balloon starting X/Y positions, X/Y per-frame step (speed), and a list of vertical "zig"  lines
 balloon_trajectory_info = [
-    (-675, 6, [70, -145]),
-    (-600, 0, []),
-    (-575, 5, [-200, -500, 290]),
-    (-575, -2, [-600, -400]),
-    (-400, 8, [0, -360, 650, -500, 500]),
-    (-400, 6, []),
-    (-400, -7, [-575, 300]),
-    (-360, 9, [0, -300, -150]),
-    (-360, 6, [-75, -150, 150, -290]),
-    (-360, 3, [-75]),
-    (-350, -1, []),
-    (-300, 7, [576, 432]),
-    (-275, 7, [0, -575, -300]),
-    (-350, 8, [-200, -300]),
-    (-225, 7, [-144, -504, 216]),
-    (-150, 0, []),
-    (425, -3, [300]),
-    (200, -7, [50, 600]),
-    (225, -9, [0, 580, -215, 215, -500, 575]),
-    (300, -5, [100, 200, -100]),
-    (300, -9, [-575, 575, -575, 575]),
-    (300, 2, []),
-    (360, -5, [0, 430]),
-    (360, -5, [75]),
-    (360, 6, [510]),
-    (450, -9, [390, 505, 450, 600, 500, 600, 550, 625]),
-    (400, -6, [-580, -290, -325]),
-    (400, -6, [140]),
-    (650, -8, [250, 675]),
-    (650, 0, [])]
+    (-675, balloon_Y_start, 6, balloon_Y_speed, [70, -145]),
+    (-600, balloon_Y_start, 0, balloon_Y_speed, []),
+    (-575, balloon_Y_start, 5, balloon_Y_speed, [-200, -500, 290]),
+    (-575, balloon_Y_start, -2, balloon_Y_speed, [-600, -400]),
+    (-400, balloon_Y_start, 8, balloon_Y_speed, [0, -360, 650, -500, 500]),
+    (-400, balloon_Y_start, 6, balloon_Y_speed, []),
+    (-400, balloon_Y_start, -7, balloon_Y_speed, [-575, 300]),
+    (-360, balloon_Y_start, 9, balloon_Y_speed, [0, -300, -150]),
+    (-360, balloon_Y_start, 6, balloon_Y_speed, [-75, -150, 150, -290]),
+    (-360, balloon_Y_start, 3, balloon_Y_speed, [-75]),
+    (-350, balloon_Y_start, -1, balloon_Y_speed, []),
+    (-300, balloon_Y_start, 7, balloon_Y_speed, [576, 432]),
+    (-275, balloon_Y_start, 7, balloon_Y_speed, [0, -575, -300]),
+    (-350, balloon_Y_start, 8, balloon_Y_speed, [-200, -300]),
+    (-225, balloon_Y_start, 7, balloon_Y_speed, [-144, -504, 216]),
+    (-150, balloon_Y_start, 0, balloon_Y_speed, []),
+    (425, balloon_Y_start, -3, balloon_Y_speed, [300]),
+    (200, balloon_Y_start, -7, balloon_Y_speed, [50, 600]),
+    (225, balloon_Y_start, -9, balloon_Y_speed, [0, 580, -215, 215, -500, 575]),
+    (300, balloon_Y_start, -5, balloon_Y_speed, [100, 200, -100]),
+    (300, balloon_Y_start, -9, balloon_Y_speed, [-575, 575, -575, 575]),
+    (300, balloon_Y_start, 2, balloon_Y_speed, []),
+    (360, balloon_Y_start, -5, balloon_Y_speed, [0, 430]),
+    (360, balloon_Y_start, -5, balloon_Y_speed, [75]),
+    (360, balloon_Y_start, 6, balloon_Y_speed, [510]),
+    (450, balloon_Y_start, -9, balloon_Y_speed, [390, 505, 450, 600, 500, 600, 550, 625]),
+    (400, balloon_Y_start, -6, balloon_Y_speed, [-580, -290, -325]),
+    (400, balloon_Y_start, -6, balloon_Y_speed, [140]),
+    (650, balloon_Y_start, -8, balloon_Y_speed, [250, 675]),
+    (650, balloon_Y_start, 0, balloon_Y_speed, [])]
 
-# read in balloon-wand collision file (created by CollisionMapMaker)
-with open(collision_file) as cf:
-   collision_space_by_y = pickle.load(cf)
+# Egg game constants
+egg_Y_start = int(.85 * screen_height/2)
+egg_zigs = [] # no zigging in egg game
+egg_starting_wand_position = (-504, 270)
+egg_rotation_rate = 5 # degrees/frame
+
+# Define per-trial balloon starting X/Y positions, X/Y per-frame step (speed), and zig lines
+egg_trajectory_info = [
+    (0, egg_Y_start, 0, -4, egg_zigs),
+    (-360, egg_Y_start, 4, -4, egg_zigs),
+    (575, egg_Y_start, -3, -4, egg_zigs),
+    (-550, egg_Y_start, 4, -6, egg_zigs),
+    (-360, egg_Y_start, 0, -4, egg_zigs),
+    (650, egg_Y_start, -5, -4, egg_zigs),
+    (10, egg_Y_start, 3, -4, egg_zigs),
+    (-450, egg_Y_start, 7, -5, egg_zigs),
+    (70, egg_Y_start, 3, -4, egg_zigs),
+    (-100, egg_Y_start, -1, -6, egg_zigs),
+    (510, egg_Y_start, -3, -6, egg_zigs),
+    (420, egg_Y_start, -2, -5, egg_zigs),
+    (-620, egg_Y_start, 0, -7, egg_zigs),
+    (-500, egg_Y_start, 7, -6, egg_zigs),
+    (170, egg_Y_start, -3, -5, egg_zigs),
+    (-360, egg_Y_start, 4, -4, egg_zigs),
+    (590, egg_Y_start, -3, -4, egg_zigs),
+    (700, egg_Y_start, -7, -5, egg_zigs),
+    (-650, egg_Y_start, 4, -4, egg_zigs),
+    (-360, egg_Y_start, 0, -4, egg_zigs),
+    (200, egg_Y_start, 0, -6, egg_zigs),
+    (100, egg_Y_start, 3, -5, egg_zigs),
+    (-375, egg_Y_start, 2, -7, egg_zigs),
+    (0, egg_Y_start, 0, -4, egg_zigs),
+    (75, egg_Y_start, 3, -4, egg_zigs),
+    (-215, egg_Y_start, 4, -5, egg_zigs),
+    (500, egg_Y_start, -3, -4, egg_zigs),
+    (420, egg_Y_start, -5, -4, egg_zigs),
+    (-575, egg_Y_start, 0, -4, egg_zigs),
+    (600, egg_Y_start, 0, -7, egg_zigs)]
+egg_catch_y_boundary = -.85 * screen_height/2
+egg_catch_boundary_direction = '<'
+
 
 # declare runtime options
 parser = OptionParser()
@@ -106,7 +163,7 @@ parser.add_option("-g", "--game-type", metavar="GAME", dest="game_type", choices
 parser.add_option("-y", "--yoke-source", metavar="YOKE_FILE", dest="yoke_source", help="For balloon_us and balloon_ns conditions, indicate a yoking file from a balloon_cs run")
 parser.add_option("-B", "--button-box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
 # options for testing and development
-parser.add_option("--short-iti", action="store_true", default=False, dest="short_iti", help="use shortened inter-trial intervals (for test runs only)")
+parser.add_option("--fast", action="store_true", default=False, dest="fast_mode", help="use shortened ITI and anticipatory periods (for test runs only)")
 parser.add_option("--skip-instructions", action="store_true", default=False, dest="skip_instructions", help="skip instructions/practice slides (for test runs only)")
 parser.add_option("--debug-trial", metavar="TRIAL_NUMBER", dest="debug_trial", help="test a specific trial and skip everything else")
 
@@ -122,7 +179,7 @@ yoke_source = options.yoke_source
 
 version = options.version
 button_box_mode = options.button_box_mode
-short_iti_mode = options.short_iti
+fast_mode = options.fast_mode
 skip_instructions = options.skip_instructions
 trial_debug_requested = options.debug_trial
 
@@ -201,16 +258,29 @@ if trial_debug_requested:
     trial_debug_mode = True
     debug_trial = int(trial_debug_requested)
     skip_instructions = True
-    short_iti_mode = True
+    fast_mode = True
 else:
     trial_debug_mode = False
 
-if short_iti_mode: ITI_duration = 1
+if fast_mode: 
+    ITI_duration = 1
+    antic_period_duration = 1
 
-# will pull from balloon settings list in random order (unless testing trials)
-balloon_trajectory_order = range(0, len(balloon_trajectory_info))
-if not trial_debug_mode and not short_iti_mode and not skip_instructions: 
-    shuffle(balloon_trajectory_order)
+# will pull from balloon/egg settings list in random order (unless testing trials)
+all_trajectory_info = egg_trajectory_info if playing_egg_game else balloon_trajectory_info
+trajectory_order = range(0, len(all_trajectory_info))
+if not trial_debug_mode and fast_mode and not skip_instructions: 
+    shuffle(trajectory_order)
+
+## Set task-specific constants depending on whether egg or balloon game is being played
+# read in target-wand collision file (created by CollisionMapMaker)
+collision_file = egg_collision_file if playing_egg_game else balloon_collision_file
+with open(collision_file) as cf:
+   collision_space_by_y = pickle.load(cf)
+
+catchable_area_y_boundary = egg_catch_y_boundary if playing_egg_game else balloon_catch_y_boundary
+boundary_direction = egg_catch_boundary_direction if playing_egg_game else balloon_catch_boundary_direction
+instruction_slide_dir = egg_slide_dir if playing_egg_game else balloon_slide_dir
 
 
 ## Now going to start loading Psychopy and setting up the experiment window
@@ -223,9 +293,9 @@ from numpy import (sin, cos, tan, log, log10, pi, average, sqrt, std, deg2rad, r
 # Set up logging using ExperimentHandler
 exp_info = {} # a dict of run information that gets passed to the ExperimentHandler
 exp_info['date'] = timestamp 
-exp_info['expName'] = exp_name
+exp_info['exp_name'] = game_type
 exp_handler_log = "%s/psychopy" % output_dir
-this_exp = data.ExperimentHandler(name=exp_name, extraInfo=exp_info, savePickle=True, saveWideText=False, dataFileName=exp_handler_log)
+this_exp = data.ExperimentHandler(name=game_type, extraInfo=exp_info, savePickle=True, saveWideText=False, dataFileName=exp_handler_log)
 log_file = logging.LogFile(exp_handler_log+'.log', level=logging.EXP)
 logging.console.setLevel(logging.WARNING) # makes warnings get printed to console window
 
@@ -249,24 +319,44 @@ slides = visual.ImageStim(win = win, name = 'slides', units='pix', image='sin', 
 wand = visual.ImageStim(win=win, name='wand',units='pix', image=media + "magic_wand.png", pos=[0,0], size=(80, 70), interpolate=True, depth=-4.0)
 time_left_label = visual.TextStim(win=win, name='time_left_label', text=None, font='Arial', units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, color='#053270', depth=-2.0);
 
-# Components for trial routines (except wand has already been declared about)
-antic_background = visual.ImageStim(win=win, name='antic_background',units='pix', 
-    image='sin', mask=None, size=(screen_width, screen_height), interpolate=True, depth=-1.0)
-avoid_background = visual.ImageStim(win=win, name='avoid_background',units='pix', image=media + "Avoidance_period_background.jpg", 
-    size=(screen_width, screen_height), interpolate=True, depth=-2.0)
+# Components for all routines (except wand, which was declared above)
 ITI = visual.ImageStim(win=win, name='ITI',units='pix', image=media + "iti_background.jpg", 
     pos=(0, 0), size=(screen_width, screen_height), interpolate=True, depth=-6.0)
-balloon = visual.ImageStim(win=win, name='balloon',units='pix', 
-    image='sin', pos=[0,0], size=(120, 150),interpolate=True, depth=-3.0)
-aversive_pop = sound.Sound(media + "Balloon_Pop.wav", secs=-1, volume = 1.0)
 counter_background = visual.ImageStim(win=win, name='counter_background',units='pix', 
     image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0)
 counter = visual.TextStim(win=win, name='counter', text=None, font=u'Arial', units='pix', pos=(550, -432), height=24,
     wrapWidth=None, color=u'#053270', depth=-8.0);
 magic_sparks = visual.ImageStim(win=win, name='magic_sparks',units='pix', 
-    image=media + "magic-effect.png", pos=[0,0], size=(150, 150), opacity=.75, interpolate=True, depth=-9.0)
-magic_sound = sound.Sound(media + "magic-sound-trimmed.wav", secs=-1, volume = .5)
+    image=media + "magic_effect.png", pos=[0,0], size=(150, 150), opacity=.75, interpolate=True, depth=-9.0)
+magic_sound = sound.Sound(media + "Sounds/magic_sound.wav", secs=-1, volume = .5)
 
+
+# Specific components for egg and balloon games
+if playing_egg_game:
+    target = visual.ImageStim(win = win, name = 'egg', units = 'pix', image = whole_egg_image, interpolate = True, depth = -3.0)
+    aversive_sound = sound.Sound(cracking_sound, secs=-1, volume = 1.0)
+    antic_background = visual.ImageStim(win=win, name='antic_background',units='pix', image=egg_anticipatory_background, 
+        size=(screen_width, screen_height), interpolate=True, depth=-1.0)
+    avoid_background = visual.ImageStim(win=win, name='avoid_background',units='pix', image=egg_avoidance_background,
+        size=(screen_width, screen_height), interpolate=True, depth=-2.0)
+    whole_target_image = whole_egg_image
+    starting_wand_position = egg_starting_wand_position
+    first_break_image = cracking_egg_1_image
+    second_break_image = cracking_egg_2_image
+    target_rotation_rate = egg_rotation_rate
+
+else:
+    target = visual.ImageStim(win=win, name='balloon', units = 'pix', image = whole_balloon_image, interpolate=True, depth = -3.0)
+    aversive_sound = sound.Sound(popping_sound, secs=-1, volume = 1.0)
+    antic_background = visual.ImageStim(win=win, name='antic_background',units='pix', image=balloon_anticipatory_background, 
+        size=(screen_width, screen_height), interpolate=True, depth=-1.0)
+    avoid_background = visual.ImageStim(win=win, name='avoid_background',units='pix', image=balloon_avoidance_background,
+        size=(screen_width, screen_height), interpolate=True, depth=-2.0)
+    whole_target_image = whole_balloon_image
+    starting_wand_position = balloon_starting_wand_position
+    target_rotation_rate = balloon_rotation_rate
+    first_break_image = pop_1_image
+    second_break_image = pop_2_image
 
 # A routine to simplify task flow
 class Routine():
@@ -389,7 +479,7 @@ def run_slides(routine, current_slide, last_slide):
     current_slide_string = str(current_slide)
     if current_slide < 10:
         current_slide_string = "0" + current_slide_string
-    current_slide_file = balloon_slide_dir + "Slide" + current_slide_string + ".jpg"
+    current_slide_file = instruction_slide_dir + "Slide" + current_slide_string + ".jpg"
     slides.setImage(current_slide_file)
     routine.current_slide = current_slide
 
@@ -434,23 +524,21 @@ h = open (highlight_data_file, 'w')
 def trial_startup(routine):
     global current_trial_num
     current_trial_num += 1
-    routine.balloon_has_popped = False
+    routine.target_broken = False
     if game_type == us:
-        routine.balloon_doomed = aversive_sound_by_trial_num[current_trial_num]
+        routine.target_doomed = aversive_sound_by_trial_num[current_trial_num]
     elif game_type == ns:
-        routine.balloon_doomed = False
+        routine.target_doomed = False
     else:
-        routine.balloon_doomed = True
+        routine.target_doomed = True
     routine.magic_has_happened = False
     routine.started_avoidance_phase = False
     routine.started_anticipatory_phase = False # doesn't stay false for long
-    routine.balloon_has_exited_catchable_area = False
+    routine.target_has_exited_catchable_area = False
     routine.started_ITI = False
     routine.trial_num = current_trial_num
-    wand.pos = (0, -360) # becomes visible later
-    balloon.setImage(media + "pink_balloon.png") # becomes visible later
-    antic_background.setImage(media + "Anticipatory_period_background.jpg")
-    avoid_background.setImage(media + "Avoidance_period_background.jpg")
+    wand.pos = starting_wand_position # becomes visible later
+    target.setImage(whole_target_image) # becomes visible later
 
     # at start of trial, only the anticipatory background and the spell counter are visible
     routine.start_component(antic_background)
@@ -458,13 +546,15 @@ def trial_startup(routine):
     routine.start_component(counter)
     counter.setText("Spells cast: %d" % spells_cast)
 
-    current_trajectory_index = balloon_trajectory_order[current_trial_num - 1]
-    balloon_info = balloon_trajectory_info[current_trajectory_index]
-    routine.balloon_step = (balloon_info[1], balloon_Y_speed)
-    routine.zigs = balloon_info[2]
-    routine.trajectory_description = str(balloon_info)
-    print "Using index %d in balloon trajectory list: " % current_trajectory_index + routine.trajectory_description
-    balloon.pos = (balloon_info[0], balloon_Y_start)
+    # get and apply current trajectory info
+    current_trajectory_index = trajectory_order[current_trial_num - 1]
+    current_trajectory_info = all_trajectory_info[current_trajectory_index]
+    target.pos = current_trajectory_info[0], current_trajectory_info[1]
+    routine.target_step = (current_trajectory_info[2], current_trajectory_info[3])
+    routine.zigs = current_trajectory_info[4]
+    routine.trajectory_description = str(current_trajectory_info)
+    print "Using index %d in trajectory list: " % current_trajectory_index + routine.trajectory_description
+
 
 
 def trial_run_frame(routine):
@@ -514,17 +604,17 @@ def trial_run_frame(routine):
         return
 
     # reaching this line means that trial is neither in anticipatory nor ITI phase, so wand/target have real positions
-    X_target, Y_target = balloon.pos
+    X_target, Y_target = target.pos
     X_wand, Y_wand = wand.pos
     target_zigged = '0'
     keyboard_used = '0'
-    balloon_step = routine.balloon_step
+    target_step = routine.target_step
 
     # starting up the avoidance phase 
     if not routine.started_avoidance_phase:
         routine.stop_component(antic_background)
         routine.start_component(avoid_background)
-        routine.start_component(balloon)
+        routine.start_component(target)
         routine.start_component(wand)
         routine.started_avoidance_phase = True
         avoid_period_onset = '1'
@@ -552,63 +642,67 @@ def trial_run_frame(routine):
         keys_pressed = ','.join(key_events)
         keyboard_used = '1'
 
-    # popping balloon if it has passed the catchable area and is doomed
-    if balloon.pos[1] > top_of_catchable_area:
+    # Popping or cracking target object if it has passed the catchable area and is doomed
+    if eval("%d %s %d" %(target.pos[1], boundary_direction, catchable_area_y_boundary)):
         target_outside_catchable_area = '1'
-        if not routine.balloon_has_exited_catchable_area:
-            routine.balloon_has_exited_catchable_area = True
+        if not routine.target_has_exited_catchable_area:
+            routine.target_has_exited_catchable_area = True
             target_just_exited_catchable_area = '1'
-        if not routine.balloon_has_popped and routine.balloon_doomed:
-            balloon.setImage(media + "pop_1.png")
-            routine.time_of_popping = time_in_trial
-            routine.start_component(aversive_pop)
+        if not routine.target_broken and routine.target_doomed:
+            target.setImage(first_break_image)
+            routine.time_of_breaking = time_in_trial
+            routine.start_component(aversive_sound)
             aversive_noise_onset = '1'
-            routine.balloon_has_popped = True
+            routine.target_broken = True
     else:
         target_outside_catchable_area = '0'
 
     # changing from pop_1 to pop_2 image after a short period (animation effect)
-    if routine.balloon_has_popped and time_in_trial > (routine.time_of_popping + .2):
-        balloon.setImage(media + "pop_2.png")
+    if routine.target_broken and time_in_trial > (routine.time_of_breaking + .2):
+        target.setImage(second_break_image)
 
-    # moving balloon if it hasn't popped
-    if not routine.balloon_has_popped:
-        balloon.pos = (balloon.pos[0] + balloon_step[0], balloon.pos[1] + balloon_step[1])
-        X_target, Y_target = balloon.pos
+    # moving target if it hasn't popped/cracked
+    if not routine.target_broken:
+        target.pos = (target.pos[0] + target_step[0], target.pos[1] + target_step[1])
+        target.ori = ((target.ori + target_rotation_rate) % 360)
+        X_target, Y_target = target.pos
         # reverse x-speed whenever a "zigzag line" is crossed
         if len(routine.zigs) > 0:
             zig_line_position = routine.zigs[0]
             # if within 6 pixels of zigzag line, x-speed reverses (+/- 6 means condition always triggers since max speed is 9)
-            if abs(balloon.pos[0] - zig_line_position) < 6:
-                routine.balloon_step = (-balloon_step[0], balloon_step[1])
+            if abs(target.pos[0] - zig_line_position) < 6:
+                routine.target_step = (-target_step[0], target_step[1])
                 routine.zigs.pop(0)
                 target_zigged = '1'
 
 
-    # measuring distance between wand an balloon
-    x_dist = wand.pos[0] - balloon.pos[0]
-    y_dist = wand.pos[1] - balloon.pos[1]
+    # measuring distance between wand and target object
+    x_dist = int(wand.pos[0] - target.pos[0])
+    y_dist = int(wand.pos[1] - target.pos[1])
 
-    # testing if the current x/y distance between balloon and wand should be counted as a collision
+    # testing if the current x/y distance between target and wand should be counted as a collision
     if y_dist in collision_space_by_y and x_dist >= collision_space_by_y[y_dist][0] and x_dist <= collision_space_by_y[y_dist][1]:
         touching_target_object = '1'
-        if not routine.magic_has_happened and not routine.balloon_has_popped:
+        if not routine.magic_has_happened and not routine.target_broken:
             routine.time_of_magic = time_in_trial
-            # in the controllable stress condition, making magic prevents the balloon from popping
+            # in the controllable stress condition (balloon game), making magic prevents the balloon from popping
             if game_type == cs:
-                routine.balloon_doomed = False
+                routine.target_doomed = False
             global spells_cast
             spells_cast += 1 
             counter.setText("Spells cast: %d" % spells_cast)
             routine.start_component(magic_sound)
-            routine.start_component(magic_sparks)
             routine.magic_has_happened =True
             just_made_magic = '1'
+            if playing_egg_game:
+                target.setColor(choice(("INDIANRED", "GOLD", "YELLOWGREEN", "DEEPSKYBLUE"))) # random.choice picks an element from a list randomly
+            else:
+                routine.start_component(magic_sparks)
     else:
         touching_target_object = '0'
 
-    # move the sparks with the balloon (it's okay if the component isn't being drawn yet)
-    magic_sparks.pos = (balloon.pos[0] + sparks_balloon_offset_x, balloon.pos[1] + sparks_balloon_offset_y)
+    # move the sparks with the target object (it's okay if the component isn't being drawn yet)
+    magic_sparks.pos = (target.pos[0] + sparks_balloon_offset_x, target.pos[1] + sparks_balloon_offset_y)
 
     # stop the magic sparks after a reasonable period
     if routine.magic_has_happened and time_in_trial > routine.time_of_magic + magic_sparks_duration:
@@ -619,8 +713,11 @@ def trial_run_frame(routine):
 def trial_shutdown(routine):
     if game_type == cs:
         global aversive_sound_by_trial_num
-        aversive_sound_by_trial_num[current_trial_num] = routine.balloon_has_popped # for readability, would be better to have a variable called sound_has_played
-
+        aversive_sound_by_trial_num[current_trial_num] = routine.target_broken # for readability, would be better to have a variable called sound_has_played
+    elif playing_egg_game:
+        # only way found so far to reset a color change!
+        global target
+        target = visual.ImageStim(win = win, name = 'egg', units = 'pix', image = whole_egg_image, interpolate = True, depth = -3.0)
 # build a list of routines to run
 routines = []
 instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 15))

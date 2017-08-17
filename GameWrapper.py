@@ -63,6 +63,16 @@ noise_rating_info = {
 	'Script':"%s/NoiseRating.py" % source_dir,
 }
 
+egg_game_info = {
+	'LongName': 'Magic Egg Game (T2)',
+	'ShortName': 'Magic Egg Game',
+	'Script':"%s/MagicGames.py" % source_dir
+}
+
+balloon = balloon_game_info['ShortName']
+noise_rating = noise_rating_info['ShortName']
+egg = egg_game_info['ShortName']
+
 # making sure that the scripts/media files that will be used match the current commit
 # this would all need to be changed if the folder structure changed
 change_list = (check_output("git -C %s status --porcelain" % source_dir, shell=True).split("\n"))
@@ -95,7 +105,7 @@ else:
 
 
 
-task_options = (balloon_game_info, noise_rating_info)
+task_options = (balloon_game_info, egg_game_info, noise_rating_info)
 num_tasks = len(task_options)
 
 # prompt user to pick task
@@ -111,7 +121,8 @@ while True:
 	except:
 		choice = raw_input("Invalid input. Enter a choice from %d-%d: " %(1, num_tasks))
 
-print "All right, we're running the %s!" %(chosen_task_info['ShortName'])
+game_chosen = chosen_task_info['ShortName']
+print "All right, we're running the %s!" % game_chosen
 
 # See if this is a real experiment or a test run
 run_type = "Real Experiment"
@@ -137,9 +148,9 @@ while True:
 		break
 	participant_id = raw_input("Invalid ID. Legal characters are letters, numbers, hyphens, and underscores. Choose a new ID: ")
 
-if chosen_task_info['ShortName'] is "Magic Balloon Game":	
+if game_chosen is not noise_rating:	
 	if run_type == "Test Run":
-		print "\nTesting options:\n1) Full run\n2) Skip instructions\n3) Short ITI\n4) Skip instructions AND short ITI\n5) Test specific trial\n"
+		print "\nTesting options:\n1) Full run\n2) Skip instructions\n3) Fast mode (short ITI/anticipatory periods\n4) Skip instructions AND fast mode\n5) Test specific trial\n"
 		choice = raw_input("Which test should be run? ")
 		while True:
 			try:
@@ -149,10 +160,10 @@ if chosen_task_info['ShortName'] is "Magic Balloon Game":
 					test_options = "--skip-instructions"
 					break
 				elif int(choice) == 3:
-					test_options = "--short-iti"
+					test_options = "--fast"
 					break
 				elif int(choice) == 4:
-					test_options = "--skip-instructions --short-iti"
+					test_options = "--skip-instructions --fast"
 					break
 				elif int(choice) == 5:
 					trial_to_test = raw_input("Which trial number should be tested? ")
@@ -171,44 +182,47 @@ if chosen_task_info['ShortName'] is "Magic Balloon Game":
 
 
 	# Ask which balloon game version to play (cs, us, ns)
-	stress_type = raw_input("Should the game be played with 1) controllable stress, 2) uncontrollable stress (yoked), or 3) non-stressed? ")
-	current_participant_is_yoked = False
-	while True:
-		if stress_type == "1":
-			game_type = "balloon_cs"
-			print "Okay, the game will be played with controllable stress."
-			break
-		if stress_type == "2":
-			game_type = "balloon_us"
-			print "Okay, the game will be played with uncontrollable stress."
-		elif stress_type == "3":
-			game_type = "balloon_ns"
-			print "Okay, the game will be played with no stress."
-			break
-		if game_type == "balloon_us":
-			current_participant_is_yoked = True
-			print "Here is a list of previous participants from the controllable stress condition:"
-			yoking_files = check_output("find %s -name 'yoking_file.pickle'" % output_directory, shell=True).split("\n")
-			numYokingFiles = 0
-			yokeable_subject = ''
-			for f in yoking_files:
-				if f == '':
-					continue
-				numYokingFiles += 1
-				yokeable_subject = os.path.dirname(f)
-				yokeable_subject = re.sub("%s\/?" % output_directory, '', yokeable_subject)
-				print "%d) %s" %(numYokingFiles, yokeable_subject)
-			chosenNum = raw_input("Which existing yoking source file from a previous participant should be used (1-%d)? " %(numYokingFiles))
-			while True:
-				try:
-					assert int(chosenNum) > 0 and int(chosenNum) <= numYokingFiles
-					yoking_source_file = yoking_files[int(chosenNum) - 1]
-					print "Okay, the current file will be yoked to this participant: %s." %(yokeable_subject)
-					break
-				except:
-					chosenNum = raw_input("Invalid response. Choose a yoking source file from 1-%d: " %(numYokingFiles))
-			break
-		stress_type = raw_input("Invalid response. Enter 1 for controllable stress, 2 for uncontrollable stress, 3 for non-stressed: ")
+	if game_chosen is balloon:
+		stress_type = raw_input("Should the game be played with 1) controllable stress, 2) uncontrollable stress (yoked), or 3) non-stressed? ")
+		current_participant_is_yoked = False
+		while True:
+			if stress_type == "1":
+				game_type = "balloon_cs"
+				print "Okay, the game will be played with controllable stress."
+				break
+			if stress_type == "2":
+				game_type = "balloon_us"
+				print "Okay, the game will be played with uncontrollable stress."
+			elif stress_type == "3":
+				game_type = "balloon_ns"
+				print "Okay, the game will be played with no stress."
+				break
+			if game_type == "balloon_us":
+				current_participant_is_yoked = True
+				print "Here is a list of previous participants from the controllable stress condition:"
+				yoking_files = check_output("find %s -name 'yoking_file.pickle'" % output_directory, shell=True).split("\n")
+				numYokingFiles = 0
+				yokeable_subject = ''
+				for f in yoking_files:
+					if f == '':
+						continue
+					numYokingFiles += 1
+					yokeable_subject = os.path.dirname(f)
+					yokeable_subject = re.sub("%s\/?" % output_directory, '', yokeable_subject)
+					print "%d) %s" %(numYokingFiles, yokeable_subject)
+				chosenNum = raw_input("Which existing yoking source file from a previous participant should be used (1-%d)? " %(numYokingFiles))
+				while True:
+					try:
+						assert int(chosenNum) > 0 and int(chosenNum) <= numYokingFiles
+						yoking_source_file = yoking_files[int(chosenNum) - 1]
+						print "Okay, the current file will be yoked to this participant: %s." %(yokeable_subject)
+						break
+					except:
+						chosenNum = raw_input("Invalid response. Choose a yoking source file from 1-%d: " %(numYokingFiles))
+				break
+			stress_type = raw_input("Invalid response. Enter 1 for controllable stress, 2 for uncontrollable stress, 3 for non-stressed: ")
+	elif game_chosen is egg:
+		game_type = "egg"
 
 	# Prompt for keyboard input mode vs. button box mode
 	button_box_mode = False
@@ -233,12 +247,13 @@ print "\nHere are the options that have been chosen: "
 print "Task: %s" % chosen_task_info['ShortName']
 print "Run type: %s" % run_type
 print "Participant ID: %s" % participant_id
-if chosen_task_info['ShortName'] is not "Noise Rating":
-	print "Stress type: %s" %(stress_type)
+if game_chosen is not noise_rating:
+	if game_chosen is balloon:
+		print "Stress type: %s" %(stress_type)
+		if current_participant_is_yoked:
+			print "Participant yoked to this file: %s" % yoking_source_file
 	input_mode = "button box" if button_box_mode else "keyboard"
 	print "Input mode: %s" % input_mode
-	if current_participant_is_yoked:
-		print "Participant yoked to this file: %s" % yoking_source_file
 print "Save output here: %s" % output_directory
 
 confirm = raw_input("\nDoes everything look okay to run (y/n)? ")
@@ -255,7 +270,7 @@ while True:
 script_with_args = python_bin + " '%s' --participant-id=%s  --output=%s  --version=%s" %(chosen_task_info['Script'], participant_id, output_directory, version)
 if chosen_task_info['ShortName'] is not 'Noise Rating':
 	script_with_args += " --game-type=%s %s" % (game_type, test_options)
-	if current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
+	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
 	if button_box_mode: script_with_args += " --button-box"
 print "Running this: %s" % script_with_args
 call(script_with_args, shell=True)

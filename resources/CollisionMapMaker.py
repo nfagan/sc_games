@@ -68,7 +68,7 @@ win = visual.Window(size=(screen_width, screen_height), fullscr=True, monitor='t
 args_1 = {"pos":(0,0)}
 image_1 = visual.ImageStim(win=win, name='image_1', units='pix', image=image_1_file, pos=[0,0], interpolate=False, depth=-3.0)
 image_1.autoDraw = True
-image_2 = visual.ImageStim(win=win, name='image_2',units='pix', image=image_2_file, pos=[0,0], interpolate=False, depth=-2.0)
+image_2 = visual.ImageStim(win=win, name='image_2',units='pix', image=image_2_file, ori = 35, pos=[0,0], interpolate=False, depth=-2.0)
 image_2.autoDraw = True
 label = visual.TextStim(win=win, name='label', text=None, font='Arial', units='pix', pos=(550, -432), height=24, wrapWidth=None, ori=0, color='#053270', depth=-6.0)
 label.autoDraw = True
@@ -138,7 +138,7 @@ for x, y in collision_space:
 
 collision_space_by_y = {}
 for y_coord, x_coords in sorted(collision_space_by_y_prelim.items()):
-    collision_space_by_y[y_coord] = (min(x_coords), max(x_coords))
+    collision_space_by_y[int(y_coord)] = (int(min(x_coords)), int(max(x_coords)))
 
 if existing_map_file and starting_collision_space_by_y == collision_space_by_y:
     print "No changes were made to the collision space defined by the pre-loaded collision map file, so no new collision map file was created."
