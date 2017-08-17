@@ -74,7 +74,7 @@ from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 
 # Setup the task window
-win = visual.Window(size=(screen_width, screen_height), fullscr=True,allowGUI=False, monitor='testMonitor', blendMode='avg', useFBO=True)
+win = visual.Window(size=(screen_width, screen_height), fullscr=True,allowGUI=False, monitor='testMonitor', blendMode='avg', units = 'pix', useFBO=True)
 
 # store frame rate of monitor if we can measure it
 exp_info = {}
