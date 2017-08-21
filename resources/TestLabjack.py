@@ -1,12 +1,25 @@
-from psychopy.hardware.labjacks import U3
+import sys
 from datetime import datetime
+from time import sleep
+import u3
 
-# alter addresses and ranges until triggers are sent reliably
+
 # make sure Exodriver (from Labjack website) and the U3 package are installed before using
 
-device = U3()
-for address in (6700, 6701, 6702):
-	for value in range(0, 256):
-		timestamp = str(datetime.now())
-		print "Sending value %s over address %s at %s" % (value, address, timestamp)
-		device.setData(value, address = address)
+try:
+	d = u3.U3()
+except:
+	print "Error: Unable to interface with the Labjack device. Are you sure it's properly connected to this computer?"
+	sys.exit()
+
+d.getCalibrationData()
+timestamp = str(datetime.now())
+d.setFIOState(4, state=1)
+print "Set FIOS4 to \"high\" at %s." % timestamp
+sleep(1)
+print "Waiting..."
+sleep(2)
+timestamp = str(datetime.now())
+d.setFIOState(4, state=0)
+print "Set FIOS4 to \"low\" (off) at %s." % timestamp
+
