@@ -47,7 +47,7 @@ try:
 except:
 		print "Error: Could not create output file \"%s\"." %output_file
 
-output.write("time\tnid\tdescription\n")
+output.write("time\tnid\tname\n")
 nid = 0
 with open(input_file, 'r') as f:
 	while True:
