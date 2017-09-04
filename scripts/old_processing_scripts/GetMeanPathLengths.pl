@@ -16,9 +16,9 @@ my $colNum = 0;
 for (@headerCols) {
 	if ($_ eq 'Trial') {
 		$trialCol = $colNum;
-	} elsif ($_ eq 'X_hand') {
+	} elsif ($_ eq 'X_hand' || $_ eq 'X_wand') {
 		$xHandCol = $colNum;
-	} elsif ($_ eq 'Y_hand') {
+	} elsif ($_ eq 'Y_hand' || $_ eq 'Y_wand') {
 		$yHandCol = $colNum;
 	} elsif ($_ eq 'Time') {
 		$timeCol = $colNum;
@@ -48,10 +48,12 @@ for my $line (@lines) {
 
 my $firstHalfTotal = 0;
 my $secondHalfTotal = 0;
+my $numFirstHalfTrials = 0;
 my $numSecondHalfTrials = 0;
 for (1 .. 15) {
 	next unless (exists $pathLengths{$_}{'total'});
 	$firstHalfTotal += $pathLengths{$_}{'total'};
+	$numFirstHalfTrials++;
 }
 
 for (16 .. 30) {
@@ -65,5 +67,11 @@ my $secondHalfMean = 'NA';
 if ($numSecondHalfTrials > 0) {
 	$secondHalfMean = $secondHalfTotal/$numSecondHalfTrials;
 }
-my $totalMean = ($firstHalfTotal + $secondHalfTotal)/(15 + $numSecondHalfTrials);
-print "$file\t$firstHalfMean\t$secondHalfMean\t$totalMean\n";
+my $totalMean = ($firstHalfTotal + $secondHalfTotal)/($numFirstHalfTrials + $numSecondHalfTrials);
+#print "$file\t$firstHalfMean\t$secondHalfMean\t$totalMean\n";
+
+my $totalNumTrials = $numFirstHalfTrials + $numSecondHalfTrials;
+my $totalPath = $firstHalfTotal + $secondHalfTotal;
+
+$file =~ s/.*\///;
+print "$file\t$totalPath\t$totalNumTrials\n";
