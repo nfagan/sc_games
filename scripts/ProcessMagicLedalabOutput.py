@@ -23,7 +23,7 @@ if len(args) > 0:
 	sys.exit()
 
 # validate input arguments
-if not input_file or not output_base:
+if not input_file or not output_base or not participant_id:
 	parser.print_help()
 	sys.exit()
 

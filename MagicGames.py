@@ -323,9 +323,9 @@ time_left_label = visual.TextStim(win=win, name='time_left_label', text=None, fo
 ITI = visual.ImageStim(win=win, name='ITI',units='pix', image=media + "iti_background.jpg", 
     pos=(0, 0), size=(screen_width, screen_height), interpolate=True, depth=-6.0)
 counter_background = visual.ImageStim(win=win, name='counter_background',units='pix', 
-    image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0)
+    image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0, opacity=0)
 counter = visual.TextStim(win=win, name='counter', text=None, font=u'Arial', units='pix', pos=(550, -432), height=24,
-    wrapWidth=None, color=u'#053270', depth=-8.0);
+    wrapWidth=None, color=u'#053270', depth=-8.0, opacity=0);
 magic_sparks = visual.ImageStim(win=win, name='magic_sparks',units='pix', 
     image=media + "magic_effect.png", pos=[0,0], size=(150, 150), opacity=.75, interpolate=True, depth=-9.0)
 magic_sound = sound.Sound(media + "Sounds/magic_sound.wav", secs=-1, volume = .5)
