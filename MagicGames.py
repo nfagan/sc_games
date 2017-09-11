@@ -442,10 +442,10 @@ class Routine():
 ## Declare all the functions that control the behavior of each routine in the experiment
 # for each numbered instruction slide, storing which key press is required to advance
 keys_to_advance = {} 
-for slide_num in range (1, 11):
+for slide_num in range (1, 10):
     keys_to_advance[slide_num] = 'space'
-keys_to_advance[11], keys_to_advance[12], keys_to_advance[13], keys_to_advance[14] = left_key, right_key, down_key, up_key
-for slide_num in range(15, 20):
+keys_to_advance[10], keys_to_advance[11], keys_to_advance[12], keys_to_advance[13] = left_key, right_key, down_key, up_key
+for slide_num in range(14, 19):
     keys_to_advance[slide_num] = 'space'
 
 def run_slides(routine, current_slide, last_slide):
@@ -720,9 +720,9 @@ def trial_shutdown(routine):
         target = visual.ImageStim(win = win, name = 'egg', units = 'pix', image = whole_egg_image, interpolate = True, depth = -3.0)
 # build a list of routines to run
 routines = []
-instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 15))
+instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
 wand_practice = Routine(window = win, startup = wand_practice_startup, run_frame = wand_practice_run_frame)
-instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 16, 18))
+instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 15, 17))
 
 if not skip_instructions: routines.extend((instructions_1, wand_practice, instructions_2))
 
@@ -736,7 +736,7 @@ for trial_num in range(1, num_trials + 1):
     trial = Routine(window = win, startup = trial_startup, run_frame = trial_run_frame, shutdown = trial_shutdown)
     routines.append(trial)
 
-thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 19, 19))
+thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 18, 18))
 routines.append(thanks)
 
 
