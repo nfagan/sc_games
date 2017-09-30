@@ -20,7 +20,7 @@ from random import shuffle, choice
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Media subdirectory should be present in project folder    
-media = project_dir + "/sc_media/"
+media = project_dir + "/media/"
 if not os.path.isdir(media):
     print "Error: Could not find required directory %s in the project source folder." % media
     print "Make sure you have a clean copy of this project's source repository."

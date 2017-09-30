@@ -14,7 +14,7 @@ from random import shuffle
 project_dir = os.path.dirname(os.path.abspath(__file__)) # this script should be located directly in the project directory
 
 # path of folder containing the sounds (if this folder doesn't exist, the script has been moved or the project directory isn't clean)
-media = project_dir + '/sc_media/'
+media = project_dir + '/media/'
 if not os.path.isdir(media):
     print "Error: Could not find project media directory %s." % media
     print "Make sure your copy of this script is located in its proper project directory, which should contain all necessary files."
