@@ -68,7 +68,7 @@ win = visual.Window(size=(screen_width, screen_height), fullscr=True, monitor='t
 args_1 = {"pos":(0,0)}
 image_1 = visual.ImageStim(win=win, name='image_1', units='pix', image=image_1_file, pos=[0,0], interpolate=False, depth=-3.0)
 image_1.autoDraw = True
-image_2 = visual.ImageStim(win=win, name='image_2',units='pix', image=image_2_file, ori = 35, pos=[0,0], interpolate=False, depth=-2.0)
+image_2 = visual.ImageStim(win=win, name='image_2',units='pix', image=image_2_file, ori = 0, pos=[0,0], interpolate=False, depth=-2.0)
 image_2.autoDraw = True
 label = visual.TextStim(win=win, name='label', text=None, font='Arial', units='pix', pos=(550, -432), height=24, wrapWidth=None, ori=0, color='#053270', depth=-6.0)
 label.autoDraw = True
