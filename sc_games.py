@@ -190,7 +190,7 @@ skip_instructions = options.skip_instructions
 trial_debug_requested = options.debug_trial
 
 # validate runtime options
-if not output_dir or not participant_id or not mode:
+if not output_dir or not participant_id or not game_type or not mode:
     parser.print_help()
     sys.exit()
 
@@ -311,7 +311,7 @@ exp_info['exp_name'] = mode
 exp_handler_log = "%s/psychopy" % output_dir
 this_exp = data.ExperimentHandler(name=mode, extraInfo=exp_info, savePickle=True, saveWideText=False, dataFileName=exp_handler_log)
 log_file = logging.LogFile(exp_handler_log+'.log', level=logging.EXP)
-logging.console.setLevel(logging.WARNING) # makes warnings get printed to console window
+#logging.console.setLevel(logging.WARNING) # makes warnings get printed to console window
 
 # Set up the experiment window (there are additional options you can specify; see documentation if you ever care)
 win = visual.Window(size=(screen_width, screen_height), fullscr=True, allowGUI=False, useFBO=True, units='pix', monitor = 'testMonitor')
