@@ -26,47 +26,54 @@ except:
 for line in config:
 	line = line.strip()
 	if line.startswith('#'): continue
-	elif re.search('^output_directory=', line):
-		output_directory = re.sub('^output_directory=', '', line)
-		if not os.path.exists(output_directory):
-			print "Error: Output directory %s given in local config file does not exist." % output_directory
+	elif re.search('^magic_output_directory=', line):
+		magic_output_directory = re.sub('^magic_output_directory=', '', line)
+		if not os.path.exists(magic_output_directory):
+			print "Error: Output directory %s given in local config file does not exist." % magic_output_directory
 			sys.exit()
 		else:
-			output_directory = os.path.abspath(output_directory)
+			magic_output_directory = os.path.abspath(magic_output_directory)
+	elif re.search('^mundane_output_directory=', line):
+		mundane_output_directory = re.sub('^mundane_output_directory=', '', line)
+		if not os.path.exists(mundane_output_directory):
+			print "Error: Output directory %s given in local config file does not exist." % mundane_output_directory
+			sys.exit()
+		else:
+			mundane_output_directory = os.path.abspath(mundane_output_directory)	
 	elif re.search('^test_directory=', line):
 		test_directory = re.sub('^test_directory=', '', line)
 		if not os.path.exists(test_directory):
 			print "Error: Test directory %s given in local config file does not exist." % test_directory
 			sys.exit()
 		else:
-			output_directory = os.path.abspath(output_directory)
+				test_directory = os.path.abspath(test_directory)
 	elif re.search('^python_bin=', line):
 		python_bin = re.sub('^python_bin=', '', line)
 
 # ensure all necessary local settings are declared in local_config file
 try:
-	for req in ["output_directory", "python_bin", "test_directory"]:
+	for req in ("magic_output_directory", "mundane_output_directory", "python_bin", "test_directory"):
 		eval(req)
 except NameError:
 	print "Error: %s not declared in local_config file" % req
 	sys.exit()
 
 balloon_game_info = {
-	'LongName':"Magic Balloon Game (Controllable stress, uncontrollable stress, or non-stressed)",
-	'ShortName':"Magic Balloon Game",
-	'Script':"%s/MagicGames.py" % source_dir,
+	'LongName':"Balloon Game (Controllable stress, uncontrollable stress, or non-stressed)",
+	'ShortName':"Balloon",
+	'Script':"%s/sc_games.py" % source_dir,
 }
 
 noise_rating_info = {
 	'LongName':"Noise Rating Task",
 	'ShortName':"Noise Rating",
-	'Script':"%s/NoiseRating.py" % source_dir,
+	'Script':"%s/noise_rating.py" % source_dir,
 }
 
 egg_game_info = {
-	'LongName': 'Magic Egg Game (T2)',
-	'ShortName': 'Magic Egg Game',
-	'Script':"%s/MagicGames.py" % source_dir
+	'LongName': 'Egg Game (T2)',
+	'ShortName': 'Egg',
+	'Script':"%s/sc_games.py" % source_dir
 }
 
 balloon = balloon_game_info['ShortName']
@@ -80,11 +87,11 @@ source_clean = True
 for line in change_list:
 	if re.search(os.path.basename(__file__), line):
 		source_clean = False
-	if re.search("sc_media", line):
+	if re.search("media", line):
 		source_clean = False
-	if re.search("MagicGames", line):
+	if re.search("sc_games", line):
 		source_clean = False
-	if re.search("NoiseRating", line):
+	if re.search("noise_rating", line):
 		source_clean = False
 
 # Making sure project code hasn't been altered accidentally
@@ -103,23 +110,37 @@ else:
 		if to_continue == 'y': break
 		to_continue = raw_input("Invalid response. Choose \"y\" to continue or \"n\" to quit: ")
 
+exp_options = (("Magic (with wand)", "magic"), ("Mundane (with hand)", "mundane"))
+num_exps = len(exp_options)
 
+print "Here are the experiments that can be run:"
+for x in range(num_exps):
+	print str(x+1) + ") " + exp_options[x][0]
+
+exp_choice = raw_input("Which experiment should be run? ")
+while True:
+	try:
+		exp_type = exp_options[int(exp_choice) - 1][1]
+		exp_name = exp_options[int(exp_choice) - 1][0]
+		break
+	except:
+		choice = raw_input("Invalid response. Enter the number (1-%d) corresponding to the experiment to run: " % num_exps)
+print "Okay, we're running the \"%s\" experiment!" % exp_name
 
 task_options = (balloon_game_info, egg_game_info, noise_rating_info)
 num_tasks = len(task_options)
-
 # prompt user to pick task
 print "Here are the available activities:"
 for x in range(num_tasks):
 	print str(x+1) + ") " + task_options[x]['LongName']
 
-choice = raw_input("Which game should be played? ")
+task_choice = raw_input("Which game should be played? ")
 while True:
 	try:
-		chosen_task_info = task_options[int(choice) - 1]
+		chosen_task_info = task_options[int(task_choice) - 1]
 		break
 	except:
-		choice = raw_input("Invalid input. Enter a choice from %d-%d: " %(1, num_tasks))
+		task_choice = raw_input("Invalid input. Enter a choice from %d-%d: " %(1, num_tasks))
 
 game_chosen = chosen_task_info['ShortName']
 print "All right, we're running the %s!" % game_chosen
@@ -134,6 +155,7 @@ while True:
 			run_type = "Test Run"
 			break
 		elif int(choice) == 2:
+			output_directory = magic_output_directory if exp_type == "magic" else mundane_output_directory
 			break
 	except:
 		choice = raw_input("Invalid input. Enter 1 for a test run, or 2 for a real experiment: ")
@@ -150,7 +172,7 @@ while True:
 
 if game_chosen is not noise_rating:	
 	if run_type == "Test Run":
-		print "\nTesting options:\n1) Full run\n2) Skip instructions\n3) Fast mode (short ITI/anticipatory periods\n4) Skip instructions AND fast mode\n5) Test specific trial\n"
+		print "\nTesting options:\n1) Full run\n2) Skip instructions\n3) Fast mode (short ITI/anticipatory periods)\n4) Skip instructions AND fast mode\n5) Test specific trial\n"
 		choice = raw_input("Which test should be run? ")
 		while True:
 			try:
@@ -187,17 +209,17 @@ if game_chosen is not noise_rating:
 		current_participant_is_yoked = False
 		while True:
 			if stress_type == "1":
-				game_type = "balloon_cs"
+				game_mode = "balloon_cs"
 				print "Okay, the game will be played with controllable stress."
 				break
 			if stress_type == "2":
-				game_type = "balloon_us"
+				game_mode = "balloon_us"
 				print "Okay, the game will be played with uncontrollable stress."
 			elif stress_type == "3":
-				game_type = "balloon_ns"
+				game_mode = "balloon_ns"
 				print "Okay, the game will be played with no stress."
 				break
-			if game_type == "balloon_us":
+			if game_mode == "balloon_us":
 				current_participant_is_yoked = True
 				print "Here is a list of previous participants from the controllable stress condition:"
 				yoking_files = check_output("find %s -name 'yoking_file.pickle'" % output_directory, shell=True).split("\n")
@@ -222,7 +244,7 @@ if game_chosen is not noise_rating:
 				break
 			stress_type = raw_input("Invalid response. Enter 1 for controllable stress, 2 for uncontrollable stress, 3 for non-stressed: ")
 	elif game_chosen is egg:
-		game_type = "egg"
+		game_mode = "egg"
 
 	# Prompt for keyboard input mode vs. button box mode
 	button_box_mode = False
@@ -244,7 +266,8 @@ if game_chosen is not noise_rating:
 			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input: ")
 	
 print "\nHere are the options that have been chosen: "
-print "Task: %s" % chosen_task_info['ShortName']
+print "Experiment: %s" % exp_name
+print "Mode: %s" % chosen_task_info['ShortName']
 print "Run type: %s" % run_type
 print "Participant ID: %s" % participant_id
 if game_chosen is not noise_rating:
@@ -269,7 +292,7 @@ while True:
 # all three scripts require the arguments given with "--id", "--source_dir", and "--output_dir"
 script_with_args = python_bin + " '%s' --participant-id=%s  --output=%s  --version=%s" %(chosen_task_info['Script'], participant_id, output_directory, version)
 if chosen_task_info['ShortName'] is not 'Noise Rating':
-	script_with_args += " --game-type=%s %s" % (game_type, test_options)
+	script_with_args += " --game-type=%s --game-mode=%s %s" % (exp_type, game_mode, test_options)
 	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
 	if button_box_mode: script_with_args += " --button-box"
 print "Running this: %s" % script_with_args
