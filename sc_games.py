@@ -641,22 +641,24 @@ def trial_run_frame(routine):
 
     # move implement if appropriate (only allowing one movement per frame)
     key_events = event.getKeys()
-    if right_key in key_events:
-        if implement.pos[0] + implement.size[0]/2 + implement_step_size < screen_width/2:
-            implement.pos = (implement.pos[0] + implement_step_size, implement.pos[1])
-            implement_move_direction = 'right'
-    elif left_key in key_events:
-        if implement.pos[0] - implement.size[0]/2 - implement_step_size > -screen_width/2: 
-            implement.pos = (implement.pos[0] - implement_step_size, implement.pos[1])
-            implement_move_direction = 'left'
-    elif up_key in key_events:
-        if implement.pos[1] + implement.size[1]/2 + implement_step_size < screen_height/2:
-            implement.pos = (implement.pos[0], implement.pos[1] + implement_step_size)
-            implement_move_direction = 'up'
-    elif down_key in key_events:
-        if implement.pos[1] - implement.size[1]/2 - implement_step_size > -screen_height/2:
-            implement.pos = (implement.pos[0], implement.pos[1] - implement_step_size)
-            implement_move_direction = 'down'
+    if not (playing_hand_game and playing_balloon_game and routine.target_frozen):
+        # in hand game, the hand can't be moved any more once the balloon is caught
+        if right_key in key_events:
+            if implement.pos[0] + implement.size[0]/2 + implement_step_size < screen_width/2:
+                implement.pos = (implement.pos[0] + implement_step_size, implement.pos[1])
+                implement_move_direction = 'right'
+        elif left_key in key_events:
+            if implement.pos[0] - implement.size[0]/2 - implement_step_size > -screen_width/2: 
+                implement.pos = (implement.pos[0] - implement_step_size, implement.pos[1])
+                implement_move_direction = 'left'
+        elif up_key in key_events:
+            if implement.pos[1] + implement.size[1]/2 + implement_step_size < screen_height/2:
+                implement.pos = (implement.pos[0], implement.pos[1] + implement_step_size)
+                implement_move_direction = 'up'
+        elif down_key in key_events:
+            if implement.pos[1] - implement.size[1]/2 - implement_step_size > -screen_height/2:
+                implement.pos = (implement.pos[0], implement.pos[1] - implement_step_size)
+                implement_move_direction = 'down'
 
     if len(key_events) >= 1:
         keys_pressed = ','.join(key_events)
