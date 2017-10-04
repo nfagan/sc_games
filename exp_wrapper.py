@@ -210,37 +210,48 @@ if game_chosen is not noise_rating:
 		while True:
 			if stress_type == "1":
 				game_mode = "balloon_cs"
+				stress_condition = "controllable"
 				print "Okay, the game will be played with controllable stress."
 				break
 			if stress_type == "2":
 				game_mode = "balloon_us"
+				stress_condition = "uncontrollable"
 				print "Okay, the game will be played with uncontrollable stress."
 			elif stress_type == "3":
 				game_mode = "balloon_ns"
+				stress_condition = "nonstressed"
 				print "Okay, the game will be played with no stress."
 				break
 			if game_mode == "balloon_us":
 				current_participant_is_yoked = True
 				print "Here is a list of previous participants from the controllable stress condition:"
 				yoking_files = check_output("find %s -name 'yoking_file.pickle'" % output_directory, shell=True).split("\n")
-				numYokingFiles = 0
+				num_yoking_files = 0
 				yokeable_subject = ''
 				for f in yoking_files:
 					if f == '':
 						continue
-					numYokingFiles += 1
+					num_yoking_files += 1
 					yokeable_subject = os.path.dirname(f)
 					yokeable_subject = re.sub("%s\/?" % output_directory, '', yokeable_subject)
-					print "%d) %s" %(numYokingFiles, yokeable_subject)
-				chosenNum = raw_input("Which existing yoking source file from a previous participant should be used (1-%d)? " %(numYokingFiles))
+					print "%d) %s" %(num_yoking_files, yokeable_subject)
+
+				if num_yoking_files == 0:
+					print "\nNo yoking files found for the given experiment type in %s." % output_directory
+					print "Either no controllable stress conditions have been run, the output files have been moved, they were generated"
+					print "on another computer and haven't synched, or the output directory settings in your local_config file should be"
+					print "changed to reflect the actual location of the yoking files. Alternatively, if you know which yoking file"
+					print "you would like to use, you could run the game script directly instead of using this wrapper."
+					sys.exit()
+				chosenNum = raw_input("Which existing yoking source file from a previous participant should be used (1-%d)? " %(num_yoking_files))
 				while True:
 					try:
-						assert int(chosenNum) > 0 and int(chosenNum) <= numYokingFiles
+						assert int(chosenNum) > 0 and int(chosenNum) <= num_yoking_files
 						yoking_source_file = yoking_files[int(chosenNum) - 1]
 						print "Okay, the current file will be yoked to this participant: %s." %(yokeable_subject)
 						break
 					except:
-						chosenNum = raw_input("Invalid response. Choose a yoking source file from 1-%d: " %(numYokingFiles))
+						chosenNum = raw_input("Invalid response. Choose a yoking source file from 1-%d: " %(num_yoking_files))
 				break
 			stress_type = raw_input("Invalid response. Enter 1 for controllable stress, 2 for uncontrollable stress, 3 for non-stressed: ")
 	elif game_chosen is egg:
@@ -272,7 +283,7 @@ print "Run type: %s" % run_type
 print "Participant ID: %s" % participant_id
 if game_chosen is not noise_rating:
 	if game_chosen is balloon:
-		print "Stress type: %s" %(stress_type)
+		print "Stress type: %s" %(stress_condition)
 		if current_participant_is_yoked:
 			print "Participant yoked to this file: %s" % yoking_source_file
 	input_mode = "button box" if button_box_mode else "keyboard"
