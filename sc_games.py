@@ -15,6 +15,9 @@ from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import call
 from random import shuffle, choice
+from time import sleep
+import u3
+from threading import Thread
 
 # The project source directory is taken to be the directory containing this script
 project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,6 +66,20 @@ up_key = "up"
 right_key = "right"
 expected_fps = 60
 win_refresh_threshold = 1.0/expected_fps + 0.004 # defining what counts as a dropped frame (value suggested by Psychopy site)
+
+# Labjack event mappings (correspond to FIO port numbers)
+lj_events = { "avoidance_onset" : 4 }
+labjack_active = False # gets set to true upon successful initiation of U3 object
+def send_labjack_event(fio_num):
+    if not labjack_active:
+        return
+    trigger_thread = Thread(target=labjack_event_handler, args=(fio_num,))
+    trigger_thread.start()
+
+def labjack_event_handler(fio_num):
+    device.setFIOState(fio_num, state=1)
+    sleep(1)
+    device.setFIOState(fio_num, state = 0)
 
 # Constants used across balloon/egg games
 implement_practice_time = 20.0
@@ -295,6 +312,27 @@ with open(collision_file) as cf:
 catchable_area_y_boundary = egg_catch_y_boundary if playing_egg_game else balloon_catch_y_boundary
 boundary_direction = egg_catch_boundary_direction if playing_egg_game else balloon_catch_boundary_direction
 instruction_slide_dir = egg_slide_dir if playing_egg_game else balloon_slide_dir
+
+
+## Try to interface with Labjack
+import u3
+try:
+    device = u3.U3()
+    print device.getCalibrationData()
+    labjack_active = True
+except:
+    get_confirm = raw_input("Warning: Unable to interface with Labjack. GSR triggers won't be sent. Would you like to continue (y/n)? ")
+    while True:
+        if get_confirm == "y" or get_confirm == "yes":
+            break
+        elif get_confirm == "n" or get_confirm == "no":
+            try:
+                os.rmdir(output_dir)
+            except:
+                pass
+            print "Aborted experiment."
+            sys.exit()
+        get_confirm = raw_input("Invalid response. Enter \"y\" to continue, \"n\" to quit: ")
 
 
 ## Now going to start loading Psychopy and setting up the experiment window
@@ -638,6 +676,8 @@ def trial_run_frame(routine):
         routine.start_component(implement)
         routine.started_avoidance_phase = True
         avoid_period_onset = '1'
+        send_labjack_event(lj_events['avoidance_onset'])
+
 
     # move implement if appropriate (only allowing one movement per frame)
     key_events = event.getKeys()
