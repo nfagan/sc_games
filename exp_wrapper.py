@@ -99,8 +99,8 @@ version = "unknown"
 if source_clean:
 	version = check_output("git -C %s rev-parse --short HEAD" % source_dir, shell=True).strip()
 else:
-	print "Warning: The project source directory has been altered from the last commit."
-	print "Unless you know what you're doing, you should pull the source code from Bitbucket before continuing."
+	print "Warning: The project source directory has been altered since the last commit."
+	print "Unless you know what you're doing, you should discard local changes and pull the source code from Bitbucket before continuing."
 	print "Here's a list of the changes:"
 	for line in change_list: print line
 	to_continue = raw_input("\nWould you like to continue (y/n)? ")

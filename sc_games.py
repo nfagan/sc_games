@@ -8,15 +8,17 @@ Soon, it will also run the Magic Egg Game.
 # Psychopy wants this
 from __future__ import absolute_import, division
 
-# Psychopy has lots of additional imports, but they'll get imported after runtime options are validated to save overhead
+# Psychopy has lots of additional imports, but they'll get imported after runtime options are validated to prevent task window from launching before it's necessary
 import os, sys
 import re, pickle
 from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import call
 from random import shuffle, choice
-from time import sleep
+
+# Labjack-related imports
 import u3
+from time import sleep
 from threading import Thread
 
 # The project source directory is taken to be the directory containing this script
@@ -68,18 +70,7 @@ expected_fps = 60
 win_refresh_threshold = 1.0/expected_fps + 0.004 # defining what counts as a dropped frame (value suggested by Psychopy site)
 
 # Labjack event mappings (correspond to FIO port numbers)
-lj_events = { "avoidance_onset" : 4 }
-labjack_active = False # gets set to true upon successful initiation of U3 object
-def send_labjack_event(fio_num):
-    if not labjack_active:
-        return
-    trigger_thread = Thread(target=labjack_event_handler, args=(fio_num,))
-    trigger_thread.start()
-
-def labjack_event_handler(fio_num):
-    device.setFIOState(fio_num, state=1)
-    sleep(1)
-    device.setFIOState(fio_num, state = 0)
+lj_events = { "avoidance_onset":4, "first_contact":5, "aversive_sound":6, "no_aversive_sound":7 }
 
 # Constants used across balloon/egg games
 implement_practice_time = 20.0
@@ -315,10 +306,9 @@ instruction_slide_dir = egg_slide_dir if playing_egg_game else balloon_slide_dir
 
 
 ## Try to interface with Labjack
-import u3
+labjack_active = False # gets set to true upon successful initiation of U3 object
 try:
     device = u3.U3()
-    print device.getCalibrationData()
     labjack_active = True
 except:
     get_confirm = raw_input("Warning: Unable to interface with Labjack. GSR triggers won't be sent. Would you like to continue (y/n)? ")
@@ -333,6 +323,31 @@ except:
             print "Aborted experiment."
             sys.exit()
         get_confirm = raw_input("Invalid response. Enter \"y\" to continue, \"n\" to quit: ")
+
+if labjack_active:
+    lj_log = output_dir + "/labjack.log"
+    global lj
+    lj = open (lj_log, 'w')
+    lj.write("#" + str(device.getCalibrationData()) + "\n")
+    lj.write("time\tport\tdescription\n")
+
+def send_labjack_event(event_type):
+    if not labjack_active:
+        return
+    if event_type not in lj_events:
+        print "Warning: invalid event type (%s) could not be handled as a GSR trigger." % event_type
+        return
+    fio_num = lj_events[event_type]
+    timestamp = str(datetime.now())
+    lj.write("%s\t%d\t%s\n" % (timestamp, fio_num, event_type))
+    lj.flush()
+    trigger_thread = Thread(target=labjack_event_handler, args=(fio_num,))
+    trigger_thread.start()
+
+def labjack_event_handler(fio_num):
+    device.setFIOState(fio_num, state=1)
+    sleep(1)
+    device.setFIOState(fio_num, state = 0)
 
 
 ## Now going to start loading Psychopy and setting up the experiment window
@@ -588,7 +603,7 @@ def trial_startup(routine):
         routine.target_doomed = False
     else:
         routine.target_doomed = True
-    routine.target_frozen = False
+    routine.target_has_been_touched = False
     routine.magic_has_happened = False
     routine.started_avoidance_phase = False
     routine.started_anticipatory_phase = False # doesn't stay false for long
@@ -611,7 +626,8 @@ def trial_startup(routine):
     routine.target_step = (current_trajectory_info[2], current_trajectory_info[3])
     routine.zigs = current_trajectory_info[4]
     routine.trajectory_description = str(current_trajectory_info)
-    print "Using index %d in trajectory list: " % current_trajectory_index + routine.trajectory_description
+    if trial_debug_mode or skip_instructions or fast_mode:
+        print "Using index %d in trajectory list: " % current_trajectory_index + routine.trajectory_description
 
 
 
@@ -623,19 +639,19 @@ def trial_run_frame(routine):
     X_target, Y_target, X_implement, Y_implement = ['NA'] * 4
     keyboard_used, keys_pressed, implement_move_direction = ['NA'] * 3
     target_zigged, touching_target_object, target_outside_catchable_area = ['NA'] * 3
-    just_made_magic, just_froze_target, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset = ['0'] * 8
+    just_made_magic, just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset = ['0'] * 8
 
     def write_to_data_files():
         output_fields = [participant_id, str(routine.trial_num), timestamp, str(time_in_seconds), str(time_in_trial), str(X_target), str(Y_target), 
             str(X_implement), str(Y_implement), keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_target_object, target_outside_catchable_area, 
-            just_made_magic, just_froze_target, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset, 
+            just_made_magic, just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset, 
             routine.trajectory_description, str(win.nDroppedFrames)]
 
         f.write("\t".join(output_fields) + "\n")
 
         # if anything of interest has happened, write to highlights file
         for field in (keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_target_object, just_made_magic, 
-                just_froze_target, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset):
+                just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset):
             if field is not "NA" and field is not "0":
                 h.write("\t".join(output_fields) + "\n")
                 break
@@ -676,7 +692,7 @@ def trial_run_frame(routine):
         routine.start_component(implement)
         routine.started_avoidance_phase = True
         avoid_period_onset = '1'
-        send_labjack_event(lj_events['avoidance_onset'])
+        send_labjack_event('avoidance_onset')
 
 
     # move implement if appropriate (only allowing one movement per frame)
@@ -708,12 +724,15 @@ def trial_run_frame(routine):
         if not routine.target_has_exited_catchable_area:
             routine.target_has_exited_catchable_area = True
             target_just_exited_catchable_area = '1'
-        if not routine.target_broken and routine.target_doomed:
-            target.setImage(first_break_image)
-            routine.time_of_breaking = time_in_trial
-            routine.start_component(aversive_sound)
-            aversive_noise_onset = '1'
-            routine.target_broken = True
+            if routine.target_doomed:
+                send_labjack_event("aversive_sound")
+                aversive_noise_onset = '1'
+                target.setImage(first_break_image)
+                routine.time_of_breaking = time_in_trial
+                routine.start_component(aversive_sound)
+                routine.target_broken = True
+            else:
+                send_labjack_event("no_aversive_sound")
     else:
         target_outside_catchable_area = '0'
 
@@ -721,8 +740,8 @@ def trial_run_frame(routine):
     if routine.target_broken and time_in_trial > (routine.time_of_breaking + .2):
         target.setImage(second_break_image)
 
-    # moving target if it hasn't popped/cracked, or been frozen
-    if not routine.target_broken and not routine.target_frozen:
+    # moving target if it hasn't popped/cracked
+    if not routine.target_broken:
         target.pos = (target.pos[0] + target_step[0], target.pos[1] + target_step[1])
         target.ori = ((target.ori + target_rotation_rate) % 360)
         X_target, Y_target = target.pos
@@ -743,14 +762,14 @@ def trial_run_frame(routine):
     # testing if the current x/y distance between target and implement should be counted as a collision
     if y_dist in collision_space_by_y and x_dist >= collision_space_by_y[y_dist][0] and x_dist <= collision_space_by_y[y_dist][1]:
         touching_target_object = '1'
-        if not routine.magic_has_happened and not routine.target_broken and not routine.target_frozen:
+        # Various events occur if this is the first time in the trial that the target has been touched
+        if not routine.target_broken and not routine.target_has_been_touched:
+            routine.target_has_been_touched = True
+            send_labjack_event("first_contact")
+            just_made_first_contact = '1'
             # in the controllable stress condition (balloon game), making touching balloon (with wand or hand) prevents it from popping
             if mode == cs:
                 routine.target_doomed = False
-                # when playing non-magic balloon game, the balloon freezes upon being caught
-                if not playing_magic_game:
-                    routine.target_frozen = True
-                    just_froze_target = '1'
             # start magic sound and iterate spells cast count if playing magic game
             if playing_magic_game:
                 routine.time_of_magic = time_in_trial
@@ -817,7 +836,7 @@ for handle in (f, h):
     if mode == us:
         handle.write("# Yoking file: %s\n" % yoke_source) 
     handle.write("Participant_ID\ttrial_num\ttimestamp\ttime_of_day_in_seconds\ttime_in_trial\tX_target\tY_target\tX_implement\tY_implement\tkeyboard_used\tkeys_pressed\t" +
-        "implement_move_direction\ttarget_zigged\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_froze_target\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
+        "implement_move_direction\ttarget_zigged\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_made_first_contact\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
         "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\ttotal_frames_dropped\n")
 
 # Run all routines
