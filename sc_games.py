@@ -38,7 +38,8 @@ cracking_egg_2_image = media + "cracking_egg_2.png"
 egg_anticipatory_background = media + "Egg_anticipatory_background.jpg"
 egg_avoidance_background =  media + "Egg_avoidance_background.jpg"
 cracking_sound = media + "Sounds/egg_crack.wav"
-egg_slide_dir = media + "Egg_instruction_slides/"
+magic_egg_slide_dir = media + "Magic_instruction_slides/Egg_instruction_slides/"
+mundane_egg_slide_dir = media + "Mundane_instruction_slides/Egg_instruction_slides/"
 
 # Balloon media files
 whole_balloon_image = media + "pink_balloon.png"
@@ -47,7 +48,8 @@ pop_2_image = media + "pop_2.png"
 balloon_anticipatory_background = media + "Balloon_anticipatory_background.jpg"
 balloon_avoidance_background = media + "Balloon_avoidance_background.jpg"
 popping_sound = media + "Sounds/balloon_pop.wav"
-balloon_slide_dir = media + "Balloon_instruction_slides/"
+magic_balloon_slide_dir = media + "Magic_instruction_slides/Balloon_instruction_slides/"
+mundane_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_instruction_slides/"
 
 # Collision files show which x/y distances between objects should count as collisions
 balloon_wand_collision_file = project_dir + "/resources/balloon_wand_collision_map.pickle"
@@ -234,6 +236,12 @@ highlight_data_file = "%s/%s_%s_%s_%s_highlights.txt" % (output_dir, participant
 # determine game type (magic or non-magic)
 playing_magic_game = True if game_type == "magic" else False
 playing_hand_game = not playing_magic_game
+if playing_magic_game:
+    balloon_slide_dir = magic_balloon_slide_dir
+    egg_slide_dir = magic_balloon_slide_dir
+else:
+    balloon_slide_dir = mundane_balloon_slide_dir
+    egg_slide_dir = mundane_egg_slide_dir
 
 # determine which game mode we're playing: balloon game comes in cs/us/ns, egg game always uncontrollable stress (us)
 playing_balloon_game = True if mode in balloon_modes else False
@@ -513,12 +521,19 @@ class Routine():
 
 ## Declare all the functions that control the behavior of each routine in the experiment
 # for each numbered instruction slide, storing which key press is required to advance
-keys_to_advance = {} 
-for slide_num in range (1, 10):
-    keys_to_advance[slide_num] = 'space'
-keys_to_advance[10], keys_to_advance[11], keys_to_advance[12], keys_to_advance[13] = left_key, right_key, down_key, up_key
-for slide_num in range(14, 19):
-    keys_to_advance[slide_num] = 'space'
+keys_to_advance = {}
+if playing_magic_game:  
+    for slide_num in range(1, 10):
+        keys_to_advance[slide_num] = 'space'
+    keys_to_advance[10], keys_to_advance[11], keys_to_advance[12], keys_to_advance[13] = left_key, right_key, down_key, up_key
+    for slide_num in range(14, 19):
+        keys_to_advance[slide_num] = 'space'
+else:
+    for slide_num in range(1, 9):
+        keys_to_advance[slide_num] = 'space'
+    keys_to_advance[9], keys_to_advance[10], keys_to_advance[11], keys_to_advance[12] = left_key, right_key, down_key, up_key
+    for slide_num in range(13, 18):
+        keys_to_advance[slide_num] = 'space'
 
 def run_slides(routine, current_slide, last_slide):
     if hasattr(routine, "current_slide"):
@@ -808,10 +823,17 @@ def trial_shutdown(routine):
         target = visual.ImageStim(win = win, name = 'egg', units = 'pix', image = whole_egg_image, interpolate = True, depth = -3.0)
 # build a list of routines to run
 routines = []
-instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
+if playing_magic_game:
+    instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
+    instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 15, 17))
+    thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 18, 18))
+else:
+    instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 13))
+    instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 14, 16))
+    thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 17, 17))
 implement_practice = Routine(window = win, startup = implement_practice_startup, run_frame = implement_practice_run_frame)
-instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 15, 17))
 
+# add instructions to routine list (save thanks for after trial routines)
 if not skip_instructions: routines.extend((instructions_1, implement_practice, instructions_2))
 
 # add all the trial routines to the list of routines
@@ -824,9 +846,8 @@ for trial_num in range(1, num_trials + 1):
     trial = Routine(window = win, startup = trial_startup, run_frame = trial_run_frame, shutdown = trial_shutdown)
     routines.append(trial)
 
-thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 18, 18))
+# finsih with thanks slide
 routines.append(thanks)
-
 
 # Now that the experiment is about to run, write data file headers
 for handle in (f, h):
