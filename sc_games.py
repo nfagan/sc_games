@@ -265,14 +265,14 @@ if mode == us:
     yoke_source = os.path.abspath(yoke_source)
     # read in the pickle from the source
     with open(yoke_source, 'r') as y:
-        aversive_sound_by_trial_num = pickle.load(y)
+        time_of_catch_by_trial = pickle.load(y)
     # make sure the source participant had the same number of trials as the current run
-    num_trials_in_yoke_source = len(aversive_sound_by_trial_num)
+    num_trials_in_yoke_source = len(time_of_catch_by_trial)
     if num_trials_in_yoke_source != num_trials:
         print "Error: The yoking source file contained data for %d trials, not the expected %d trials." % (num_trials_in_yoke_source, num_trials)
         sys.exit()
 else:
-    aversive_sound_by_trial_num = {} # Keys = trial number, values = True/False on whether aversive sound should play
+    time_of_catch_by_trial = {} # Keys = trial number, values = True/False on whether aversive sound should play
 
 if button_box_mode:
     down_key = "1" # green
@@ -612,8 +612,14 @@ def trial_startup(routine):
     global current_trial_num
     current_trial_num += 1
     routine.target_broken = False
+    routine.target_frozen = False
+    routine.scheduled_save_time = None # gets set to yoked save time in balloon_us condition
     if mode == us:
-        routine.target_doomed = aversive_sound_by_trial_num[current_trial_num]
+        if time_of_catch_by_trial[current_trial_num] == None:
+            routine.target_doomed = True
+        else:
+            routine.target_doomed = False
+            routine.scheduled_save_time = time_of_catch_by_trial[current_trial_num]
     elif mode == ns:
         routine.target_doomed = False
     else:
@@ -657,6 +663,12 @@ def trial_run_frame(routine):
     just_made_magic, just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset = ['0'] * 8
 
     def write_to_data_files():
+        # when implement is frozen over target object, that's not interesting; otherwise, it is interesting when target object is being touched
+        if routine.target_frozen:
+            touching_test = just_made_first_contact
+        else:
+            touching_test = touching_target_object
+
         output_fields = [participant_id, str(routine.trial_num), timestamp, str(time_in_seconds), str(time_in_trial), str(X_target), str(Y_target), 
             str(X_implement), str(Y_implement), keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_target_object, target_outside_catchable_area, 
             just_made_magic, just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset, 
@@ -665,7 +677,7 @@ def trial_run_frame(routine):
         f.write("\t".join(output_fields) + "\n")
 
         # if anything of interest has happened, write to highlights file
-        for field in (keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_target_object, just_made_magic, 
+        for field in (keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_test, just_made_magic, 
                 just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset):
             if field is not "NA" and field is not "0":
                 h.write("\t".join(output_fields) + "\n")
@@ -712,19 +724,19 @@ def trial_run_frame(routine):
 
     # move implement if appropriate (only allowing one movement per frame)
     key_events = event.getKeys()
-    if right_key in key_events:
+    if right_key in key_events and not routine.target_frozen:
         if implement.pos[0] + implement.size[0]/2 + implement_step_size < screen_width/2:
             implement.pos = (implement.pos[0] + implement_step_size, implement.pos[1])
             implement_move_direction = 'right'
-    elif left_key in key_events:
+    elif left_key in key_events and not routine.target_frozen:
         if implement.pos[0] - implement.size[0]/2 - implement_step_size > -screen_width/2: 
             implement.pos = (implement.pos[0] - implement_step_size, implement.pos[1])
             implement_move_direction = 'left'
-    elif up_key in key_events:
+    elif up_key in key_events and not routine.target_frozen:
         if implement.pos[1] + implement.size[1]/2 + implement_step_size < screen_height/2:
             implement.pos = (implement.pos[0], implement.pos[1] + implement_step_size)
             implement_move_direction = 'up'
-    elif down_key in key_events:
+    elif down_key in key_events and not routine.target_frozen:
         if implement.pos[1] - implement.size[1]/2 - implement_step_size > -screen_height/2:
             implement.pos = (implement.pos[0], implement.pos[1] - implement_step_size)
             implement_move_direction = 'down'
@@ -732,6 +744,12 @@ def trial_run_frame(routine):
     if len(key_events) >= 1:
         keys_pressed = ','.join(key_events)
         keyboard_used = '1'
+
+    # Setting target to "saved" at the proper time for yoked stress conditions 
+    if routine.scheduled_save_time and time_in_trial > routine.scheduled_save_time:
+        routine.target_doomed = False
+        if not playing_magic_game:
+            routine.target_frozen = True
 
     # Popping or cracking target object if it has passed the catchable area and is doomed
     if eval("%d %s %d" %(target.pos[1], boundary_direction, catchable_area_y_boundary)):
@@ -755,8 +773,8 @@ def trial_run_frame(routine):
     if routine.target_broken and time_in_trial > (routine.time_of_breaking + .2):
         target.setImage(second_break_image)
 
-    # moving target if it hasn't popped/cracked
-    if not routine.target_broken:
+    # moving target if it hasn't popped/cracked or been frozen
+    if not routine.target_broken and not routine.target_frozen:
         target.pos = (target.pos[0] + target_step[0], target.pos[1] + target_step[1])
         target.ori = ((target.ori + target_rotation_rate) % 360)
         X_target, Y_target = target.pos
@@ -780,11 +798,14 @@ def trial_run_frame(routine):
         # Various events occur if this is the first time in the trial that the target has been touched
         if not routine.target_broken and not routine.target_has_been_touched:
             routine.target_has_been_touched = True
+            routine.time_of_first_contact = time_in_trial
             send_labjack_event("first_contact")
             just_made_first_contact = '1'
             # in the controllable stress condition (balloon game), making touching balloon (with wand or hand) prevents it from popping
             if mode == cs:
                 routine.target_doomed = False
+                if not playing_magic_game:
+                    routine.target_frozen = True
             # start magic sound and iterate spells cast count if playing magic game
             if playing_magic_game:
                 routine.time_of_magic = time_in_trial
@@ -815,8 +836,11 @@ def trial_run_frame(routine):
 # at the end of each trial for the balloon_cs mode, need to preserve the order of pops/non-pops
 def trial_shutdown(routine):
     if mode == cs:
-        global aversive_sound_by_trial_num
-        aversive_sound_by_trial_num[current_trial_num] = routine.target_broken # for readability, would be better to have a variable called sound_has_played
+        global time_of_catch_by_trial
+        if routine.target_broken:
+            time_of_catch_by_trial[current_trial_num] = None
+        else:
+            time_of_catch_by_trial[current_trial_num] = routine.time_of_first_contact
     elif playing_egg_game:
         # only way found so far to reset a color change!
         global target
@@ -875,7 +899,7 @@ call("gzip %s" % full_data_file, shell = True)
 if mode == cs:
     yoking_file = "%s/yoking_file.pickle" % output_dir
     with open (yoking_file, 'w') as y:
-        pickle.dump(aversive_sound_by_trial_num, y)
+        pickle.dump(time_of_catch_by_trial, y)
 print "Finished the game!"
 print "Output has been written to %s." % output_dir
 
