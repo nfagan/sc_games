@@ -72,7 +72,7 @@ expected_fps = 60
 win_refresh_threshold = 1.0/expected_fps + 0.004 # defining what counts as a dropped frame (value suggested by Psychopy site)
 
 # Labjack event mappings (correspond to FIO port numbers)
-lj_events = { "avoidance_onset":4, "first_contact":5, "aversive_sound":6, "no_aversive_sound":7 }
+lj_events = { "avoidance_onset":4, "first_contact":5, "aversive_sound":6, "no_aversive_sound":7, "target_frozen":7}
 
 # Constants used across balloon/egg games
 implement_practice_time = 20.0
@@ -750,6 +750,7 @@ def trial_run_frame(routine):
         routine.target_doomed = False
         if not playing_magic_game:
             routine.target_frozen = True
+            send_labjack_event("target_frozen")
 
     # Popping or cracking target object if it has passed the catchable area and is doomed
     if eval("%d %s %d" %(target.pos[1], boundary_direction, catchable_area_y_boundary)):
@@ -764,7 +765,10 @@ def trial_run_frame(routine):
                 routine.time_of_breaking = time_in_trial
                 routine.start_component(aversive_sound)
                 routine.target_broken = True
-            else:
+            elif playing_magic_game or nonstressed_mode:
+                # in the magic game, target objects don't freeze, so participant only learns fate of object when it passes kill line
+                # therefore, a trigger is sent in the event of "no_aversive_sound" (for non-magic game, object always pops after 
+                # passing kill line except in non-stress game)
                 send_labjack_event("no_aversive_sound")
     else:
         target_outside_catchable_area = '0'
@@ -806,6 +810,7 @@ def trial_run_frame(routine):
                 routine.target_doomed = False
                 if not playing_magic_game:
                     routine.target_frozen = True
+                    send_labjack_event("target_frozen")
             # start magic sound and iterate spells cast count if playing magic game
             if playing_magic_game:
                 routine.time_of_magic = time_in_trial
