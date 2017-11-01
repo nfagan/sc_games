@@ -243,12 +243,12 @@ if game_chosen is not noise_rating:
 					print "changed to reflect the actual location of the yoking files. Alternatively, if you know which yoking file"
 					print "you would like to use, you could run the game script directly instead of using this wrapper."
 					sys.exit()
-				chosenNum = raw_input("Which existing yoking source file from a previous participant should be used (1-%d)? " %(num_yoking_files))
+				chosenNum = raw_input("Which existing yoking source file from a previous participant should be used (1-%d)? " % (num_yoking_files))
 				while True:
 					try:
 						assert int(chosenNum) > 0 and int(chosenNum) <= num_yoking_files
 						yoking_source_file = yoking_files[int(chosenNum) - 1]
-						print "Okay, the current file will be yoked to this participant: %s." %(yokeable_subject)
+						print "Okay, this yoking file will be used: %s." % yoking_source_file
 						break
 					except:
 						chosenNum = raw_input("Invalid response. Choose a yoking source file from 1-%d: " %(num_yoking_files))
