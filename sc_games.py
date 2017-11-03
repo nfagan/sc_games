@@ -238,7 +238,7 @@ playing_magic_game = True if game_type == "magic" else False
 playing_hand_game = not playing_magic_game
 if playing_magic_game:
     balloon_slide_dir = magic_balloon_slide_dir
-    egg_slide_dir = magic_balloon_slide_dir
+    egg_slide_dir = magic_egg_slide_dir
 else:
     balloon_slide_dir = mundane_balloon_slide_dir
     egg_slide_dir = mundane_egg_slide_dir
