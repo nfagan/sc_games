@@ -170,6 +170,7 @@ while True:
 		break
 	participant_id = raw_input("Invalid ID. Legal characters are letters, numbers, hyphens, and underscores. Choose a new ID: ")
 
+debug_trial_mode = False
 if game_chosen is not noise_rating:	
 	if run_type == "Test Run":
 		print "\nTesting options:\n1) Full run\n2) Skip instructions\n3) Fast mode (short ITI/anticipatory periods)\n4) Skip instructions AND fast mode\n5) Test specific trial\n"
@@ -189,6 +190,7 @@ if game_chosen is not noise_rating:
 					break
 				elif int(choice) == 5:
 					trial_to_test = raw_input("Which trial number should be tested? ")
+					debug_trial_mode = True
 					while True:
 						try:
 							int(trial_to_test) # ensuring conversion to integer is possible
@@ -257,6 +259,28 @@ if game_chosen is not noise_rating:
 	elif game_chosen is egg:
 		game_mode = "egg"
 
+	# Prompt for randomization mode
+	non_randomized = False
+	if not debug_trial_mode:
+		response = raw_input("Should trial presentation order be 1) randomized or 2) non-randomized? ")
+		while True:
+			try:
+				response = int(response)
+			except ValueError:
+				response = raw_input("Invalid response: Enter 1 for randomized trial order, or 2 for non-randomized: ")
+				continue
+			if response == 1:
+				print "Okay. Trial presentation order will be randomized."
+				break
+			if response == 2:
+				print "Okay. Trial presentation order will NOT be randomized."
+				non_randomized = True
+				break
+			else:
+				response = raw_input("Invalid response: Enter 1 for randomized trial order, or 2 for non-randomized: ")
+	else:
+		non_randomized = True
+
 	# Prompt for keyboard input mode vs. button box mode
 	button_box_mode = False
 	response = raw_input("Are we playing with 1) keyboard input or 2) button box input? ")
@@ -286,6 +310,8 @@ if game_chosen is not noise_rating:
 		print "Stress type: %s" %(stress_condition)
 		if current_participant_is_yoked:
 			print "Participant yoked to this file: %s" % yoking_source_file
+	randomization_mode = "non-random" if non_randomized else "random"
+	print "Trial presentation order: %s" % randomization_mode
 	input_mode = "button box" if button_box_mode else "keyboard"
 	print "Input mode: %s" % input_mode
 print "Save output here: %s" % output_directory
@@ -306,5 +332,6 @@ if chosen_task_info['ShortName'] is not 'Noise Rating':
 	script_with_args += " --game-type=%s --game-mode=%s %s" % (exp_type, game_mode, test_options)
 	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
 	if button_box_mode: script_with_args += " --button-box"
+	if non_randomized: script_with_args += " --non-randomized"
 print "Running this: %s" % script_with_args
 call(script_with_args, shell=True)

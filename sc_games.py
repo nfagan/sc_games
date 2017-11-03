@@ -176,6 +176,8 @@ parser.add_option("-g", "--game-type", metavar="GAME", dest="game_type", choices
 parser.add_option("-m", "--game-mode", metavar="MODE", dest="mode", choices=all_modes, help="the game mode (choices: %s)" % str(all_modes))
 parser.add_option("-y", "--yoke-source", metavar="YOKE_FILE", dest="yoke_source", help="For balloon_us and balloon_ns conditions, indicate a yoking file from a balloon_cs run")
 parser.add_option("-B", "--button-box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
+parser.add_option("--non-randomized", action="store_true", default=False, dest="non_randomize", help="trials (target trajectories) will be presented in a set order")
+
 
 # options for testing and development
 parser.add_option("--fast", action="store_true", default=False, dest="fast_mode", help="use shortened ITI and anticipatory periods (for test runs only)")
@@ -192,6 +194,9 @@ participant_id = options.participant_id
 game_type = options.game_type
 mode = options.mode
 yoke_source = options.yoke_source
+randomized = not options.non_randomize
+if not randomized:
+    print "Note: \"--non-randomized\" invoked, so trials will be be presented in fixed order."
 
 version = options.version
 button_box_mode = options.button_box_mode
@@ -281,6 +286,7 @@ if button_box_mode:
     right_key = "4" # yellow
 
 if trial_debug_requested:
+    randomized = False # can't randomize since a specific trial is supposed to be displayed
     trial_debug_mode = True
     debug_trial = int(trial_debug_requested)
     skip_instructions = True
@@ -295,7 +301,7 @@ if fast_mode:
 # will pull from balloon/egg settings list in random order (unless testing trials)
 all_trajectory_info = egg_trajectory_info if playing_egg_game else balloon_trajectory_info
 trajectory_order = range(0, len(all_trajectory_info))
-if not trial_debug_mode and not fast_mode and not skip_instructions: 
+if randomized: 
     shuffle(trajectory_order)
 
 ## Set task-specific constants depending on whether egg or balloon game is being played
@@ -883,8 +889,10 @@ for handle in (f, h):
     handle.write("# Version: %s\n" % version)
     handle.write("# Task type: %s\n" % game_type)
     handle.write("# Task mode: %s\n" % mode)
+    event_ordering = "random" if randomized else "non-random"
+    handle.write("# Trajectory order: %s\n" % event_ordering)
     if mode == us:
-        handle.write("# Yoking file: %s\n" % yoke_source) 
+        handle.write("# Yoking file: %s\n" % yoke_source)
     handle.write("Participant_ID\ttrial_num\ttimestamp\ttime_of_day_in_seconds\ttime_in_trial\tX_target\tY_target\tX_implement\tY_implement\tkeyboard_used\tkeys_pressed\t" +
         "implement_move_direction\ttarget_zigged\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_made_first_contact\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
         "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\ttotal_frames_dropped\n")
