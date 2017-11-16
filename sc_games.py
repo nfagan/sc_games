@@ -196,7 +196,7 @@ mode = options.mode
 yoke_source = options.yoke_source
 randomized = not options.non_randomize
 if not randomized:
-    print "Note: \"--non-randomized\" invoked, so trials will be be presented in fixed order."
+    print "Note: \"--non-randomized\" invoked, so trials will be presented in fixed order."
 
 version = options.version
 button_box_mode = options.button_box_mode
