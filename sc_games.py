@@ -280,10 +280,10 @@ else:
     time_of_catch_by_trial = {} # Keys = trial number, values = True/False on whether aversive sound should play
 
 if button_box_mode:
-    down_key = "1" # green
-    left_key = "2" # red
-    up_key = "3" # blue
-    right_key = "4" # yellow
+    up_key = "1" # green
+    right_key = "2" # red
+    down_key = "3" # blue
+    left_key = "4" # yellow
 
 if trial_debug_requested:
     randomized = False # can't randomize since a specific trial is supposed to be displayed
