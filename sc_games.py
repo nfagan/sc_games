@@ -175,7 +175,7 @@ parser.add_option("-g", "--game-type", metavar="GAME", dest="game_type", choices
     help="the type of exeriment to run: \"magic\" (with wand) or \"mundane\" (with hand)")
 parser.add_option("-m", "--game-mode", metavar="MODE", dest="mode", choices=all_modes, help="the game mode (choices: %s)" % str(all_modes))
 parser.add_option("-y", "--yoke-source", metavar="YOKE_FILE", dest="yoke_source", help="For balloon_us and balloon_ns conditions, indicate a yoking file from a balloon_cs run")
-parser.add_option("-B", "--button-box", action="store_true", default=False, dest="button_box_mode", help="use button box input (1-4 instead of right, down, left, up)")
+parser.add_option("--mri-mode", action="store_true", default=False, dest="mri_mode", help="use button box input, incorporate MRI trigger, and split trials into two phases")
 parser.add_option("--non-randomized", action="store_true", default=False, dest="non_randomize", help="trials (target trajectories) will be presented in a set order")
 
 
@@ -199,7 +199,7 @@ if not randomized:
     print "Note: \"--non-randomized\" invoked, so trials will be presented in fixed order."
 
 version = options.version
-button_box_mode = options.button_box_mode
+mri_mode = options.mri_mode
 fast_mode = options.fast_mode
 skip_instructions = options.skip_instructions
 trial_debug_requested = options.debug_trial
@@ -279,7 +279,7 @@ if mode == us:
 else:
     time_of_catch_by_trial = {} # Keys = trial number, values = True/False on whether aversive sound should play
 
-if button_box_mode:
+if mri_mode:
     up_key = "1" # green
     right_key = "2" # red
     down_key = "3" # blue
@@ -378,10 +378,10 @@ exp_info['exp_name'] = mode
 exp_handler_log = "%s/psychopy" % output_dir
 this_exp = data.ExperimentHandler(name=mode, extraInfo=exp_info, savePickle=True, saveWideText=False, dataFileName=exp_handler_log)
 log_file = logging.LogFile(exp_handler_log+'.log', level=logging.EXP)
-#logging.console.setLevel(logging.WARNING) # makes warnings get printed to console window
+logging.console.setLevel(logging.CRITICAL) # makes warnings get printed to console window
 
 # Set up the experiment window (there are additional options you can specify; see documentation if you ever care)
-win = visual.Window(size=(screen_width, screen_height), fullscr=True, allowGUI=False, useFBO=True, units='pix', monitor = 'testMonitor')
+win = visual.Window(size=(screen_width, screen_height), monitor = 'testMonitor', allowGUI=False, fullscr=True, useFBO=False, units='pix')
 calculated_fps = int(round(win.getActualFrameRate()))
 if calculated_fps != expected_fps:
     print "Warning: This experiment is meant to run at %d frames per second, but your display was recorded at %d fps." % (expected_fps, calculated_fps)
@@ -408,8 +408,9 @@ ITI = visual.ImageStim(win=win, name='ITI',units='pix', image=media + "iti_backg
     pos=(0, 0), size=(screen_width, screen_height), interpolate=True, depth=-6.0)
 counter_background = visual.ImageStim(win=win, name='counter_background',units='pix', 
     image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0, opacity=0)
-counter = visual.TextStim(win=win, name='counter', text=None, font=u'Arial', units='pix', pos=(550, -432), height=24,
-    wrapWidth=None, color=u'#053270', depth=-8.0, opacity=0);
+counter = visual.TextStim(win=win, name='counter', text=None, font='Arial', units='pix', pos=(550, -432), height=24,
+    wrapWidth=None, color=u'#053270', depth=-8.0, opacity=0)
+break_label = visual.TextStim(win=win, name='break', text="We're taking a break!", font='Arial', units='pix', pos=(0, 0), height=30)
 
 if playing_magic_game:
     magic_sparks = visual.ImageStim(win=win, name='magic_sparks',units='pix', 
@@ -871,6 +872,17 @@ implement_practice = Routine(window = win, startup = implement_practice_startup,
 # add instructions to routine list (save thanks for after trial routines)
 if not skip_instructions: routines.extend((instructions_1, implement_practice, instructions_2))
 
+# in MRI mode, there's an extra routine that serves as a break between sets of trials
+def start_break(routine):
+	routine.start_component(break_label)
+
+def run_break(routine):
+	keys_pressed = event.getKeys()
+	if 'space' in keys_pressed:
+		routine.stop_component(break_label)
+break_routine = Routine(window = win, startup = start_break, run_frame = run_break)
+
+
 # add all the trial routines to the list of routines
 for trial_num in range(1, num_trials + 1):
     # if debugging one trial, skip the other trials
@@ -880,8 +892,10 @@ for trial_num in range(1, num_trials + 1):
         continue
     trial = Routine(window = win, startup = trial_startup, run_frame = trial_run_frame, shutdown = trial_shutdown)
     routines.append(trial)
+    if mri_mode and trial_num == num_trials/2:
+    	routines.append(break_routine)
 
-# finsih with thanks slide
+# finish with thanks slide
 routines.append(thanks)
 
 # Now that the experiment is about to run, write data file headers
@@ -921,4 +935,4 @@ this_exp.saveAsPickle(exp_handler_log)
 logging.flush()
 this_exp.abort()
 win.close()
-core.quit()
+core.quit() # calling core.quit causes a pyo error that can be ignored (this is Psychopy's fault)

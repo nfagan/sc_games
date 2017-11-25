@@ -282,23 +282,23 @@ if game_chosen is not noise_rating:
 		non_randomized = True
 
 	# Prompt for keyboard input mode vs. button box mode
-	button_box_mode = False
-	response = raw_input("Are we playing with 1) keyboard input or 2) button box input? ")
+	mri_mode = False
+	response = raw_input("Are we playing with 1) keyboard input or 2) button box input (MRI mode)? ")
 	while True:
 		try:
 			response = int(response)
 		except ValueError:
-			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input: ")
+			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input (MRI mode): ")
 			continue
 		if response == 1:
 			print "Okay, we'll play with keyboard input."
 			break
 		elif response == 2:
-			print "Okay, we'll play with button box input."
-			button_box_mode = True
+			print "Okay, we'll play in MRI mode (button box input, MRI trigger, two phases of trials)."
+			mri_mode = True
 			break
 		else:
-			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input: ")
+			response = raw_input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input (MRI mode): ")
 	
 print "\nHere are the options that have been chosen: "
 print "Experiment: %s" % exp_name
@@ -312,7 +312,7 @@ if game_chosen is not noise_rating:
 			print "Participant yoked to this file: %s" % yoking_source_file
 	randomization_mode = "non-random" if non_randomized else "random"
 	print "Trial presentation order: %s" % randomization_mode
-	input_mode = "button box" if button_box_mode else "keyboard"
+	input_mode = "button box (MRI mode)" if mri_mode else "keyboard"
 	print "Input mode: %s" % input_mode
 print "Save output here: %s" % output_directory
 
@@ -331,7 +331,7 @@ script_with_args = python_bin + " '%s' --participant-id=%s  --output=%s  --versi
 if chosen_task_info['ShortName'] is not 'Noise Rating':
 	script_with_args += " --game-type=%s --game-mode=%s %s" % (exp_type, game_mode, test_options)
 	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
-	if button_box_mode: script_with_args += " --button-box"
+	if mri_mode: script_with_args += " --mri-mode"
 	if non_randomized: script_with_args += " --non-randomized"
 print "Running this: %s" % script_with_args
 call(script_with_args, shell=True)
