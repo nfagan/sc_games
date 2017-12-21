@@ -184,9 +184,9 @@ for condition in ("%s_aversive_noise" % timepoint, "%s_save" % timepoint):
 		# add columns with square root transformation for amp_sum data, using training data for the max values
 		if data_col is cda_amp_sum_col or data_col is tpp_amp_sum_col:
 			max_value = max(data[condition][data_col]) if data[condition][data_col] else 0
-			sqrt_transform = sum(x ** 0.5 for x in data[condition][data_col]) / event_count / (max_value ** 0.5) if event_count != 0 else "NA"
-			sqrt_early = sum(x ** 0.5 for x in data[condition][data_col][0:midpoint]) / midpoint / (max_value ** 0.5) if midpoint != 0 else "NA"
-			sqrt_late = sum(x ** 0.5 for x in data[condition][data_col][midpoint:event_count]) / midpoint / (max_value ** 0.5) if midpoint != 0 else "NA"
+			sqrt_transform = sum(x ** 0.5 for x in data[condition][data_col]) / event_count / (max_value ** 0.5) if 0 not in (max_value, event_count) else "NA"
+			sqrt_early = sum(x ** 0.5 for x in data[condition][data_col][0:midpoint]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else "NA"
+			sqrt_late = sum(x ** 0.5 for x in data[condition][data_col][midpoint:event_count]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else "NA"
 			output_fields.extend(str(field) for field in (sqrt_transform, sqrt_early, sqrt_late))
 
 	for datum in output_fields[1:]:
