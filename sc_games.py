@@ -401,7 +401,7 @@ if playing_magic_game:
     implement = visual.ImageStim(win=win, name='wand',units='pix', image=media + "magic_wand.png", pos=[0,0], interpolate=True, depth=-4.0)
 else:
     implement = visual.ImageStim(win=win, name='hand',units='pix', image=media + "orange_hand.png", pos=[0,0], interpolate=True, depth=-4.0)
-time_left_label = visual.TextStim(win=win, name='time_left_label', text=None, font='Arial', units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, color='#053270', depth=-2.0);
+time_left_label = visual.TextStim(win=win, name='time_left_label', text=None, font='Arial', units='norm', pos=(.9, -.8), height=0.1, wrapWidth=None, color='#053270', depth=-2.0)
 
 # Components for all routines (except wand or hand, which was declared above)
 ITI = visual.ImageStim(win=win, name='ITI',units='pix', image=media + "iti_background.jpg", 
@@ -410,7 +410,9 @@ counter_background = visual.ImageStim(win=win, name='counter_background',units='
     image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0, opacity=0)
 counter = visual.TextStim(win=win, name='counter', text=None, font='Arial', units='pix', pos=(550, -432), height=24,
     wrapWidth=None, color=u'#053270', depth=-8.0, opacity=0)
-break_label = visual.TextStim(win=win, name='break', text="We're taking a break!", font='Arial', units='pix', pos=(0, 0), height=30)
+break_label = visual.TextStim(win=win, name='break_start', text="We're taking a break!", font='Arial', units='pix', pos=(0, 0), height=30)
+get_ready_label = visual.TextStim(win=win, name='get_ready', text="Get ready...", font='Arial', units='pix', pos=(0, 0), height=30)
+
 
 if playing_magic_game:
     magic_sparks = visual.ImageStim(win=win, name='magic_sparks',units='pix', 
@@ -550,7 +552,7 @@ def run_slides(routine, current_slide, last_slide):
         routine.start_component(slides)
 
     # first slide stays for 2 seconds (although user can still skip forward with space bar if they try)
-    ## TO DO: get rid of this, repalce with a label that appears on some slides
+    ## TO DO: get rid of this, replace with a label that appears on some slides
     if (routine.clock.getTime() > 2 and current_slide == 1):
         current_slide += 1
 
@@ -609,6 +611,30 @@ def implement_practice_run_frame(routine):
         routine.rounded_seconds_remaining -= 1
         time_left_label.setText(str(int(routine.rounded_seconds_remaining)))
 
+
+# In MRI, a long ITI (20 seconds) is used at start and after midtask break
+def start_long_iti(routine):
+    routine.start_component(ITI)
+def run_long_iti(routine):
+    if routine.clock.getTime() > 20:
+        routine.stop_component(ITI)
+
+# In MRI mode, need to await a trigger (which comes in as a '5' keyboard event) before starting trials
+def await_MRI_trigger_start(routine):
+    routine.start_component(get_ready_label)
+def await_MRI_trigger_run(routine):
+    keys_pressed = event.getKeys()
+    if '5' in keys_pressed:
+        routine.stop_component(get_ready_label)
+            
+# in MRI mode, there is a one minute break between sets of trials
+def start_break(routine):
+    routine.start_component(break_label)
+
+def run_break(routine):
+    if routine.clock.getTime() > 60:
+        routine.stop_component(break_label)
+
 # define global variables needed by the trial routines
 spells_cast = 0
 current_trial_num = 0
@@ -657,8 +683,6 @@ def trial_startup(routine):
     if trial_debug_mode or skip_instructions or fast_mode:
         print "Using index %d in trajectory list: " % current_trajectory_index + routine.trajectory_description
 
-
-
 def trial_run_frame(routine):
     time_in_trial = routine.clock.getTime()
     t = datetime.now()
@@ -666,8 +690,8 @@ def trial_run_frame(routine):
     time_in_seconds = t.hour * 3600 + t.minute * 60 + t.second + t.microsecond/1000000.0
     X_target, Y_target, X_implement, Y_implement = ['NA'] * 4
     keyboard_used, keys_pressed, implement_move_direction = ['NA'] * 3
-    target_zigged, touching_target_object, target_outside_catchable_area = ['NA'] * 3
-    just_made_magic, just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset = ['0'] * 8
+    target_zigged, target_is_frozen, touching_target_object, target_outside_catchable_area = ['NA'] * 4
+    just_made_magic, just_made_first_contact, just_froze, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset = ['0'] * 9
 
     def write_to_data_files():
         # when implement is frozen over target object, that's not interesting; otherwise, it is interesting when target object is being touched
@@ -677,17 +701,19 @@ def trial_run_frame(routine):
             touching_test = touching_target_object
 
         output_fields = [participant_id, str(routine.trial_num), timestamp, str(time_in_seconds), str(time_in_trial), str(X_target), str(Y_target), 
-            str(X_implement), str(Y_implement), keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_target_object, target_outside_catchable_area, 
-            just_made_magic, just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset, 
+            str(X_implement), str(Y_implement), keyboard_used, keys_pressed, implement_move_direction, target_zigged, target_is_frozen, touching_target_object, target_outside_catchable_area, 
+            just_made_magic, just_made_first_contact, just_froze, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset, 
             routine.trajectory_description, str(win.nDroppedFrames)]
 
         f.write("\t".join(output_fields) + "\n")
+        # going to try not flushing here for better performance
 
         # if anything of interest has happened, write to highlights file
         for field in (keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_test, just_made_magic, 
-                just_made_first_contact, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset):
+                just_made_first_contact, just_froze, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset):
             if field is not "NA" and field is not "0":
                 h.write("\t".join(output_fields) + "\n")
+                h.flush()
                 break
 
     # handling anticipatory phase
@@ -717,6 +743,8 @@ def trial_run_frame(routine):
     target_zigged = '0'
     keyboard_used = '0'
     target_step = routine.target_step
+    target_is_frozen = '1' if routine.target_frozen else '0'
+
 
     # starting up the avoidance phase 
     if not routine.started_avoidance_phase:
@@ -755,8 +783,10 @@ def trial_run_frame(routine):
     # Setting target to "saved" at the proper time for yoked stress conditions 
     if routine.scheduled_save_time and time_in_trial > routine.scheduled_save_time:
         routine.target_doomed = False
-        if not playing_magic_game:
+        if not playing_magic_game and not routine.target_frozen:
             routine.target_frozen = True
+            just_froze ='1'
+            target_is_frozen = '1'
             send_labjack_event("target_frozen")
 
     # Popping or cracking target object if it has passed the catchable area and is doomed
@@ -817,6 +847,9 @@ def trial_run_frame(routine):
                 routine.target_doomed = False
                 if not playing_magic_game:
                     routine.target_frozen = True
+                    # these extra markers are necessary for correct logging on the first frame of capture
+                    just_froze = '1'
+                    target_is_frozen = '1'
                     send_labjack_event("target_frozen")
             # start magic sound and iterate spells cast count if playing magic game
             if playing_magic_game:
@@ -870,18 +903,15 @@ else:
 implement_practice = Routine(window = win, startup = implement_practice_startup, run_frame = implement_practice_run_frame)
 
 # add instructions to routine list (save thanks for after trial routines)
-if not skip_instructions: routines.extend((instructions_1, implement_practice, instructions_2))
+if not skip_instructions:
+    routines.extend((instructions_1, implement_practice, instructions_2))
 
-# in MRI mode, there's an extra routine that serves as a break between sets of trials
-def start_break(routine):
-	routine.start_component(break_label)
+await_MRI_trigger = Routine(window = win, startup = await_MRI_trigger_start, run_frame = await_MRI_trigger_run)
+midtask_break = Routine(window = win, startup = start_break, run_frame = run_break)
+long_iti = Routine(window = win, startup = start_long_iti, run_frame = run_long_iti)
 
-def run_break(routine):
-	keys_pressed = event.getKeys()
-	if 'space' in keys_pressed:
-		routine.stop_component(break_label)
-break_routine = Routine(window = win, startup = start_break, run_frame = run_break)
-
+if mri_mode:
+    routines.extend((await_MRI_trigger, long_iti))
 
 # add all the trial routines to the list of routines
 for trial_num in range(1, num_trials + 1):
@@ -892,8 +922,9 @@ for trial_num in range(1, num_trials + 1):
         continue
     trial = Routine(window = win, startup = trial_startup, run_frame = trial_run_frame, shutdown = trial_shutdown)
     routines.append(trial)
+    # since so many GSR-only subjects have already been collected, only doing the midtask break for MRI participants
     if mri_mode and trial_num == num_trials/2:
-    	routines.append(break_routine)
+        routines.extend((midtask_break, await_MRI_trigger, long_iti))
 
 # finish with thanks slide
 routines.append(thanks)
@@ -908,7 +939,7 @@ for handle in (f, h):
     if mode == us:
         handle.write("# Yoking file: %s\n" % yoke_source)
     handle.write("Participant_ID\ttrial_num\ttimestamp\ttime_of_day_in_seconds\ttime_in_trial\tX_target\tY_target\tX_implement\tY_implement\tkeyboard_used\tkeys_pressed\t" +
-        "implement_move_direction\ttarget_zigged\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_made_first_contact\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
+        "implement_move_direction\ttarget_zigged\ttarget_frozen\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_made_first_contact\ttarget_just_froze\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
         "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\ttotal_frames_dropped\n")
 
 # Run all routines
@@ -927,6 +958,7 @@ if mode == cs:
     yoking_file = "%s/yoking_file.pickle" % output_dir
     with open (yoking_file, 'w') as y:
         pickle.dump(time_of_catch_by_trial, y)
+        y.flush()
 print "Finished the game!"
 print "Output has been written to %s." % output_dir
 

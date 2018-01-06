@@ -134,7 +134,7 @@ print "Here are the available activities:"
 for x in range(num_tasks):
 	print str(x+1) + ") " + task_options[x]['LongName']
 
-task_choice = raw_input("Which game should be played? ")
+task_choice = raw_input("Which task should be run? ")
 while True:
 	try:
 		chosen_task_info = task_options[int(task_choice) - 1]
@@ -143,7 +143,7 @@ while True:
 		task_choice = raw_input("Invalid input. Enter a choice from %d-%d: " %(1, num_tasks))
 
 game_chosen = chosen_task_info['ShortName']
-print "All right, we're running the %s!" % game_chosen
+print "All right, we're running the %s task!" % game_chosen
 
 # See if this is a real experiment or a test run
 run_type = "Real Experiment"
