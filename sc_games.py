@@ -57,6 +57,8 @@ egg_wand_collision_file = project_dir + "/resources/egg_wand_collision_map.pickl
 balloon_hand_collision_file = project_dir + "/resources/balloon_hand_collision_map.pickle"
 egg_hand_collision_file = project_dir + "/resources/egg_hand_collision_map.pickle"
 
+# Post-task noise rating slide
+noise_rating_slide = media + "post_task_stress_rating.jpg"
 
 # Experiment parameters
 balloon_modes = (cs, us, ns) = ("balloon_cs", "balloon_us", "balloon_ns")
@@ -237,6 +239,7 @@ else:
 # Declare additional variables based on the runtime options
 full_data_file = "%s/%s_%s_%s_%s_full.txt" % (output_dir, participant_id, game_type, mode, timestamp)
 highlight_data_file = "%s/%s_%s_%s_%s_highlights.txt" % (output_dir, participant_id, game_type, mode, timestamp)
+post_task_noise_rating_file = "%s/%s_%s_%s_%s_post-task-noise-ratings.txt" % (output_dir, participant_id, game_type, mode, timestamp)
 
 # determine game type (magic or non-magic)
 playing_magic_game = True if game_type == "magic" else False
@@ -410,9 +413,10 @@ counter_background = visual.ImageStim(win=win, name='counter_background',units='
     image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0, opacity=0)
 counter = visual.TextStim(win=win, name='counter', text=None, font='Arial', units='pix', pos=(550, -432), height=24,
     wrapWidth=None, color=u'#053270', depth=-8.0, opacity=0)
+
+# Additional labels
 break_label = visual.TextStim(win=win, name='break_start', text="We're taking a break!", font='Arial', units='pix', pos=(0, 0), height=30)
 get_ready_label = visual.TextStim(win=win, name='get_ready', text="Get ready...", font='Arial', units='pix', pos=(0, 0), height=30)
-
 
 if playing_magic_game:
     magic_sparks = visual.ImageStim(win=win, name='magic_sparks',units='pix', 
@@ -942,9 +946,57 @@ for handle in (f, h):
         "implement_move_direction\ttarget_zigged\ttarget_frozen\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_made_first_contact\ttarget_just_froze\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
         "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\ttotal_frames_dropped\n")
 
+
 # Run all routines
 for routine in routines:
     Routine.run_routine(routine)
+
+
+# Record aversive sound outcomes from cs condition for future yoked runs
+if mode == cs:
+    yoking_file = "%s/yoking_file.pickle" % output_dir
+    with open (yoking_file, 'w') as y:
+        pickle.dump(time_of_catch_by_trial, y)
+        y.flush()
+
+# In MRI mode, collect post-task noise ratings
+question_label = visual.TextStim(win=win, name='rating_question', font='Calibri', units='pix', wrapWidth=screen_width, color="black", pos=(0, -screen_height/2.4), height=30, depth=-3.0)
+def start_noise_ratings(routine):
+    routine.responses = []
+    routine.start_component(slides)
+    slides.setImage(noise_rating_slide)
+    if playing_balloon_game:
+        routine.first_question = "How stressed did you feel by the noise in the Balloon Game?"
+        routine.second_question = "How stressed did you feel over the course of the Balloon Game?"
+    else:
+        routine.first_question = "How stressed did you feel by the noise in the Egg Game?"
+        routine.second_question = "How stressed did you feel over the course of the Egg Game?"
+    question_label.setText(routine.first_question)
+    routine.start_component(question_label)
+def run_noise_ratings(routine):
+    key_events = event.getKeys()
+    if len(key_events) != 1:
+        return
+    try:
+        num_pressed = int(key_events[0])
+    except:
+        return
+    routine.responses.append(key_events[0])
+    if len(routine.responses) == 1:
+        question_label.setText(routine.second_question)
+    elif len(routine.responses) == 2:
+        routine.stop_all_components()
+def finish_noise_ratings(routine):
+    with open(post_task_noise_rating_file, 'w') as ratings:
+        ratings.write("post_task_noise_stress\tpost_task_game_stress\n")
+        ratings.write("%s\t%s\n" % (routine.responses[0], routine.responses[1]))
+        ratings.flush()
+
+
+if mri_mode:
+    Routine.run_routine(Routine(window = win, startup = start_noise_ratings, run_frame = run_noise_ratings, shutdown = finish_noise_ratings ))
+
+
 
 ## Wrap things up
 
@@ -953,12 +1005,6 @@ f.close()
 h.close()
 call("gzip %s" % full_data_file, shell = True)
 
-# Record aversive sound outcomes from cs condition for future yoked runs
-if mode == cs:
-    yoking_file = "%s/yoking_file.pickle" % output_dir
-    with open (yoking_file, 'w') as y:
-        pickle.dump(time_of_catch_by_trial, y)
-        y.flush()
 print "Finished the game!"
 print "Output has been written to %s." % output_dir
 
