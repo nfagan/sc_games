@@ -39,7 +39,8 @@ egg_anticipatory_background = media + "Egg_anticipatory_background.jpg"
 egg_avoidance_background =  media + "Egg_avoidance_background.jpg"
 cracking_sound = media + "Sounds/egg_crack.wav"
 magic_egg_slide_dir = media + "Magic_instruction_slides/Egg_instruction_slides/"
-mundane_egg_slide_dir = media + "Mundane_instruction_slides/Egg_instruction_slides/"
+mundane_keyboard_egg_slide_dir = media + "Mundane_instruction_slides/Egg_keyboard_instruction_slides/"
+mundane_mri_egg_slide_dir = media + "Mundane_instruction_slides/Egg_mri_instruction_slides/"
 
 # Balloon media files
 whole_balloon_image = media + "pink_balloon.png"
@@ -49,7 +50,8 @@ balloon_anticipatory_background = media + "Balloon_anticipatory_background.jpg"
 balloon_avoidance_background = media + "Balloon_avoidance_background.jpg"
 popping_sound = media + "Sounds/balloon_pop.wav"
 magic_balloon_slide_dir = media + "Magic_instruction_slides/Balloon_instruction_slides/"
-mundane_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_instruction_slides/"
+mundane_keyboard_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_keyboard_instruction_slides/"
+mundane_mri_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_mri_instruction_slides/"
 
 # Collision files show which x/y distances between objects should count as collisions
 balloon_wand_collision_file = project_dir + "/resources/balloon_wand_collision_map.pickle"
@@ -248,8 +250,12 @@ if playing_magic_game:
     balloon_slide_dir = magic_balloon_slide_dir
     egg_slide_dir = magic_egg_slide_dir
 else:
-    balloon_slide_dir = mundane_balloon_slide_dir
-    egg_slide_dir = mundane_egg_slide_dir
+    if mri_mode:
+        balloon_slide_dir = mundane_mri_balloon_slide_dir
+        egg_slide_dir = mundane_mri_egg_slide_dir
+    else:
+        balloon_slide_dir = mundane_keyboard_balloon_slide_dir
+        egg_slide_dir = mundane_keyboard_egg_slide_dir
 
 # determine which game mode we're playing: balloon game comes in cs/us/ns, egg game always uncontrollable stress (us)
 playing_balloon_game = True if mode in balloon_modes else False
@@ -531,57 +537,46 @@ class Routine():
             routine.run_frame()
         routine.shutdown()
 
+# this dictionary keeps track of the states of all slideshows (i.e., sets of instructions to the user)
+slide_info_by_dir = {}
+def run_slides(routine, slide_dir):
+    if slide_dir not in slide_info_by_dir:
+        with open("%s/slide_info.txt" % slide_dir) as lines:
+            slide_num = 0
+            slide_info_by_dir[slide_dir] = {}
+            for line in lines:
+                line = line.strip()
+                if not line: continue
+                fields = line.split("\t")
+                slide_num += 1
+                slide_info_by_dir[slide_dir][slide_num] = {}
+                slide_info_by_dir[slide_dir][slide_num]['name'] = fields[0]
+                slide_info_by_dir[slide_dir][slide_num]['trigger'] = fields[1]
+                slide_info_by_dir[slide_dir][slide_num]['action'] = fields[2]
+        slide_info_by_dir[slide_dir]['current'] = 1
 
-## Declare all the functions that control the behavior of each routine in the experiment
-# for each numbered instruction slide, storing which key press is required to advance
-keys_to_advance = {}
-if playing_magic_game:  
-    for slide_num in range(1, 10):
-        keys_to_advance[slide_num] = 'space'
-    keys_to_advance[10], keys_to_advance[11], keys_to_advance[12], keys_to_advance[13] = left_key, right_key, down_key, up_key
-    for slide_num in range(14, 19):
-        keys_to_advance[slide_num] = 'space'
-else:
-    for slide_num in range(1, 9):
-        keys_to_advance[slide_num] = 'space'
-    keys_to_advance[9], keys_to_advance[10], keys_to_advance[11], keys_to_advance[12] = left_key, right_key, down_key, up_key
-    for slide_num in range(13, 18):
-        keys_to_advance[slide_num] = 'space'
-
-def run_slides(routine, current_slide, last_slide):
-    if hasattr(routine, "current_slide"):
-        current_slide = routine.current_slide
-    else:
-        routine.current_slide = current_slide
+    current_slide = slide_info_by_dir[slide_dir]['current']
+    routine.trigger = slide_info_by_dir[slide_dir][current_slide]['trigger']
+    routine.action = slide_info_by_dir[slide_dir][current_slide]['action']
+    if not hasattr(routine, "started"):
         routine.start_component(slides)
+        slides.setImage("%s%s" % (slide_dir, slide_info_by_dir[slide_dir][current_slide]['name']))
+        routine.started = True
+    
 
-    # first slide stays for 2 seconds (although user can still skip forward with space bar if they try)
-    ## TO DO: get rid of this, replace with a label that appears on some slides
-    if (routine.clock.getTime() > 2 and current_slide == 1):
-        current_slide += 1
-
-    # most slides advance with the press of the space bar
     keys_pressed = event.getKeys()
-
     # if multiple keys are pressed in one frame, doing nothing
-    if len(keys_pressed) > 1:
+    if len(keys_pressed) != 1:
         return
 
     # if a key was pressed, check if it's the right one
-    try:
-        key_pressed = keys_pressed[0]
-        if keys_to_advance[current_slide] == key_pressed:
-            current_slide += 1
-    except IndexError: pass
-    if current_slide > last_slide:
-        routine.live = False
-        return
-    current_slide_string = str(current_slide)
-    if current_slide < 10:
-        current_slide_string = "0" + current_slide_string
-    current_slide_file = instruction_slide_dir + "Slide" + current_slide_string + ".jpg"
-    slides.setImage(current_slide_file)
-    routine.current_slide = current_slide
+    if keys_pressed[0] == routine.trigger:
+        slide_info_by_dir[slide_dir]['current'] += 1
+        current_slide = slide_info_by_dir[slide_dir]['current']
+        if routine.action == "break":
+            routine.live = False
+        else:
+            slides.setImage("%s%s" % (slide_dir, slide_info_by_dir[slide_dir][current_slide]['name']))
 
 def implement_practice_startup(routine):
     routine.start_component(implement)
@@ -897,13 +892,14 @@ def trial_shutdown(routine):
 # build a list of routines to run
 routines = []
 if playing_magic_game:
-    instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
-    instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 15, 17))
-    thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 18, 18))
+    pass
+    # instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
+    # instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 15, 17))
+    # thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 18, 18))
 else:
-    instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 13))
-    instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 14, 16))
-    thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 17, 17))
+    instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
+    instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
+    thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
 implement_practice = Routine(window = win, startup = implement_practice_startup, run_frame = implement_practice_run_frame)
 
 # add instructions to routine list (save thanks for after trial routines)
@@ -979,6 +975,7 @@ def run_noise_ratings(routine):
         return
     try:
         num_pressed = int(key_events[0])
+        assert num_pressed != 0
     except:
         return
     routine.responses.append(key_events[0])

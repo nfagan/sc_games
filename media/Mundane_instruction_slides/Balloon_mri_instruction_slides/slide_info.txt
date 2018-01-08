@@ -1,0 +1,15 @@
+Slide01.jpg	space	continue
+Slide02.jpg	space	continue
+Slide03.jpg	space	continue
+Slide04.jpg	space	continue
+Slide05.jpg	space	continue
+Slide06.jpg	space	continue
+Slide07.jpg	space	continue
+Slide08.jpg	4	continue
+Slide09.jpg	2	continue
+Slide10.jpg	3	continue
+Slide11.jpg	1	continue
+Slide12.jpg	2	break
+Slide13.jpg	2	break
+Slide14.jpg	space	break
+
