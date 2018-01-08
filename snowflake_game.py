@@ -1,8 +1,28 @@
 from pygame import *
 import random, sys
 
-# this is an edited version of Max Kubierschky's Snow Angel game (version 1.1), found here: https://www.pygame.org/project/1082/2021
+# This activity is adapted from Max Kubierschky's Snow Angel game (version 1.1), found here: https://www.pygame.org/project/1082/2021
 # Info on Max (presumably the right guy): http://www.maxky.de/en/index.html
+
+
+input_mode = raw_input("Would you like to play in 1) keyboard mode or 2) button box mode? ")
+while True:
+    try:
+        assert input_mode == "1" or input_mode == "2"
+        break
+    except:
+        input_mode = raw_input("Invalid response. Enter \"1\" for keyboard mode or \"2\" for button box mode: ")
+
+if input_mode == "1":
+    up = K_UP
+    down = K_DOWN
+    left = K_LEFT
+    right = K_RIGHT
+else:
+    up = K_1
+    down = K_3
+    left = K_4
+    right = K_2
 
 class Flake(sprite.Sprite):
     def __init__(self):
@@ -21,6 +41,7 @@ class Flake(sprite.Sprite):
             flakes.remove(self)
         if angel.lives>0 and self.rect.colliderect(angel.rect):
             angel.lives -= 1
+            angel.just_failed = True
             startLevel()
 
 class Angel(sprite.Sprite):
@@ -34,32 +55,33 @@ class Angel(sprite.Sprite):
         draw.circle(self.image,Color("white"),(5,2),2)
         self.lives = 100 # changed to 100 from 12
         self.currently_pressed = set()
+        self.just_failed = False
     # changed angel movement to only allow one key press at a time
     def update(self):
         key_states = key.get_pressed()
         # not allowing keys to be held down, but increasing the amount of movement per key press
-        if key_states[K_UP] and K_UP not in self.currently_pressed and K_DOWN not in self.currently_pressed:
+        if key_states[up] and up not in self.currently_pressed and down not in self.currently_pressed:
             self.rect.y -=  15
-            self.currently_pressed.add(K_UP)
-            for i in (K_LEFT, K_RIGHT):
+            self.currently_pressed.add(up)
+            for i in (left, right):
                 if not key_states[i]:
                     self.currently_pressed.discard(i)
-        elif key_states[K_DOWN] and self.rect.bottom<height and K_DOWN not in self.currently_pressed and K_UP not in self.currently_pressed:
+        elif key_states[down] and self.rect.bottom<height and down not in self.currently_pressed and up not in self.currently_pressed:
             self.rect.y += 15
-            self.currently_pressed.add(K_DOWN)
-            for i in (K_LEFT, K_RIGHT):
+            self.currently_pressed.add(down)
+            for i in (left, right):
                 if not key_states[i]:
                     self.currently_pressed.discard(i)
-        elif key_states[K_LEFT] and self.rect.x>0 and K_LEFT not in self.currently_pressed and K_RIGHT not in self.currently_pressed:
+        elif key_states[left] and self.rect.x>0 and left not in self.currently_pressed and right not in self.currently_pressed:
             self.rect.x -= 15
-            self.currently_pressed.add(K_LEFT)
-            for i in (K_UP, K_DOWN):
+            self.currently_pressed.add(left)
+            for i in (up, down):
                 if not key_states[i]:
                     self.currently_pressed.discard(i)
-        elif key_states[K_RIGHT] and self.rect.right<width and K_RIGHT not in self.currently_pressed and K_LEFT not in self.currently_pressed:
+        elif key_states[right] and self.rect.right<width and right not in self.currently_pressed and left not in self.currently_pressed:
             self.rect.x += 15
-            self.currently_pressed.add(K_RIGHT)
-            for i in (K_UP, K_DOWN):
+            self.currently_pressed.add(right)
+            for i in (up, down):
                 if not key_states[i]:
                     self.currently_pressed.discard(i)
         # once no keys are being pressed, all arrow presses become valid again
@@ -70,10 +92,11 @@ class Angel(sprite.Sprite):
 
 flakes = sprite.RenderPlain()
 init()
-width = 800
-height = 600
-window = display.set_mode((width, height)) 
-screen = display.get_surface() 
+# changed window size to be appropriate for full screen
+width = 1440
+height = 900
+window = display.set_mode((width, height), FULLSCREEN) # changed to full screen
+screen = display.get_surface()
 fnt = font.Font(None, 24)
 
 
@@ -130,12 +153,21 @@ while True:
         write("game over",width/2,height/2-10,1)
         write("Start new game with 'n'.", width/2,height/2+40,1)
     # changing "lives" from 12 to 100
+    # hitting the "n" key starts a new game (do we want to keep this?)
     if key.get_pressed()[K_n]:
         angel.lives = 100
         startLevel(1)
+    # added the ability to quit with the "q" or escape keys
+    if key.get_pressed()[K_q] or key.get_pressed()[K_ESCAPE]:
+        exit(0)
     if level == 1 and angel.lives==100 and angel.rect.bottom==height:
-        write("Fly past all the snow flakes without being hit!", width/2,height/2-20,1)
-    elif level > 1 and level <= len(vxRanges) - 1 and angel.rect.bottom==height:
+        write("Fly past all the snowflakes without being hit!", width/2,height/2-20,1)
+    if angel.just_failed: 
+        if angel.rect.bottom == height:
+            write("Try again!", width/2,height/2-20,1)
+        else:
+            angel.just_failed = False
+    elif level > 1 and level < len(vxRanges) and angel.rect.bottom==height:
         write("When you're ready, keep going!", width/2,height/2-20,1)
     display.flip()
     clock.tick(40)
