@@ -102,6 +102,10 @@ fnt = font.Font(None, 24)
 
 def write(s,x,y,center=0):
     text = fnt.render(s,True,Color("white"))
+    # in MRI mode, need to flip text horizontally to display correctly on MRC's practice MRI display
+    # this option may have to be changed for use on other MRI/practice MRI set-ups
+    if input_mode == "2":
+        text = transform.flip(text, True, False)
     screen.blit(text,(x-center*text.get_width()/2,y))
 
 
@@ -129,6 +133,7 @@ def startLevel(lvl=0):
         for i in range(800):
             updateFlakes()
 
+mouse.set_visible(False) # turn off cursor
 startLevel(1)
 while True:
     for ev in event.get():
