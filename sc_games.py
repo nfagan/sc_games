@@ -621,6 +621,7 @@ def run_long_iti(routine):
 # In MRI mode, need to await a trigger (which comes in as a '5' keyboard event) before starting trials
 def await_MRI_trigger_start(routine):
     routine.start_component(get_ready_label)
+    event.clearEvents()
 def await_MRI_trigger_run(routine):
     keys_pressed = event.getKeys()
     if '5' in keys_pressed:
