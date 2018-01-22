@@ -470,6 +470,21 @@ else:
     first_break_image = pop_1_image
     second_break_image = pop_2_image
 
+# MRI trigger recording file (MRI mode only)
+tr_count = 0
+if mri_mode:
+    trigger_file = output_dir + "/mri_triggers.txt"
+    mri_logger = open(trigger_file, 'w')
+    def record_mri_trigger(t):
+        timestamp = datetime.strftime(t, "%H:%M:%S.%f")
+        time_in_seconds = t.hour * 3600 + t.minute * 60 + t.second + t.microsecond/1000000.0
+        global tr_count
+        tr_count += 1
+        mri_logger.write("%d\t%f\n" % (tr_count, time_in_seconds))
+        mri_logger.flush()
+
+
+
 # A routine to simplify task flow
 class Routine():
     # A routine consists of a set of associated components (ImageStim, TextStim, Sound), a clock, a frame counter, and a marker to
@@ -599,7 +614,10 @@ def implement_practice_startup(routine):
 
 def implement_practice_run_frame(routine):
     # move implement if appropriate (only allowing one implement movement per frame)
-    keys_pressed = event.getKeys()
+    if mri_mode:
+        keys_pressed = event.getKeys([left_key, right_key, up_key, down_key, 'escape']) # want to avoid clearing '5' from buffer in MRI mode
+    else:
+        keys_pressed = event.getKeys()
     if right_key in keys_pressed:
         if implement.pos[0] + implement.size[0]/2 + implement_step_size < screen_width/2:
             implement.pos = (implement.pos[0] + implement_step_size, implement.pos[1])
@@ -628,6 +646,8 @@ def implement_practice_run_frame(routine):
 def start_long_iti(routine):
     routine.start_component(ITI)
 def run_long_iti(routine):
+    if event.getKeys(['5',]):
+        record_mri_trigger(datetime.now())
     if routine.clock.getTime() > mri_post_trigger_fixation_duration:
         routine.stop_component(ITI)
 
@@ -636,9 +656,9 @@ def await_MRI_trigger_start(routine):
     routine.start_component(get_ready_label)
     event.clearEvents()
 def await_MRI_trigger_run(routine):
-    keys_pressed = event.getKeys()
-    if '5' in keys_pressed:
-        routine.stop_component(get_ready_label)
+    if len(event.getKeys('5')) > 0:
+        record_mri_trigger(datetime.now())
+        routine.stop_all_components()
             
 # in MRI mode, there is a one minute break between sets of trials
 def start_break(routine):
@@ -699,12 +719,16 @@ def trial_startup(routine):
 def trial_run_frame(routine):
     time_in_trial = routine.clock.getTime()
     t = datetime.now()
+    if mri_mode and event.getKeys(['5',]):
+        record_mri_trigger(t)
     timestamp = datetime.strftime(t, "%H:%M:%S.%f")
     time_in_seconds = t.hour * 3600 + t.minute * 60 + t.second + t.microsecond/1000000.0
     X_target, Y_target, X_implement, Y_implement = ['NA'] * 4
     keyboard_used, keys_pressed, implement_move_direction = ['NA'] * 3
     target_zigged, target_is_frozen, touching_target_object, target_outside_catchable_area = ['NA'] * 4
     just_made_magic, just_made_first_contact, just_froze, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset = ['0'] * 9
+
+
 
     def write_to_data_files():
         # when implement is frozen over target object, that's not interesting; otherwise, it is interesting when target object is being touched
@@ -716,7 +740,7 @@ def trial_run_frame(routine):
         output_fields = [participant_id, str(routine.trial_num), timestamp, str(time_in_seconds), str(time_in_trial), str(X_target), str(Y_target), 
             str(X_implement), str(Y_implement), keyboard_used, keys_pressed, implement_move_direction, target_zigged, target_is_frozen, touching_target_object, target_outside_catchable_area, 
             just_made_magic, just_made_first_contact, just_froze, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset, 
-            routine.trajectory_description, str(win.nDroppedFrames)]
+            routine.trajectory_description, str(tr_count), str(win.nDroppedFrames)]
 
         f.write("\t".join(output_fields) + "\n")
         # going to try not flushing here for better performance
@@ -771,7 +795,10 @@ def trial_run_frame(routine):
 
 
     # move implement if appropriate (only allowing one movement per frame)
-    key_events = event.getKeys()
+    if mri_mode:
+        key_events = event.getKeys([left_key, right_key, up_key, down_key]) # avoid clearing '5' from keyboard buffer
+    else:
+        key_events = event.getKeys()
     if right_key in key_events and not routine.target_frozen:
         if implement.pos[0] + implement.size[0]/2 + implement_step_size < screen_width/2:
             implement.pos = (implement.pos[0] + implement_step_size, implement.pos[1])
@@ -954,7 +981,7 @@ for handle in (f, h):
         handle.write("# Yoking file: %s\n" % yoke_source)
     handle.write("Participant_ID\ttrial_num\ttimestamp\ttime_of_day_in_seconds\ttime_in_trial\tX_target\tY_target\tX_implement\tY_implement\tkeyboard_used\tkeys_pressed\t" +
         "implement_move_direction\ttarget_zigged\ttarget_frozen\ttouching_target_object\ttarget_outside_catchable_area\tjust_made_magic\tjust_made_first_contact\ttarget_just_froze\ttarget_just_exited_catchable_area\taversive_noise_onset\tantic_period_onset\t" +
-        "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\ttotal_frames_dropped\n")
+        "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\tlast_tr_num\ttotal_frames_dropped\n")
 
 
 # Enforce full volume
