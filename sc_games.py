@@ -16,10 +16,9 @@ from datetime import datetime
 from subprocess import call
 from random import shuffle, choice
 
-# Labjack-related imports
-import u3
+# Additional imports
+import u3, threading
 from time import sleep
-from threading import Thread
 
 # The project source directory is taken to be the directory containing this script
 project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -79,6 +78,8 @@ win_refresh_threshold = 1.0/expected_fps + 0.004 # defining what counts as a dro
 lj_events = { "avoidance_onset":4, "first_contact":5, "aversive_sound":6, "no_aversive_sound":7, "target_frozen":7}
 
 # Constants used across balloon/egg games
+trial_break_duration = 60 # This is a break halfway through the trials (MRI mode only, currently)
+mri_post_trigger_fixation_duration = 20 # this is a long fixation period that comes after an MRI trigger (MRI mode only)
 implement_practice_time = 20.0
 antic_period_duration = 4
 avoidance_period_duration = 4.5
@@ -187,6 +188,7 @@ parser.add_option("--non-randomized", action="store_true", default=False, dest="
 parser.add_option("--fast", action="store_true", default=False, dest="fast_mode", help="use shortened ITI and anticipatory periods (for test runs only)")
 parser.add_option("--skip-instructions", action="store_true", default=False, dest="skip_instructions", help="skip instructions/practice slides (for test runs only)")
 parser.add_option("--debug-trial", metavar="TRIAL_NUMBER", dest="debug_trial", help="test a specific trial and skip everything else")
+parser.add_option("--free-volume", action="store_true", dest="no_volume_enforcement", help="don't enforce volume requirements")
 
 # to specify git version of project (wrapper script supplies automatically if it finds a clean repository; don't fake it by supplying your own value!)
 parser.add_option("-v", "--version", metavar="VERSION", dest="version", help=SUPPRESS_HELP, default="unknown")
@@ -199,6 +201,7 @@ game_type = options.game_type
 mode = options.mode
 yoke_source = options.yoke_source
 randomized = not options.non_randomize
+no_volume_enforcement = options.no_volume_enforcement
 if not randomized:
     print "Note: \"--non-randomized\" invoked, so trials will be presented in fixed order."
 
@@ -306,6 +309,8 @@ else:
 if fast_mode: 
     ITI_duration = 1
     antic_period_duration = 1
+    mri_post_trigger_fixation_duration = 2
+    trial_break_duration = 3
 
 # will pull from balloon/egg settings list in random order (unless testing trials)
 all_trajectory_info = egg_trajectory_info if playing_egg_game else balloon_trajectory_info
@@ -364,14 +369,22 @@ def send_labjack_event(event_type):
     timestamp = str(datetime.now())
     lj.write("%s\t%d\t%s\n" % (timestamp, fio_num, event_type))
     lj.flush()
-    trigger_thread = Thread(target=labjack_event_handler, args=(fio_num,))
+    trigger_thread = threading.Thread(target=labjack_event_handler, args=(fio_num,))
     trigger_thread.start()
-
 def labjack_event_handler(fio_num):
     device.setFIOState(fio_num, state=1)
     sleep(1)
     device.setFIOState(fio_num, state = 0)
 
+# Note that these will only work in MacOS
+task_finished = threading.Event()
+def enforce_volume():
+    while not task_finished.is_set():
+        call("osascript -e 'set volume output muted false'", shell=True)
+        call("osascript -e 'set volume output volume 100'", shell=True)
+        sleep(1)
+volume_enforcement_thread = threading.Thread(target=enforce_volume) # will start this thread when it's needed
+volume_enforcement_thread.daemon = True
 
 ## Now going to start loading Psychopy and setting up the experiment window
 # Psychopy uses all this stuff, supposedly
@@ -615,7 +628,7 @@ def implement_practice_run_frame(routine):
 def start_long_iti(routine):
     routine.start_component(ITI)
 def run_long_iti(routine):
-    if routine.clock.getTime() > 20:
+    if routine.clock.getTime() > mri_post_trigger_fixation_duration:
         routine.stop_component(ITI)
 
 # In MRI mode, need to await a trigger (which comes in as a '5' keyboard event) before starting trials
@@ -632,7 +645,7 @@ def start_break(routine):
     routine.start_component(break_label)
 
 def run_break(routine):
-    if routine.clock.getTime() > 60:
+    if routine.clock.getTime() > trial_break_duration:
         routine.stop_component(break_label)
 
 # define global variables needed by the trial routines
@@ -944,6 +957,10 @@ for handle in (f, h):
         "avoid_period_onset\titi_onset\ttrial_offset\ttrial_trajectory\ttotal_frames_dropped\n")
 
 
+# Enforce full volume
+if not no_volume_enforcement:
+    volume_enforcement_thread.start()
+
 # Run all routines
 for routine in routines:
     Routine.run_routine(routine)
@@ -1002,6 +1019,11 @@ if mri_mode:
 f.close()
 h.close()
 call("gzip %s" % full_data_file, shell = True)
+task_finished.set()
+try:
+    volume_enforcement_thread.join(2) # timeout of 2 seconds
+except:
+    pass
 
 print "Finished the game!"
 print "Output has been written to %s." % output_dir

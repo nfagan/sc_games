@@ -180,13 +180,13 @@ if game_chosen is not noise_rating:
 				if int(choice) == 1:
 					break
 				elif int(choice) == 2:
-					test_options = "--skip-instructions"
+					test_options = "--skip-instructions --free-volume"
 					break
 				elif int(choice) == 3:
-					test_options = "--fast"
+					test_options = "--fast --free-volume"
 					break
 				elif int(choice) == 4:
-					test_options = "--skip-instructions --fast"
+					test_options = "--skip-instructions --fast --free-volume"
 					break
 				elif int(choice) == 5:
 					trial_to_test = raw_input("Which trial number should be tested? ")
