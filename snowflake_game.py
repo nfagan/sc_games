@@ -19,10 +19,12 @@ if input_mode == "1":
     left = K_LEFT
     right = K_RIGHT
 else:
+    # Note these are different mappings than in sc_games (left/right switched) because the practice
+    # MRI display flips everything
     up = K_1
     down = K_3
-    left = K_4
-    right = K_2
+    left = K_2
+    right = K_4
 
 class Flake(sprite.Sprite):
     def __init__(self):
