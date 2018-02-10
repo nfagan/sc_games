@@ -245,6 +245,7 @@ else:
 full_data_file = "%s/%s_%s_%s_%s_full.txt" % (output_dir, participant_id, game_type, mode, timestamp)
 highlight_data_file = "%s/%s_%s_%s_%s_highlights.txt" % (output_dir, participant_id, game_type, mode, timestamp)
 post_task_noise_rating_file = "%s/%s_%s_%s_%s_post-task-noise-ratings.txt" % (output_dir, participant_id, game_type, mode, timestamp)
+post_task_avoidance_rating_file = "%s/%s_%s_avoidance_ratings.txt" % (output_dir, participant_id, timestamp)
 
 # determine game type (magic or non-magic)
 playing_magic_game = True if game_type == "magic" else False
@@ -1034,11 +1035,46 @@ def finish_noise_ratings(routine):
         ratings.write("%s\t%s\n" % (routine.responses[0], routine.responses[1]))
         ratings.flush()
 
+def start_avoidance_ratings(routine):
+    routine.responses = []
+    routine.start_component(slides)
+    slides.setImage(noise_rating_slide)
+    routine.started_questions = False
+    routine.first_question = "How much did you try to avoid the noise that the balloon made when it reached the top of the screen?"
+    routine.second_question = "How much did you try to avoid the noise that the egg made when it reached the bottom of the screen?"
+    question_label.setText("Now you will be asked some questions about both games.")
+    routine.start_component(question_label)
+
+def run_avoidance_ratings(routine):
+    key_events = event.getKeys()
+    if len(key_events) != 1:
+        return
+    if not routine.started_questions:
+        if key_events[0] == 'space':
+            routine.started_questions = True
+            question_label.setText(routine.first_question)
+        return
+    try:
+        num_pressed = int(key_events[0])
+        assert num_pressed != 0
+    except:
+        return
+    routine.responses.append(key_events[0])
+    if len(routine.responses) == 1:
+        question_label.setText(routine.second_question)
+    elif len(routine.responses) == 2:
+        routine.stop_all_components()
+
+def finish_avoidance_ratings(routine):
+    with open(post_task_avoidance_rating_file, 'w') as ratings:
+        ratings.write("balloon_avoidance\tegg_avoidance\n")
+        ratings.write("%s\t%s\n" % (routine.responses[0], routine.responses[1]))
+        ratings.flush()
 
 if mri_mode:
     Routine.run_routine(Routine(window = win, startup = start_noise_ratings, run_frame = run_noise_ratings, shutdown = finish_noise_ratings ))
-
-
+    if playing_egg_game:
+        Routine.run_routine(Routine(window = win, startup = start_avoidance_ratings, run_frame = run_avoidance_ratings, shutdown = finish_avoidance_ratings))
 
 ## Wrap things up
 
