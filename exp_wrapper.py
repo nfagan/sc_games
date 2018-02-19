@@ -260,26 +260,26 @@ if game_chosen is not noise_rating:
 		game_mode = "egg"
 
 	# Prompt for randomization mode
-	non_randomized = False
-	if not debug_trial_mode:
-		response = raw_input("Should trial presentation order be 1) randomized or 2) non-randomized? ")
-		while True:
-			try:
-				response = int(response)
-			except ValueError:
-				response = raw_input("Invalid response: Enter 1 for randomized trial order, or 2 for non-randomized: ")
-				continue
-			if response == 1:
-				print "Okay. Trial presentation order will be randomized."
-				break
-			if response == 2:
-				print "Okay. Trial presentation order will NOT be randomized."
-				non_randomized = True
-				break
-			else:
-				response = raw_input("Invalid response: Enter 1 for randomized trial order, or 2 for non-randomized: ")
-	else:
-		non_randomized = True
+	non_randomized = True
+	# if not debug_trial_mode:
+	# 	response = raw_input("Should trial presentation order be 1) randomized or 2) non-randomized? ")
+	# 	while True:
+	# 		try:
+	# 			response = int(response)
+	# 		except ValueError:
+	# 			response = raw_input("Invalid response: Enter 1 for randomized trial order, or 2 for non-randomized: ")
+	# 			continue
+	# 		if response == 1:
+	# 			print "Okay. Trial presentation order will be randomized."
+	# 			break
+	# 		if response == 2:
+	# 			print "Okay. Trial presentation order will NOT be randomized."
+	# 			non_randomized = True
+	# 			break
+	# 		else:
+	# 			response = raw_input("Invalid response: Enter 1 for randomized trial order, or 2 for non-randomized: ")
+	# else:
+	# 	non_randomized = True
 
 	# Prompt for keyboard input mode vs. button box mode
 	mri_mode = False
