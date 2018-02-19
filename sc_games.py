@@ -586,12 +586,24 @@ def run_slides(routine, slide_dir):
 
     current_slide = slide_info_by_dir[slide_dir]['current']
     routine.trigger = slide_info_by_dir[slide_dir][current_slide]['trigger']
+    slide_timeout = None
+    if re.search('^wait:\d+$', routine.trigger):
+        slide_timeout = int(re.sub('wait:', '', routine.trigger))
     routine.action = slide_info_by_dir[slide_dir][current_slide]['action']
     if not hasattr(routine, "started"):
         routine.start_component(slides)
         slides.setImage("%s%s" % (slide_dir, slide_info_by_dir[slide_dir][current_slide]['name']))
         routine.started = True
     
+    if slide_timeout: 
+        if routine.clock.getTime() > slide_timeout:
+            slide_info_by_dir[slide_dir]['current'] += 1
+            current_slide = slide_info_by_dir[slide_dir]['current']
+            if routine.action == "break":
+                routine.live = False
+            else:
+                slides.setImage("%s%s" % (slide_dir, slide_info_by_dir[slide_dir][current_slide]['name']))
+        return
 
     keys_pressed = event.getKeys()
     # if multiple keys are pressed in one frame, doing nothing
