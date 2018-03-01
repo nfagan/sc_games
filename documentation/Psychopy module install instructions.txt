@@ -3,39 +3,31 @@ Based off of instructions on Psychopy website (http://psychopy.org/installation.
 Note that Steps 6-7 are only necessary if you will be using a Labjack.
 
 1. Install Homebrew, if you haven't already done so. The Homebrew website provides the necessary installation command.
-2. Using Homebrew, install new, standalone versions of Python/Pip using the command "brew install python". Homebrew should 
-automatically install Python version 2.7 and make this the default Python on your user account. To test this, run the 
-commands "which python" and "which pip". The output should show that Python/pip are both located in 
-/usr/local/bin, not /usr/bin.
+2. Using Homebrew, install new, standalone versions of Python/Pip using the command "brew install python". Homebrew should automatically install Python version 2.7 and make this the default Python on your user account. After the installation, follow Homebrew's instructions to add the new Python executable to your path. To test this, run the 
+commands "which python" and "which pip". Output should look like this: /usr/local/opt/python/libexec/bin/pip
 2. WxPython
-	Download the cocoa/python2.7 version of wxPython (link on Psychopy page)
-	To install, temporarily change security settings in System Preferences (Security and Privacy) to allow apps 
-	downloaded from "anywhere."
-	If you don't do this, you'll get a message that the package is damaged when you try to open the installer
-	When you finish installing WxPython, change your security settings back.
+	Run the following command to install:
+		pip install -U wxPython 
 3. pyo 
 	Run the following commands to install pyo prerequisites and then pyo itself.
 		brew install liblo libsndfile portaudio portmidi --universal
 		# cd into a suitable installation directory for pyo
 		git clone https://github.com/belangeo/pyo.git
 		cd pyo
-		sudo python setup.py install --use-coreaudio --use-double
+		python setup.py install --use-coreaudio --use-double
 	If you get warnings/errors during the brew step, you may have to follow homebrew's advice and run some
 	"force overwrite" link commmands.
 4. Run the following commands to install Python modules
 	pip install numpy scipy pandas matplotlib pyopengl pyglet pillow moviepy lxml openpyxl configobj pyserial pyparallel psychopy
 	(If this command fails due to permissions errors, try re-running with "sudo".)
-5. For now, a module called "matplotlib" needs to be manually re-installed. From https://pypi.python.org/pypi/matplotlib/1.4.3, find
-	the most recently uploaded Python wheel for matplotlib-1.4.3 that has "macosx" in its name. Download that file, and then run this:
-		pip install [path to downloaded wheel]
-		(If this fails due to a permissions error, re-run with "sudo")
+5. Run the following command to downgrade matplotlib to fix a compatibility problem
+	pip install --upgrade matplotlib==1.4.3
+	(If this command fails due to permissions errors, try re-running with "sudo".)
 6. LabJackPython (make sure link is still correct, should be listed on Psychopy page)
 	# cd into a good installation directory
 	git clone https://github.com/labjack/LabJackPython
 	cd LabJackPython
 	sudo python setup.py install
-	# Note: substitute "python" with the path given for Python in your local_config if you have a specific Python 
-	version you want to use.
 7. Labjack Exodriver
 	Download the Exodriver pre-built installer from here: https://labjack.com/support/software/installers/exodriver
 	Then, open the downloaded installer and follow instructions to install.

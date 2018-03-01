@@ -1,4 +1,4 @@
-# A file based on this template (with the exact name "local_config") should be saved in the stressor controllability superdirectory (the one containing the exp_wrapper.py script)
+# A file based on this template (with the exact name "local_config") should be saved in the sc_magic superdirectory (the one containing the exp_wrapper.py script)
 
 # Output directories are where all data and log files for the magic and non-magic versions of the experiment are saved at the end of each task
 magic_output_directory=[insert absolute path]
