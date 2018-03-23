@@ -37,6 +37,10 @@ if os.path.isdir(output_dir):
 
 mri_start_time = float(mri.readline().strip().split("\t")[-1])
 
+#adjusting for subtraction of 8 volumes from beginning of scan due to conversation with PO 3/20/18 (8 TRs x .8 seconds per TR)
+
+mri_start_time = mri_start_time + 6.4
+
 try:
 	os.mkdir(output_dir)
 except OSError:
