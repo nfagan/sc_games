@@ -1,0 +1,6 @@
+# Version: 3eedb4b
+Participant	Sound	Rating
+284	/Users/ecohodes/sc_magic/media/Sounds/shape_task_sound.wav	2
+284	/Users/ecohodes/sc_magic/media/Sounds/egg_crack.wav	4
+284	/Users/ecohodes/sc_magic/media/Sounds/chime.wav	6
+284	/Users/ecohodes/sc_magic/media/Sounds/balloon_pop.wav	2

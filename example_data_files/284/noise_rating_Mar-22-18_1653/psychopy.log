@@ -1,0 +1,34 @@
+6.4312 	EXP 	Created Slide = ImageStim(autoLog=True, color=array([ 1.,  1.,  1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='Slide', opacity=1.0, ori=0.0, pos=array([ 0.,  0.]), size=array([ 1440.,   900.]), texRes=128, units='pix', win=Window(...))
+8.7125 	EXP 	Set  sound=C
+8.7431 	EXP 	Set  sound=A
+8.7595 	EXP 	Set  sound=/Users/ecohodes/sc_magic/media/Sounds/shape_task_sound.wav
+8.8934 	EXP 	Slide: autoDraw = True
+8.8934 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/InstructionSlide.jpg'
+25.9280 	DATA 	Keypress: space
+25.9928 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/iti_background.jpg'
+26.4949 	EXP 	Sound  started
+27.5264 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/RatingSlide.jpg'
+31.6773 	DATA 	Keypress: 2
+31.6893 	EXP 	Set  sound=/Users/ecohodes/sc_magic/media/Sounds/egg_crack.wav
+31.7092 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/InstructionSlide.jpg'
+32.4967 	DATA 	Keypress: space
+32.5582 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/iti_background.jpg'
+33.0598 	EXP 	Sound  started
+33.5921 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/RatingSlide.jpg'
+36.0135 	DATA 	Keypress: 4
+36.0179 	EXP 	Set  sound=/Users/ecohodes/sc_magic/media/Sounds/chime.wav
+36.0427 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/InstructionSlide.jpg'
+36.7323 	DATA 	Keypress: space
+36.7923 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/iti_background.jpg'
+37.2929 	EXP 	Sound  started
+38.3258 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/RatingSlide.jpg'
+41.2235 	DATA 	Keypress: 6
+41.2281 	EXP 	Set  sound=/Users/ecohodes/sc_magic/media/Sounds/balloon_pop.wav
+41.2595 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/InstructionSlide.jpg'
+42.2934 	DATA 	Keypress: space
+42.3429 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/iti_background.jpg'
+42.8436 	EXP 	Sound  started
+43.0587 	EXP 	Slide: image = '/Users/ecohodes/sc_magic/media/Noise_Rating_Slides/RatingSlide.jpg'
+47.3878 	DATA 	Keypress: 2
+47.4086 	EXP 	Slide: autoDraw = False
+47.4134 	EXP 	window1: mouseVisible = True
