@@ -4,7 +4,7 @@ from collections import OrderedDict
 source_dir = os.path.abspath(os.path.dirname(__file__))
 
 
-# This script is adaptable for other experiments except for all the logic relating to early/late avoidance periods
+# This script would be adaptable for other experiments except that it has a bunch of logic for handling early/late SC trials
 missing_data_symbol = '7777'
 event_names = OrderedDict([
 	('4','avoidance_onset'),
@@ -21,16 +21,18 @@ for tp in ('T1', 'T2'):
 
 
 parser = argparse.ArgumentParser(description="This script produces descriptive statistics by event type for various GSR measures.")
-parser.add_argument("-i", "--input", required=True, type=argparse.FileType('r'), help="the GSR text file")
-parser.add_argument("-o", "--output", required=True, help="the basename/path to be used for output files (don't include a file extension)")
+parser.add_argument("-t1", type=argparse.FileType('r'), help="the T1 GSR text file")
+parser.add_argument("-t2", type=argparse.FileType('r'), help="the T2 GSR text file")
 parser.add_argument("-p", "--participant-id", metavar="ID", required=True, help="the participant id (e.g., 001, 002, 999, etc.)")
-parser.add_argument("-t", "--timepoint", metavar="T1|T2", choices=("T1", "T2"), required=True, help="the experiment timepoint (choices: T1, T2)")
+parser.add_argument("-o", "--output", required=True, help="the basename/path to be used for output files (don't include a file extension)")
+
 
 args = parser.parse_args()
-input_file = args.input
+t1_input = args.t1
+t2_input = args.t2
 output_base = args.output
 participant_id = args.participant_id
-timepoint = args.timepoint
+
 
 output_dir = os.path.dirname(output_base) or os.getcwd() # if no path included, then use working directory
 if not os.access(output_dir, os.W_OK):
@@ -39,30 +41,22 @@ if not os.access(output_dir, os.W_OK):
 else:
 	output_base = os.path.abspath(output_base)
 
+if not t1_input and not t2_input:
+	parser.print_help()
+	sys.exit()
+
+if not t1_input or not t2_input:
+	missing_tp = 'T1' if not t1_input else 'T2'
+	confirm = raw_input("Warning: No GSR input file supplied for %s timepoint. Continue anyway (y/n)? " % missing_tp)
+	while True:
+		if confirm == 'y':
+			break
+		if confirm == 'n':
+			sys.exit()
+		confirm = raw_input("Invalid response. Enter \"y\" to continue or \"n\" to quit: ")
+
+
 spss_file = output_base + '_gsr_stats_spss.txt'
-
-input_headers = input_file.readline().strip()
-# put data lines into list after stripping whitespace padding
-input_lines = map(lambda line: re.sub(' ', '', line), input_file.read().splitlines())
-
-num_lines = len(input_lines)
-
-# find the indexes of the columns in the input file
-input_header_fields = input_headers.split("\t")
-nid_col = input_header_fields.index("Event.NID")
-cda_nSCR_col = input_header_fields.index("CDA.nSCR")
-cda_latency_col = input_header_fields.index("CDA.Latency")
-cda_amp_sum_col = input_header_fields.index("CDA.AmpSum")
-cda_scr_col = input_header_fields.index("CDA.SCR")
-cda_iscr_col = input_header_fields.index("CDA.ISCR")
-cda_phasic_max_col = input_header_fields.index("CDA.PhasicMax")
-cda_tonic_col = input_header_fields.index("CDA.Tonic")
-tpp_nSCR_col = input_header_fields.index("TTP.nSCR")
-tpp_latency_col = input_header_fields.index("TTP.Latency")
-tpp_amp_sum_col = input_header_fields.index("TTP.AmpSum")
-global_mean_col = input_header_fields.index("Global.Mean")
-global_max_deflection_col = input_header_fields.index("Global.MaxDeflection")
-event_name_col = input_header_fields.index("Event.Name")
 
 # simple nested dictionary implementation
 class Tree(dict):
@@ -71,48 +65,71 @@ class Tree(dict):
 		return value
 data = Tree()
 
-num_avoidance_onsets = 0 # keep track of number of avoidance onsets to ensure the expected number of trials appears
-for index, line in enumerate(input_lines):
-	# strip space characters, if any
-	line = re.sub(' ', '', line)
-	fields = line.split("\t")
-	event_code = fields[event_name_col]
-	event_code = re.sub('"', '', event_code) # strip out quotation marks
-	try:
-		event_name = event_names[event_code]  # see event_names dict declaration
-	except KeyError:
-		print("Unexpected event name \"%s\" in input file." % event_code)
+for f, timepoint in ((t1_input, 'T1'), (t2_input, 'T2')):
+# read header line and put data lines into list after stripping whitespace padding
+	if not f: continue # for cases where T1 or T2 is missing
+	input_headers = f.readline().strip()
+	input_lines = map(lambda line: re.sub(' ', '', line), f.read().splitlines())
+	num_lines = len(input_lines)
 
-	condition = "%s_%s" % (timepoint, event_name)
-	if event_name == 'avoidance_onset':
-		num_avoidance_onsets += 1
+	# find the indexes of the columns in the input file
+	input_header_fields = input_headers.split("\t")
+	nid_col = input_header_fields.index("Event.NID")
+	cda_nSCR_col = input_header_fields.index("CDA.nSCR")
+	cda_latency_col = input_header_fields.index("CDA.Latency")
+	cda_amp_sum_col = input_header_fields.index("CDA.AmpSum")
+	cda_scr_col = input_header_fields.index("CDA.SCR")
+	cda_iscr_col = input_header_fields.index("CDA.ISCR")
+	cda_phasic_max_col = input_header_fields.index("CDA.PhasicMax")
+	cda_tonic_col = input_header_fields.index("CDA.Tonic")
+	tpp_nSCR_col = input_header_fields.index("TTP.nSCR")
+	tpp_latency_col = input_header_fields.index("TTP.Latency")
+	tpp_amp_sum_col = input_header_fields.index("TTP.AmpSum")
+	global_mean_col = input_header_fields.index("Global.Mean")
+	global_max_deflection_col = input_header_fields.index("Global.MaxDeflection")
+	event_name_col = input_header_fields.index("Event.Name")
 
-	# Store all data for calculating averages
-	## Each value is stored as a tuple: (value, trial_number), where trial number is inferred from number of avoidance onset events
+	num_avoidance_onsets = 0 # keep track of number of avoidance onsets to ensure the expected number of trials appears
+	for index, line in enumerate(input_lines):
+		# strip space characters, if any
+		line = re.sub(' ', '', line)
+		fields = line.split("\t")
+		event_code = fields[event_name_col]
+		event_code = re.sub('"', '', event_code) # strip out quotation marks
+		try:
+			event_name = event_names[event_code]  # see event_names dict declaration
+		except KeyError:
+			print("Unexpected event name \"%s\" in input file." % event_code)
 
-	# first, handle columns that count significant events and their latencies separately
-	cda_nSCR = int(fields[cda_nSCR_col])
-	tpp_nSCR = int(fields[tpp_nSCR_col])
+		condition = "%s_%s" % (timepoint, event_name)
+		if event_name == 'avoidance_onset':
+			num_avoidance_onsets += 1
 
-	cda_nSCR_value = 1 if cda_nSCR >= 1 else 0
-	cda_latency_value = float(fields[cda_latency_col]) if cda_nSCR_value == 1 else 0
-	data[condition].setdefault(cda_nSCR_col, []).append((cda_nSCR_value, num_avoidance_onsets))
-	data[condition].setdefault(cda_latency_col, []).append((cda_latency_value, num_avoidance_onsets))
+		# Store all data for calculating averages
+		## Each value is stored as a tuple: (value, trial_number), where trial number is inferred from number of avoidance onset events
 
-	tpp_nSCR_value = 1 if tpp_nSCR >= 1 else 0
-	tpp_latency_value = float(fields[tpp_latency_col]) if tpp_nSCR_value == 1 else 0
+		# first, handle columns that count significant events and their latencies separately
+		cda_nSCR = int(fields[cda_nSCR_col])
+		tpp_nSCR = int(fields[tpp_nSCR_col])
 
-	data[condition].setdefault(tpp_nSCR_col, []).append((tpp_nSCR_value, num_avoidance_onsets))
-	data[condition].setdefault(tpp_latency_col, []).append((tpp_latency_value, num_avoidance_onsets))
+		cda_nSCR_value = 1 if cda_nSCR >= 1 else 0
+		cda_latency_value = float(fields[cda_latency_col]) if cda_nSCR_value == 1 else 0
+		data[condition].setdefault(cda_nSCR_col, []).append((cda_nSCR_value, num_avoidance_onsets))
+		data[condition].setdefault(cda_latency_col, []).append((cda_latency_value, num_avoidance_onsets))
 
-	# handle rest of columns together
-	for data_col in (cda_amp_sum_col, cda_scr_col, cda_iscr_col, cda_phasic_max_col, cda_tonic_col, tpp_amp_sum_col, global_mean_col, global_max_deflection_col):
-		data[condition].setdefault(data_col, []).append((float(fields[data_col]), num_avoidance_onsets))
+		tpp_nSCR_value = 1 if tpp_nSCR >= 1 else 0
+		tpp_latency_value = float(fields[tpp_latency_col]) if tpp_nSCR_value == 1 else 0
 
-if num_avoidance_onsets != 30:
-	print("Error: Expected 30 avoidance period onset events, but found %d." % num_avoidance_onsets)
-	print("Since this discrepancy throws off many of this script's calculations, no output file can be created.")
-	sys.exit()
+		data[condition].setdefault(tpp_nSCR_col, []).append((tpp_nSCR_value, num_avoidance_onsets))
+		data[condition].setdefault(tpp_latency_col, []).append((tpp_latency_value, num_avoidance_onsets))
+
+		# handle rest of columns together
+		for data_col in (cda_amp_sum_col, cda_scr_col, cda_iscr_col, cda_phasic_max_col, cda_tonic_col, tpp_amp_sum_col, global_mean_col, global_max_deflection_col):
+			data[condition].setdefault(data_col, []).append((float(fields[data_col]), num_avoidance_onsets))
+
+	if num_avoidance_onsets != 30:
+		print("Error: Expected 30 avoidance period onset events, but found %d in %s." % (num_avoidance_onsets, f.name))
+		sys.exit()
 
 # will build up the fields of wide-formatted averages output file while the regular one is being written
 wide_header_fields = ["participant_id",]
