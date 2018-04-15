@@ -3,6 +3,8 @@ from collections import OrderedDict
 
 source_dir = os.path.abspath(os.path.dirname(__file__))
 
+
+# This script is adaptable for other experiments except for all the logic relating to early/late avoidance periods
 missing_data_symbol = '7777'
 event_names = OrderedDict([
 	('4','avoidance_onset'),
@@ -85,38 +87,32 @@ for index, line in enumerate(input_lines):
 	if event_name == 'avoidance_onset':
 		num_avoidance_onsets += 1
 
-	## Store all data for calculating averages
+	# Store all data for calculating averages
+	## Each value is stored as a tuple: (value, trial_number), where trial number is inferred from number of avoidance onset events
 
 	# first, handle columns that count significant events and their latencies separately
 	cda_nSCR = int(fields[cda_nSCR_col])
 	tpp_nSCR = int(fields[tpp_nSCR_col])
-	if condition not in data:
-		data[condition][cda_latency_col] = []
-		data[condition][cda_nSCR_col] = []
-		data[condition][tpp_latency_col] = []
-		data[condition][tpp_nSCR_col] = []
 
-	if cda_nSCR >= 1:
-		data[condition][cda_nSCR_col].append(1)
-		data[condition][cda_latency_col].append(float(fields[cda_latency_col]))
-	else:
-		data[condition][cda_nSCR_col].append(0)
-		data[condition][cda_latency_col].append(0)
-	if tpp_nSCR >= 1:
-		data[condition][tpp_nSCR_col].append(1)
-		data[condition][tpp_latency_col].append(float(fields[tpp_latency_col]))
-	else:
-		data[condition][tpp_nSCR_col].append(0)
-		data[condition][tpp_latency_col].append(0)
+	cda_nSCR_value = 1 if cda_nSCR >= 1 else 0
+	cda_latency_value = float(fields[cda_latency_col]) if cda_nSCR_value == 1 else 0
+	data[condition].setdefault(cda_nSCR_col, []).append((cda_nSCR_value, num_avoidance_onsets))
+	data[condition].setdefault(cda_latency_col, []).append((cda_latency_value, num_avoidance_onsets))
+
+	tpp_nSCR_value = 1 if tpp_nSCR >= 1 else 0
+	tpp_latency_value = float(fields[tpp_latency_col]) if tpp_nSCR_value == 1 else 0
+
+	data[condition].setdefault(tpp_nSCR_col, []).append((tpp_nSCR_value, num_avoidance_onsets))
+	data[condition].setdefault(tpp_latency_col, []).append((tpp_latency_value, num_avoidance_onsets))
 
 	# handle rest of columns together
 	for data_col in (cda_amp_sum_col, cda_scr_col, cda_iscr_col, cda_phasic_max_col, cda_tonic_col, tpp_amp_sum_col, global_mean_col, global_max_deflection_col):
-		if not data[condition][data_col]:
-			data[condition][data_col] = []
-		data[condition][data_col].append(float(fields[data_col]))
+		data[condition].setdefault(data_col, []).append((float(fields[data_col]), num_avoidance_onsets))
 
 if num_avoidance_onsets != 30:
-	print("Warning! Expected 30 avoidance period onset events, but found %d." % num_avoidance_onsets)
+	print("Error: Expected 30 avoidance period onset events, but found %d." % num_avoidance_onsets)
+	print("Since this discrepancy throws off many of this script's calculations, no output file can be created.")
+	sys.exit()
 
 # will build up the fields of wide-formatted averages output file while the regular one is being written
 wide_header_fields = ["participant_id",]
@@ -135,49 +131,67 @@ for condition in all_conditions:
 	# add current condition name to list of header fields to create a set of header columns for the wide file
 	for header in header_fields[1:]:
 		wide_header_fields.append("%s_%s" % (condition, header))
-	# calculate averages for all fields (Note that latency averages are calculated across significant events, not all events)
-	event_count = len(data[condition][cda_nSCR_col])
-	midpoint = event_count / 2
-	if event_count % 2 != 0:
-		print("Warning: Odd number of events found condition %s.") % condition
-		print("Some fields (e.g., first and second half averages) may be calculated incorrectly.")
-	cda_count = sum(data[condition][cda_nSCR_col])
-	first_half_cda = sum(data[condition][cda_nSCR_col][0:midpoint]) if data[condition][cda_nSCR_col] else 0
-	second_half_cda = cda_count - first_half_cda
-	tpp_count = sum(data[condition][tpp_nSCR_col])
-	first_half_tpp = sum(data[condition][tpp_nSCR_col][0:midpoint]) if data[condition][tpp_nSCR_col] else 0
-	second_half_tpp = tpp_count - first_half_tpp
-	output_fields = [condition,]
-	output_fields.extend(str(field) for field in (event_count, midpoint, midpoint, cda_count, first_half_cda, second_half_cda))
 
-	average_cda_latency = sum(data[condition][cda_latency_col]) / float(cda_count) if cda_count != 0 else missing_data_symbol
-	avg_cda_latency_first_half = sum(data[condition][cda_latency_col][0:midpoint]) / float(first_half_cda) if first_half_cda != 0 else missing_data_symbol
-	avg_cda_latency_second_half = sum(data[condition][cda_latency_col][midpoint:event_count]) / float(second_half_cda) if second_half_cda != 0 else missing_data_symbol
-	average_tpp_latency = sum(data[condition][tpp_latency_col]) / float(tpp_count) if tpp_count != 0 else missing_data_symbol
-	avg_tpp_latency_first_half = sum(data[condition][tpp_latency_col][0:midpoint]) / float(first_half_tpp) if first_half_tpp != 0 else missing_data_symbol
-	avg_tpp_latency_second_half = sum(data[condition][tpp_latency_col][midpoint:event_count]) / float(second_half_tpp) if second_half_tpp != 0 else missing_data_symbol
-	output_fields.extend(str(field) for field in [average_cda_latency, avg_cda_latency_first_half, avg_cda_latency_second_half]) # tpp columns get appended later 
+	# calculate averages for all fields (Note that latency averages are calculated across significant events, not all events)
+	total_event_count = len(data[condition][cda_nSCR_col])
+	first_half_event_count = len(filter(lambda x: x[1] <=15, data[condition][cda_nSCR_col]))
+	second_half_event_count = total_event_count - first_half_event_count
+
+	cda_latencies = [x[0] for x in data[condition][cda_latency_col]]
+	cda_count = sum(x[0] for x in data[condition][cda_nSCR_col])
+	first_half_cda_latencies = [x[0] for x in filter(lambda y: y[1] <= 15, data[condition][cda_latency_col])]
+	first_half_cda_count = sum(x[0] for x in filter(lambda y: y[1] <= 15, data[condition][cda_nSCR_col]))
+	second_half_cda_latencies = [x[0] for x in filter(lambda y: y[1] > 15, data[condition][cda_latency_col])]
+	second_half_cda_count = sum(x[0] for x in filter(lambda y: y[1] > 15, data[condition][cda_nSCR_col]))
+
+	tpp_latencies = [x[0] for x in data[condition][tpp_latency_col]]
+	tpp_count = sum([x[0] for x in data[condition][tpp_nSCR_col]])
+	first_half_tpp_latencies = [x[0] for x in filter(lambda y: y[1] <= 15, data[condition][tpp_latency_col])]
+	first_half_tpp_count = sum(x[0] for x in filter(lambda y: y[1] <= 15, data[condition][tpp_nSCR_col]))
+	second_half_tpp_latencies = [x[0] for x in filter(lambda y: y[1] > 15, data[condition][tpp_latency_col])]
+	second_half_tpp_count = sum(x[0] for x in filter(lambda y: y[1] > 15, data[condition][tpp_nSCR_col]))
+
+
+	# start putting together the output
+	output_fields = [condition,]
+	output_fields.extend([total_event_count, first_half_event_count, second_half_event_count, cda_count, first_half_cda_count, second_half_cda_count])
+
+	# returns an average by summing a list and dividing by a given divisor
+	def average(values, divisor):
+		return sum(values)/float(divisor) if divisor != 0 else missing_data_symbol
+
+	average_cda_latency = average(cda_latencies, cda_count)
+	avg_cda_latency_first_half = average(first_half_cda_latencies, first_half_cda_count)
+	avg_cda_latency_second_half = average(second_half_cda_latencies, second_half_cda_count)
+
+	average_tpp_latency = average(tpp_latencies, tpp_count)
+	avg_tpp_latency_first_half = average(first_half_tpp_latencies, first_half_tpp_count)
+	avg_tpp_latency_second_half = average(second_half_tpp_latencies, second_half_tpp_count)
+	output_fields.extend([average_cda_latency, avg_cda_latency_first_half, avg_cda_latency_second_half]) # tpp columns get appended later 
 
 	for data_col in (cda_amp_sum_col, cda_scr_col, cda_iscr_col, cda_phasic_max_col, cda_tonic_col, tpp_nSCR_col, tpp_latency_col, tpp_amp_sum_col, global_mean_col, global_max_deflection_col):
 		if data_col is tpp_nSCR_col:
-			output_fields.extend(str(field) for field in (tpp_count, first_half_tpp, second_half_tpp))
+			output_fields.extend([tpp_count, first_half_tpp_count, second_half_tpp_count])
 			continue
 		elif data_col is tpp_latency_col:
-			output_fields.extend(str(field) for field in (average_tpp_latency, avg_tpp_latency_first_half, avg_tpp_latency_second_half))
+			output_fields.extend([average_tpp_latency, avg_tpp_latency_first_half, avg_tpp_latency_second_half])
 			continue
 		else:
-			average_value = sum(data[condition][data_col]) / event_count if event_count != 0 else missing_data_symbol
-			average_first_half = sum(data[condition][data_col][0:midpoint]) / midpoint if event_count != 0 else missing_data_symbol
-			average_second_half = sum(data[condition][data_col][midpoint:event_count]) / midpoint if event_count != 0 else missing_data_symbol
-			output_fields.extend(str(field) for field in (average_value, average_first_half, average_second_half))
+			all_values = [x[0] for x in data[condition][data_col]]
+			first_half_values = [x[0] for x in filter(lambda y: y[1] <= 15, data[condition][data_col])]
+			second_half_values = [x[0] for x in filter(lambda y: y[1] > 15, data[condition][data_col])]
+			overall_average = average(all_values, total_event_count)
+			average_first_half = average(first_half_values, first_half_event_count)
+			average_second_half = average(second_half_values, second_half_event_count)
+			output_fields.extend([overall_average, average_first_half, average_second_half])
 
-		# add columns with square root transformation for amp_sum data, using training data for the max values
+		# add columns with square root transformation for amp_sum data
 		if data_col is cda_amp_sum_col or data_col is tpp_amp_sum_col:
-			max_value = max(data[condition][data_col]) if data[condition][data_col] else 0
-			sqrt_transform = sum(x ** 0.5 for x in data[condition][data_col]) / event_count / (max_value ** 0.5) if 0 not in (max_value, event_count) else missing_data_symbol
-			sqrt_early = sum(x ** 0.5 for x in data[condition][data_col][0:midpoint]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else missing_data_symbol
-			sqrt_late = sum(x ** 0.5 for x in data[condition][data_col][midpoint:event_count]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else missing_data_symbol
-			output_fields.extend(str(field) for field in (sqrt_transform, sqrt_early, sqrt_late))
+			max_value = max(all_values) if data[condition][data_col] else 0
+			sqrt_transform = sum(x ** 0.5 for x in all_values) / total_event_count / (max_value ** 0.5) if 0 not in (max_value, total_event_count) else missing_data_symbol
+			sqrt_early = sum(x ** 0.5 for x in first_half_values) / first_half_event_count / (max_value ** 0.5) if 0 not in (max_value, first_half_event_count) else missing_data_symbol
+			sqrt_late = sum(x ** 0.5 for x in second_half_values) / second_half_event_count / (max_value ** 0.5) if 0 not in (max_value, second_half_event_count) else missing_data_symbol
+			output_fields.extend([sqrt_transform, sqrt_early, sqrt_late])
 
 	for datum in output_fields[1:]:
 		wide_data_fields.append(datum)
@@ -185,5 +199,5 @@ for condition in all_conditions:
 # write wide averages output file
 spss = open(spss_file, 'w')
 spss.write("\t".join(wide_header_fields) + "\n")
-spss.write("\t".join(wide_data_fields) + "\n")
+spss.write("\t".join([str(x) for x in wide_data_fields]) + "\n")
 
