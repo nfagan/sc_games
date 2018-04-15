@@ -1,49 +1,61 @@
-import sys, os, re, argparse
-from collections import OrderedDict
+import sys, os, re
+from optparse import OptionParser
 
 source_dir = os.path.abspath(os.path.dirname(__file__))
 
-missing_data_symbol = '7777'
-event_names = OrderedDict([
-	('4','avoidance_onset'),
-	('5','aversive_sound'),
-	('6','first_contact'),
-	('7','target_frozen'),
-])
+# egg_noise, egg_magic, balloon_noise, balloon_magic
 
-all_conditions = []
-for tp in ('T1', 'T2'):
-	for name in event_names.values():
-		all_conditions.append("%s_%s" % (tp, name))
+parser = OptionParser()
+parser.add_option("-i", "--input", metavar="INPUT", dest="input_file", help="the GSR text file")
+parser.add_option("-o", "--output", metavar="OUTPUT", dest="output_base", help="the basename/path to be used for output files (don't include a file extension)")
+parser.add_option("-p", "--participant-id", metavar="ID", dest="participant_id", help="the participant id (e.g., 001, 002, 999, etc.)")
+parser.add_option("-t", "--timepoint", metavar="T1|T2", dest="timepoint", choices=("T1", "T2"), help="the experiment timepoint (choices: T1, T2)")
+(options, args) = parser.parse_args()
+input_file = options.input_file
+output_base = options.output_base
+participant_id = options.participant_id
+timepoint = options.timepoint
 
+if len(args) > 0:
+	bad_args = ", ".join(args)
+	print "Invalid input arguments: %s" % bad_args
+	parser.print_help()
+	sys.exit()
 
+# validate input arguments
+if not input_file or not output_base or not participant_id:
+	parser.print_help()
+	sys.exit()
 
-parser = argparse.ArgumentParser(description="This script produces descriptive statistics by event type for various GSR measures.")
-parser.add_argument("-i", "--input", required=True, type=argparse.FileType('r'), help="the GSR text file")
-parser.add_argument("-o", "--output", required=True, help="the basename/path to be used for output files (don't include a file extension)")
-parser.add_argument("-p", "--participant-id", metavar="ID", required=True, help="the participant id (e.g., 001, 002, 999, etc.)")
-parser.add_argument("-t", "--timepoint", metavar="T1|T2", choices=("T1", "T2"), required=True, help="the experiment timepoint (choices: T1, T2)")
-
-args = parser.parse_args()
-input_file = args.input
-output_base = args.output
-participant_id = args.participant_id
-timepoint = args.timepoint
+if not os.path.isfile(input_file):
+	print "Error: Input file %s does not exist." % input_file
+	sys.exit()
+else:
+	input_file = os.path.abspath(input_file)
 
 output_dir = os.path.dirname(output_base) or os.getcwd() # if no path included, then use working directory
 if not os.access(output_dir, os.W_OK):
-	print("Error: Output basename/path %s is either invalid or non-writeable.") % output_base
+	print "Error: Output basename/path %s is either invalid or non-writeable." % output_base
 	sys.exit()
 else:
 	output_base = os.path.abspath(output_base)
 
 spss_file = output_base + '_gsr_stats_spss.txt'
 
-input_headers = input_file.readline().strip()
-# put data lines into list after stripping whitespace padding
-input_lines = map(lambda line: re.sub(' ', '', line), input_file.read().splitlines())
+with open(input_file, 'rU') as f:
+	input_headers = f.readline().strip()
+	# put data lines into list after stripping whitespace padding
+	input_lines = map(lambda line: re.sub(' ', '', line), f.read().splitlines())
 
 num_lines = len(input_lines)
+if num_lines > 30:
+	print "Warning: More events found (%d) than expected (30)." % (num_lines)
+	print "Some calculations may be off."
+elif num_lines < 30:
+	print "Warning: Fewer events found (%d) than expected (30)." % (num_lines)
+	print "Some calculations (e.g., early/late trial averages) may be off."
+
+Num_events = num_lines
 
 # find the indexes of the columns in the input file
 input_header_fields = input_headers.split("\t")
@@ -69,21 +81,20 @@ class Tree(dict):
 		return value
 data = Tree()
 
-num_avoidance_onsets = 0 # keep track of number of avoidance onsets to ensure the expected number of trials appears
 for index, line in enumerate(input_lines):
 	# strip space characters, if any
 	line = re.sub(' ', '', line)
 	fields = line.split("\t")
-	event_code = fields[event_name_col]
-	event_code = re.sub('"', '', event_code) # strip out quotation marks
-	try:
-		event_name = event_names[event_code]  # see event_names dict declaration
-	except KeyError:
-		print("Unexpected event name \"%s\" in input file." % event_code)
+	event_name = fields[event_name_col]
+	if re.search("aversive_noise", event_name):
+		event_type = "aversive_noise"
+	elif re.search("save", event_name):
+		event_type = "save"
+	else:
+		print "Error: The input file had an event that couldn't be categorized as \"aversive_noise\" or \"save.\""
+		sys.exit()
 
-	condition = "%s_%s" % (timepoint, event_name)
-	if event_name == 'avoidance_onset':
-		num_avoidance_onsets += 1
+	condition = "%s_%s" % (timepoint, event_type)
 
 	## Store all data for calculating averages
 
@@ -115,8 +126,7 @@ for index, line in enumerate(input_lines):
 			data[condition][data_col] = []
 		data[condition][data_col].append(float(fields[data_col]))
 
-if num_avoidance_onsets != 30:
-	print("Warning! Expected 30 avoidance period onset events, but found %d." % num_avoidance_onsets)
+
 
 # will build up the fields of wide-formatted averages output file while the regular one is being written
 wide_header_fields = ["participant_id",]
@@ -131,7 +141,7 @@ for header in ("Num_events", "Num_CDA.nSCR", "Avg_CDA.Latency", "Avg_CDA.AmpSum"
 	header_fields.extend([header, header + "_early", header + "_late"])
 
 # going through conditions in a specific order for printing the output file
-for condition in all_conditions:
+for condition in ("%s_aversive_noise" % timepoint, "%s_save" % timepoint):
 	# add current condition name to list of header fields to create a set of header columns for the wide file
 	for header in header_fields[1:]:
 		wide_header_fields.append("%s_%s" % (condition, header))
@@ -139,8 +149,8 @@ for condition in all_conditions:
 	event_count = len(data[condition][cda_nSCR_col])
 	midpoint = event_count / 2
 	if event_count % 2 != 0:
-		print("Warning: Odd number of events found condition %s.") % condition
-		print("Some fields (e.g., first and second half averages) may be calculated incorrectly.")
+		print "Warning: Odd number of events found condition %s." % condition
+		print "Some fields (e.g., first and second half averages) may be calculated incorrectly."
 	cda_count = sum(data[condition][cda_nSCR_col])
 	first_half_cda = sum(data[condition][cda_nSCR_col][0:midpoint]) if data[condition][cda_nSCR_col] else 0
 	second_half_cda = cda_count - first_half_cda
@@ -150,12 +160,12 @@ for condition in all_conditions:
 	output_fields = [condition,]
 	output_fields.extend(str(field) for field in (event_count, midpoint, midpoint, cda_count, first_half_cda, second_half_cda))
 
-	average_cda_latency = sum(data[condition][cda_latency_col]) / float(cda_count) if cda_count != 0 else missing_data_symbol
-	avg_cda_latency_first_half = sum(data[condition][cda_latency_col][0:midpoint]) / float(first_half_cda) if first_half_cda != 0 else missing_data_symbol
-	avg_cda_latency_second_half = sum(data[condition][cda_latency_col][midpoint:event_count]) / float(second_half_cda) if second_half_cda != 0 else missing_data_symbol
-	average_tpp_latency = sum(data[condition][tpp_latency_col]) / float(tpp_count) if tpp_count != 0 else missing_data_symbol
-	avg_tpp_latency_first_half = sum(data[condition][tpp_latency_col][0:midpoint]) / float(first_half_tpp) if first_half_tpp != 0 else missing_data_symbol
-	avg_tpp_latency_second_half = sum(data[condition][tpp_latency_col][midpoint:event_count]) / float(second_half_tpp) if second_half_tpp != 0 else missing_data_symbol
+	average_cda_latency = sum(data[condition][cda_latency_col]) / float(cda_count) if cda_count != 0 else "NA"
+	avg_cda_latency_first_half = sum(data[condition][cda_latency_col][0:midpoint]) / float(first_half_cda) if first_half_cda != 0 else "NA"
+	avg_cda_latency_second_half = sum(data[condition][cda_latency_col][midpoint:event_count]) / float(second_half_cda) if second_half_cda != 0 else "NA"
+	average_tpp_latency = sum(data[condition][tpp_latency_col]) / float(tpp_count) if tpp_count != 0 else "NA"
+	avg_tpp_latency_first_half = sum(data[condition][tpp_latency_col][0:midpoint]) / float(first_half_tpp) if first_half_tpp != 0 else "NA"
+	avg_tpp_latency_second_half = sum(data[condition][tpp_latency_col][midpoint:event_count]) / float(second_half_tpp) if second_half_tpp != 0 else "NA"
 	output_fields.extend(str(field) for field in [average_cda_latency, avg_cda_latency_first_half, avg_cda_latency_second_half]) # tpp columns get appended later 
 
 	for data_col in (cda_amp_sum_col, cda_scr_col, cda_iscr_col, cda_phasic_max_col, cda_tonic_col, tpp_nSCR_col, tpp_latency_col, tpp_amp_sum_col, global_mean_col, global_max_deflection_col):
@@ -166,17 +176,17 @@ for condition in all_conditions:
 			output_fields.extend(str(field) for field in (average_tpp_latency, avg_tpp_latency_first_half, avg_tpp_latency_second_half))
 			continue
 		else:
-			average_value = sum(data[condition][data_col]) / event_count if event_count != 0 else missing_data_symbol
-			average_first_half = sum(data[condition][data_col][0:midpoint]) / midpoint if event_count != 0 else missing_data_symbol
-			average_second_half = sum(data[condition][data_col][midpoint:event_count]) / midpoint if event_count != 0 else missing_data_symbol
+			average_value = sum(data[condition][data_col]) / event_count if event_count != 0 else "NA"
+			average_first_half = sum(data[condition][data_col][0:midpoint]) / midpoint if event_count != 0 else "NA"
+			average_second_half = sum(data[condition][data_col][midpoint:event_count]) / midpoint if event_count != 0 else "NA"
 			output_fields.extend(str(field) for field in (average_value, average_first_half, average_second_half))
 
 		# add columns with square root transformation for amp_sum data, using training data for the max values
 		if data_col is cda_amp_sum_col or data_col is tpp_amp_sum_col:
 			max_value = max(data[condition][data_col]) if data[condition][data_col] else 0
-			sqrt_transform = sum(x ** 0.5 for x in data[condition][data_col]) / event_count / (max_value ** 0.5) if 0 not in (max_value, event_count) else missing_data_symbol
-			sqrt_early = sum(x ** 0.5 for x in data[condition][data_col][0:midpoint]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else missing_data_symbol
-			sqrt_late = sum(x ** 0.5 for x in data[condition][data_col][midpoint:event_count]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else missing_data_symbol
+			sqrt_transform = sum(x ** 0.5 for x in data[condition][data_col]) / event_count / (max_value ** 0.5) if 0 not in (max_value, event_count) else "NA"
+			sqrt_early = sum(x ** 0.5 for x in data[condition][data_col][0:midpoint]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else "NA"
+			sqrt_late = sum(x ** 0.5 for x in data[condition][data_col][midpoint:event_count]) / midpoint / (max_value ** 0.5) if 0 not in (max_value, midpoint) else "NA"
 			output_fields.extend(str(field) for field in (sqrt_transform, sqrt_early, sqrt_late))
 
 	for datum in output_fields[1:]:
