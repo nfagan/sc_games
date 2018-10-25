@@ -51,7 +51,7 @@ template_text = re.sub('EV_FILE_1', os.path.abspath(args.intersection_timing), t
 template_text = re.sub('EV_FILE_2', os.path.abspath(args.anticipatory_timing), template_text)
 template_text = re.sub('EV_FILE_3', os.path.abspath(args.avoidance_timing), template_text)
 template_text = re.sub('EV_FILE_4', os.path.abspath(args.aversive_timing), template_text)
-template_text = re.sub('MOTION_FILE', os.path.abspath(args.motion), template_text)
+template_text = re.sub('MOTION_FILE', os.path.abspath(args.motion_file), template_text)
 
 # define and write design file
 design_file = output_directory + "design_%s.fsf" % args.subject_id
