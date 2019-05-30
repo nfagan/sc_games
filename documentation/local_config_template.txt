@@ -7,6 +7,4 @@ mundane_output_directory=[insert absolute path]
 # The test_directory is where output data files are saved for test runs of either game type (as opposed to real experiment runs)
 test_directory=[insert absolute path]
 
-# The version of Python that has Psychopy installed
-python_bin=[insert your version of Python that has Psychopy installed]
 

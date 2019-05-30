@@ -1,16 +1,7 @@
-#!/usr/bin/env python2
-
-"""
-This script runs three conditions Magic Balloon Game: Controllable stress, uncontrollable stress, and non-stressed.
-Soon, it will also run the Magic Egg Game.
-"""
-
-# Psychopy wants this
-from __future__ import absolute_import, division
+#!/usr/bin/env python3
 
 # Psychopy has lots of additional imports, but they'll get imported after runtime options are validated to prevent task window from launching before it's necessary
-import os, sys
-import re, pickle
+import sys, os, re, pickle
 from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from subprocess import call
@@ -53,7 +44,7 @@ mundane_keyboard_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon
 mundane_mri_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_mri_instruction_slides/"
 
 # Sound check media (the chime from noise ratings)
-sound_check_sound = media + "Sounds/chime.wav"
+chime = media + "Sounds/chime.wav"
 sound_check_slide_1 = media + "sound_check_slide_1.jpg"
 sound_check_slide_2 = media + "sound_check_slide_2.jpg"
 
@@ -320,7 +311,7 @@ if fast_mode:
 
 # will pull from balloon/egg settings list in random order (unless testing trials)
 all_trajectory_info = egg_trajectory_info if playing_egg_game else balloon_trajectory_info
-trajectory_order = range(0, len(all_trajectory_info))
+trajectory_order = list(range(0, len(all_trajectory_info)))
 if randomized: 
     shuffle(trajectory_order)
 
@@ -331,13 +322,18 @@ if playing_magic_game:
 else:
     collision_file = egg_hand_collision_file if playing_egg_game else balloon_hand_collision_file
 
-with open(collision_file) as cf:
+with open(collision_file, 'rb') as cf:
    collision_space_by_y = pickle.load(cf)
 
 catchable_area_y_boundary = egg_catch_y_boundary if playing_egg_game else balloon_catch_y_boundary
 boundary_direction = egg_catch_boundary_direction if playing_egg_game else balloon_catch_boundary_direction
 instruction_slide_dir = egg_slide_dir if playing_egg_game else balloon_slide_dir
 
+# Clear Terminal window so that participant doesn't seem sc_games invocation on command line if task crashes
+os.system('clear')
+
+# Clear clipboard to avoid accidentally running same experiment twice (hope nothing important is there!)
+call("pbcopy < /dev/null", shell=True)
 
 ## Try to interface with Labjack
 labjack_active = False # gets set to true upon successful initiation of U3 object
@@ -345,7 +341,7 @@ try:
     device = u3.U3()
     labjack_active = True
 except:
-    get_confirm = raw_input("Warning: Unable to interface with Labjack. GSR triggers won't be sent. Would you like to continue (y/n)? ")
+    get_confirm = input("Warning: Unable to interface with Labjack. GSR triggers won't be sent. Would you like to continue (y/n)? ")
     while True:
         if get_confirm == "y" or get_confirm == "yes":
             break
@@ -356,7 +352,7 @@ except:
                 pass
             print("Aborted experiment.")
             sys.exit()
-        get_confirm = raw_input("Invalid response. Enter \"y\" to continue, \"n\" to quit: ")
+        get_confirm = input("Invalid response. Enter \"y\" to continue, \"n\" to quit: ")
 
 if labjack_active:
     lj_log = output_dir + "/labjack.log"
@@ -423,6 +419,9 @@ win.refreshThreshold = win_refresh_threshold
 ## Declare all the ImageStim, TextStim, and Sound objects that are used through the experiment
 # The image component used for instruction slide routines (instructions_1, instructions_2, and the thank you message at the end)
 slides = visual.ImageStim(win = win, name = 'slides', units='pix', image='sin', size=(screen_width, screen_height), interpolate=True, depth=-2.0)
+
+# Sound check sound
+sound_check_sound = sound.Sound(chime, secs=-1, volume = 1.0)
 
 # Components for implement (hand/wand) practice routine
 if playing_magic_game:
@@ -975,7 +974,8 @@ def trial_shutdown(routine):
 # build a list of routines to run
 routines = []
 sound_check = Routine(window = win, startup = start_sound_check, run_frame = run_sound_check)
-routines.append(sound_check)
+if not fast_mode:
+    routines.append(sound_check)
 
 if playing_magic_game:
     pass
@@ -1138,8 +1138,8 @@ print("Finished the game!")
 print("Output has been written to %s." % output_dir)
 
 # Psychopy shutdown code
+win.close()
 this_exp.saveAsPickle(exp_handler_log)
 logging.flush()
 this_exp.abort()
-win.close()
-core.quit() # calling core.quit causes a pyo error that can be ignored (this is Psychopy's fault)
+core.quit()

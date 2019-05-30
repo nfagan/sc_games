@@ -5,13 +5,13 @@ import random, sys
 # Info on Max (presumably the right guy): http://www.maxky.de/en/index.html
 
 
-input_mode = raw_input("Would you like to play in 1) keyboard mode or 2) button box mode? ")
+input_mode = input("Would you like to play in 1) keyboard mode or 2) button box mode? ")
 while True:
     try:
         assert input_mode == "1" or input_mode == "2"
         break
     except:
-        input_mode = raw_input("Invalid response. Enter \"1\" for keyboard mode or \"2\" for button box mode: ")
+        input_mode = input("Invalid response. Enter \"1\" for keyboard mode or \"2\" for button box mode: ")
 
 if input_mode == "1":
     up = K_UP

@@ -1,7 +1,4 @@
-#!/usr/bin/env python2
-
-# psychopy wants this import, and __future__ must be the first line of code when it's used
-from __future__ import absolute_import, division
+#!/usr/bin/env python3
 
 # script-specific imports (more psychopy imports will come later, after parsing input options)
 import os, sys, re 
@@ -9,15 +6,14 @@ from optparse import OptionParser, SUPPRESS_HELP
 from datetime import datetime
 from random import shuffle
 
-
 ## Task constants
 project_dir = os.path.dirname(os.path.abspath(__file__)) # this script should be located directly in the project directory
 
 # path of folder containing the sounds (if this folder doesn't exist, the script has been moved or the project directory isn't clean)
 media = project_dir + '/media/'
 if not os.path.isdir(media):
-    print "Error: Could not find project media directory %s." % media
-    print "Make sure your copy of this script is located in its proper project directory, which should contain all necessary files."
+    print("Error: Could not find project media directory %s." % media)
+    print("Make sure your copy of this script is located in its proper project directory, which should contain all necessary files.")
 
 # slides that are cycled through for each sound to be rated
 instruction_slide = media + 'Noise_Rating_Slides/InstructionSlide.jpg'
@@ -25,8 +21,7 @@ rating_slide = media + 'Noise_Rating_Slides/RatingSlide.jpg'
 fixation_slide = media + 'iti_background.jpg'
 
 # The sounds to be played, the order of which is randomized for each run
-sounds_to_rate = [media + 'Sounds/chime.wav', media + 'Sounds/balloon_pop.wav', media + 'Sounds/shape_task_sound.wav', media + 'Sounds/egg_crack.wav']
-shuffle(sounds_to_rate)
+#sounds_to_rate = [, media + 'Sounds/balloon_pop.wav', media + 'Sounds/shape_task_sound.wav', media + 'Sounds/egg_crack.wav']
 
 # window size
 screen_width = 1440
@@ -51,20 +46,20 @@ game_type = "noise_rating"
 output_dir = re.sub('\/+$', '', output_dir) # strip trailing slashes
 timestamp = datetime.strftime(datetime.now(),  "%b-%d-%y_%H%M")
 if not os.path.isdir(output_dir):
-    print "Error: Output destination %s does not exist." % output_dir
+    print("Error: Output destination %s does not exist." % output_dir)
     sys.exit()
 else:
     output_dir = os.path.abspath(output_dir)
     output_dir += "/%s/%s_%s" % (participant_id, game_type, timestamp)
     if os.path.exists(output_dir):
-        print "Error: Run-specific output directory %s already exists." % output_dir
+        print("Error: Run-specific output directory %s already exists." % output_dir)
         sys.exit()
     else:
         try:
             os.makedirs(output_dir)
         except:
-            print "Error: Could not create output directory %s." % output_dir
-            print "Are you sure that directory is writeable?"
+            print("Error: Could not create output directory %s." % output_dir)
+            print("Are you sure that directory is writeable?")
             sys.exit()
 
 
@@ -72,6 +67,13 @@ else:
 from psychopy import locale_setup, sound, gui, visual, core, data, event, logging
 from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
+
+chime = sound.Sound(media + 'Sounds/chime.wav', name = 'chime')
+pop = sound.Sound(media + 'Sounds/balloon_pop.wav', name = 'balloon_pop')
+shape_sound = sound.Sound(media + 'Sounds/shape_task_sound.wav', name ='shape_task_sound')
+egg_crack = sound.Sound(media + 'Sounds/egg_crack.wav', name = 'egg_crack')
+sounds_to_rate = [chime, pop, shape_sound, egg_crack]
+shuffle(sounds_to_rate)
 
 # Setup the task window
 win = visual.Window(size=(screen_width, screen_height), fullscr=True,allowGUI=False, monitor='testMonitor', blendMode='avg', units = 'pix', useFBO=True)
@@ -99,8 +101,8 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 # Check that participant ID is valid
 valid_id_pattern = '^[A-Za-z0-9][A-Za-z0-9_\-]*$'
 if not re.search(valid_id_pattern, participant_id):
-    print "Error: Invalid or missing participant ID."
-    print "The participant ID must start with a letter or number, and it can only contain numbers, letters, hyphens, and underscores."
+    print("Error: Invalid or missing participant ID.")
+    print("The participant ID must start with a letter or number, and it can only contain numbers, letters, hyphens, and underscores.")
     core.quit()
 
 # Open the output file and write headers
@@ -113,21 +115,22 @@ f.write("Participant\tSound\tRating\n")
 # define the components for the task: a screen-sized image for instructions/ratings, and a sound to play
 slide = visual.ImageStim(win=win, name='Slide', image='sin', size=(screen_width, screen_height), interpolate=True)
 slide.autoDraw = True
-sound_component = sound.Sound('A', secs=-1) # "A" is a placeholder sound
+#sound_component = sound.Sound('A', secs=-1) # "A" is a placeholder sound
+
 rating_keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] # sounds get rated 1-9
 
 # run the task
 for current_sound in sounds_to_rate:
-    sound_component.setSound(current_sound)
     slide.setImage(instruction_slide)
     win.flip() # causes instruction slide to be drawn now
     event.waitKeys(keyList = ['space']) # wait for user to request sound
     slide.setImage(fixation_slide)
     win.flip()
     core.wait(0.5)
-    sound_component.play()
-    while sound_component.status != FINISHED:
-        pass
+    #sound_component.play()
+    current_sound.play()
+    while current_sound.status != FINISHED:
+        core.wait(0.2)
     slide.setImage(rating_slide)
     win.flip()
     while True:
@@ -136,18 +139,18 @@ for current_sound in sounds_to_rate:
         if len(key_list) == 1:
             break
     current_rating = key_list[0]
-    f.write("%s\t%s\t%s\n" % (participant_id, current_sound, current_rating))
+    f.write("%s\t%s\t%s\n" % (participant_id, current_sound.name, current_rating))
 
 # clean up
 slide.autoDraw = False
 win.flip()
 f.close()
-print "Finished run!"
-print "Output has been written to %s." % output_dir
+print("Finished run!")
+print("Output has been written to %s." % output_dir)
 
 # Psychopy's shutdown code
+win.close()
 this_exp.saveAsPickle(exp_handler_log)
 logging.flush()
 this_exp.abort()
-win.close()
 core.quit()
