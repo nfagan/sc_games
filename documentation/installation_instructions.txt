@@ -1,3 +1,9 @@
+
+Something called "HDF5 libraries" is a prerequisite of Psychopy. On MacOS, these seem to be most easily installed with
+Homebrew. If your computer doesn't have Homebrew, follow installation instructions on the Homebrew website, then run this:
+	brew install hdf5
+
+
 If the computer doesn't have Python 3 installed, download and install the latest stable version.
 
 Then, create a virtual environment called sc to use exclusively for the sc task.
