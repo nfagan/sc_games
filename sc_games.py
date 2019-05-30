@@ -26,8 +26,8 @@ project_dir = os.path.dirname(os.path.abspath(__file__))
 # Media subdirectory should be present in project folder    
 media = project_dir + "/media/"
 if not os.path.isdir(media):
-    print "Error: Could not find required directory %s in the project source folder." % media
-    print "Make sure you have a clean copy of this project's source repository."
+    print("Error: Could not find required directory %s in the project source folder." % media)
+    print("Make sure you have a clean copy of this project's source repository.")
     sys.exit()
 
 # Egg media files
@@ -208,7 +208,7 @@ yoke_source = options.yoke_source
 randomized = not options.non_randomize
 no_volume_enforcement = options.no_volume_enforcement
 if not randomized:
-    print "Note: \"--non-randomized\" invoked, so trials will be presented in fixed order."
+    print("Note: \"--non-randomized\" invoked, so trials will be presented in fixed order.")
 
 version = options.version
 mri_mode = options.mri_mode
@@ -223,27 +223,27 @@ if not output_dir or not participant_id or not game_type or not mode:
 
 valid_id_pattern = '^[A-Za-z0-9][A-Za-z0-9_\-]*$'
 if not re.search(valid_id_pattern, participant_id):
-    print "Error: Illegal participant ID."
-    print "ID must start with a letter or number, and may only contain letters, numbers, hyphens, and underscores."
+    print("Error: Illegal participant ID.")
+    print("ID must start with a letter or number, and may only contain letters, numbers, hyphens, and underscores.")
     sys.exit()
 
 output_dir = re.sub('\/+$', '', output_dir) # strip trailing slashes
 timestamp = datetime.strftime(datetime.now(),  "%b-%d-%y_%H%M")
 if not os.path.isdir(output_dir):
-    print "Error: Output destination %s does not exist." % output_dir
+    print("Error: Output destination %s does not exist." % output_dir)
     sys.exit()
 else:
     output_dir = os.path.abspath(output_dir)
     output_dir += "/%s/%s_%s_%s" % (participant_id, game_type, mode, timestamp)
     if os.path.exists(output_dir):
-        print "Error: Run-specific output directory %s already exists." % output_dir
+        print("Error: Run-specific output directory %s already exists." % output_dir)
         sys.exit()
     else:
         try:
             os.makedirs(output_dir)
         except:
-            print "Error: Could not create output directory %s." % output_dir
-            print "Are you sure that directory is writeable?"
+            print("Error: Could not create output directory %s." % output_dir)
+            print("Are you sure that directory is writeable?")
             sys.exit()
 
 # Declare additional variables based on the runtime options
@@ -273,17 +273,17 @@ nonstressed_mode = True if mode == ns else False
 
 # handle yoking of aversive sound outcomes for the uncontrollable stress condition
 if not mode == us and yoke_source:
-    print "Error: A yoking source file has been specified even though the game type requested does not involve yoking."
+    print("Error: A yoking source file has been specified even though the game type requested does not involve yoking.")
     sys.exit()
 if mode == us:
     if not yoke_source:
-        print "Error: The requested game type requires a yoking source file (re-run with \"--help\" for more information.)"
+        print("Error: The requested game type requires a yoking source file (re-run with \"--help\" for more information.)")
         sys.exit()
     if not re.search('\.pickle$', yoke_source):
-        print "Error: The yoking file specified does not seem proper, as its name does not end in \".pickle\"."
+        print("Error: The yoking file specified does not seem proper, as its name does not end in \".pickle\".")
         sys.exit()
     if not os.path.isfile(yoke_source):
-        print "Error: The specified yoking file could not be found."
+        print("Error: The specified yoking file could not be found.")
         sys.exit()
     yoke_source = os.path.abspath(yoke_source)
     # read in the pickle from the source
@@ -292,7 +292,7 @@ if mode == us:
     # make sure the source participant had the same number of trials as the current run
     num_trials_in_yoke_source = len(time_of_catch_by_trial)
     if num_trials_in_yoke_source != num_trials:
-        print "Error: The yoking source file contained data for %d trials, not the expected %d trials." % (num_trials_in_yoke_source, num_trials)
+        print("Error: The yoking source file contained data for %d trials, not the expected %d trials." % (num_trials_in_yoke_source, num_trials))
         sys.exit()
 else:
     time_of_catch_by_trial = {} # Keys = trial number, values = True/False on whether aversive sound should play
@@ -354,7 +354,7 @@ except:
                 os.rmdir(output_dir)
             except:
                 pass
-            print "Aborted experiment."
+            print("Aborted experiment.")
             sys.exit()
         get_confirm = raw_input("Invalid response. Enter \"y\" to continue, \"n\" to quit: ")
 
@@ -369,7 +369,7 @@ def send_labjack_event(event_type):
     if not labjack_active:
         return
     if event_type not in lj_events:
-        print "Warning: invalid event type (%s) could not be handled as a GSR trigger." % event_type
+        print("Warning: invalid event type (%s) could not be handled as a GSR trigger." % event_type)
         return
     fio_num = lj_events[event_type]
     timestamp = str(datetime.now())
@@ -412,8 +412,8 @@ logging.console.setLevel(logging.CRITICAL) # makes warnings get printed to conso
 win = visual.Window(size=(screen_width, screen_height), monitor = 'testMonitor', allowGUI=False, fullscr=True, useFBO=False, units='pix')
 calculated_fps = int(round(win.getActualFrameRate()))
 if calculated_fps != expected_fps:
-    print "Warning: This experiment is meant to run at %d frames per second, but your display was recorded at %d fps." % (expected_fps, calculated_fps)
-    print "(If you're within a couple of frames, there's no need to worry about this.)"
+    print("Warning: This experiment is meant to run at %d frames per second, but your display was recorded at %d fps." % (expected_fps, calculated_fps))
+    print("(If you're within a couple of frames, there's no need to worry about this.)")
 
 # Having dropped frames recorded (will access later with win.nDroppedFrames)
 win.recordFrameIntervals = True
@@ -756,7 +756,7 @@ def trial_startup(routine):
     routine.zigs = current_trajectory_info[4]
     routine.trajectory_description = str(current_trajectory_info)
     if trial_debug_mode or skip_instructions or fast_mode:
-        print "Using index %d in trajectory list: " % current_trajectory_index + routine.trajectory_description
+        print("Using index %d in trajectory list: " % current_trajectory_index + routine.trajectory_description)
 
 def trial_run_frame(routine):
     time_in_trial = routine.clock.getTime()
@@ -974,7 +974,7 @@ def trial_shutdown(routine):
         target = visual.ImageStim(win = win, name = 'egg', units = 'pix', image = whole_egg_image, interpolate = True, depth = -3.0)
 # build a list of routines to run
 routines = []
-sound_check = Routine(window = win, run_frame = start_sound_check, run_frame = run_sound_check)
+sound_check = Routine(window = win, startup = start_sound_check, run_frame = run_sound_check)
 routines.append(sound_check)
 
 if playing_magic_game:
@@ -1134,8 +1134,8 @@ try:
 except:
     pass
 
-print "Finished the game!"
-print "Output has been written to %s." % output_dir
+print("Finished the game!")
+print("Output has been written to %s." % output_dir)
 
 # Psychopy shutdown code
 this_exp.saveAsPickle(exp_handler_log)
