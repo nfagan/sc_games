@@ -333,5 +333,6 @@ if chosen_task_info['ShortName'] is not 'Noise Rating':
 	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
 	if mri_mode: script_with_args += " --mri-mode"
 	if non_randomized: script_with_args += " --non-randomized"
-print "Running this: %s" % script_with_args
+
+print("Running task....")
 call(script_with_args, shell=True)
