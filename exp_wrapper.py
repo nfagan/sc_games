@@ -9,6 +9,12 @@ def catch_sigint(signal, frame):
 	sys.exit()
 signal.signal(signal.SIGINT, catch_sigint)
 
+
+# a dev mode gives extra run options
+dev_mode = False
+if len(sys.argv) > 1 and sys.argv[1] == "dev":
+	dev_mode = True
+
 # This script should not be moved from its location in the sc task directory
 source_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -108,22 +114,26 @@ else:
 		if to_continue == 'y': break
 		to_continue = input("Invalid response. Choose \"y\" to continue or \"n\" to quit: ")
 
-exp_options = (("Magic (with wand)", "magic"), ("Mundane (with hand)", "mundane"))
-num_exps = len(exp_options)
+if dev_mode:
+	exp_options = (("Magic (with wand)", "magic"), ("Mundane (with hand)", "mundane"))
+	num_exps = len(exp_options)
 
-print("Here are the experiments that can be run:")
-for x in range(num_exps):
-	print(str(x+1) + ") " + exp_options[x][0])
+	print("Here are the experiments that can be run:")
+	for x in range(num_exps):
+		print(str(x+1) + ") " + exp_options[x][0])
 
-exp_choice = input("Which experiment should be run? ")
-while True:
-	try:
-		exp_type = exp_options[int(exp_choice) - 1][1]
-		exp_name = exp_options[int(exp_choice) - 1][0]
-		break
-	except:
-		choice = input("Invalid response. Enter the number (1-%d) corresponding to the experiment to run: " % num_exps)
-print("Okay, we're running the \"%s\" experiment!" % exp_name)
+	exp_choice = input("Which experiment should be run? ")
+	while True:
+		try:
+			exp_type = exp_options[int(exp_choice) - 1][1]
+			exp_name = exp_options[int(exp_choice) - 1][0]
+			break
+		except:
+			choice = input("Invalid response. Enter the number (1-%d) corresponding to the experiment to run: " % num_exps)
+	print("Okay, we're running the \"%s\" experiment!" % exp_name)
+else:
+	exp_type = "mundane"
+	exp_name = "Mundane (with hand)"
 
 task_options = (balloon_game_info, egg_game_info, noise_rating_info)
 num_tasks = len(task_options)
@@ -145,18 +155,21 @@ print("All right, we're running the %s task!" % game_chosen)
 
 # See if this is a real experiment or a test run
 run_type = "Real Experiment"
-choice = input("Is this going to be...\n1) A test run or 2) The real thing? ")
-while True:
-	try:
-		if int(choice) == 1:
-			output_directory = test_directory
-			run_type = "Test Run"
-			break
-		elif int(choice) == 2:
-			output_directory = magic_output_directory if exp_type == "magic" else mundane_output_directory
-			break
-	except:
-		choice = input("Invalid input. Enter 1 for a test run, or 2 for a real experiment: ")
+output_directory = magic_output_directory if exp_type == "magic" else mundane_output_directory
+
+if dev_mode:
+	choice = input("Is this going to be...\n1) A test run or 2) The real thing? ")
+	while True:
+		try:
+			if int(choice) == 1:
+				output_directory = test_directory
+				run_type = "Test Run"
+				break
+			elif int(choice) == 2:
+				output_directory = magic_output_directory if exp_type == "magic" else mundane_output_directory
+				break
+		except:
+			choice = input("Invalid input. Enter 1 for a test run, or 2 for a real experiment: ")
 
 test_options = '' # will be passed on command line to the game script
 
@@ -280,23 +293,25 @@ if game_chosen is not noise_rating:
 	# 	non_randomized = True
 
 	# Prompt for keyboard input mode vs. button box mode
-	mri_mode = False
-	response = input("Are we playing with 1) keyboard input or 2) button box input (MRI mode)? ")
-	while True:
-		try:
-			response = int(response)
-		except ValueError:
-			response = input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input (MRI mode): ")
-			continue
-		if response == 1:
-			print("Okay, we'll play with keyboard input.")
-			break
-		elif response == 2:
-			print("Okay, we'll play in MRI mode (button box input, MRI trigger, two phases of trials).")
-			mri_mode = True
-			break
-		else:
-			response = input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input (MRI mode): ")
+	mri_mode = True
+
+	if dev_mode:
+		response = input("Are we playing with 1) keyboard input or 2) button box input (MRI mode)? ")
+		while True:
+			try:
+				response = int(response)
+			except ValueError:
+				response = input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input (MRI mode): ")
+				continue
+			if response == 1:
+				print("Okay, we'll play with keyboard input.")
+				mri_mode = False
+				break
+			elif response == 2:
+				print("Okay, we'll play in MRI mode (button box input, MRI trigger, two phases of trials).")
+				break
+			else:
+				response = input("Invalid response. Enter 1 for keyboard input mode, or 2 for button box input (MRI mode): ")
 	
 print("\nHere are the options that have been chosen: ")
 print("Experiment: %s" % exp_name)
@@ -319,12 +334,12 @@ while True:
 	if confirm == 'y':
 		break;
 	if confirm == 'n':
-		print("Aborting. No game will be played!")
+		print("Okay, try again if you still want to run.")
 		sys.exit()
 	confirm = input("Invalid response. Choose \"y\" to confirm or \"n\" to quit: ")
 
 # all three scripts require the arguments given with "--id", "--source_dir", and "--output_dir"
-script_with_args = "python '%s' --participant-id=%s  --output=%s  --version=%s" %(chosen_task_info['Script'], participant_id, output_directory, version)
+script_with_args = "python '%s' --participant-id=%s  --output='%s'  --version=%s" %(chosen_task_info['Script'], participant_id, output_directory, version)
 if chosen_task_info['ShortName'] is not 'Noise Rating':
 	script_with_args += " --game-type=%s --game-mode=%s %s" % (exp_type, game_mode, test_options)
 	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file

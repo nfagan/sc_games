@@ -19,3 +19,6 @@ Then, open the downloaded installer and follow instructions to install.
 
 Whenever you want to run the task, start by activating the virtual environment: [path]/sc/bin/activate
 When you're finished, run "deactivate" (or just close the Terminal window).
+
+Last thing: To use the wrapper script, which builds the task run commands for you, you need to create a config file 
+in the main directory of the repository. See the local_config template for the formatting.
