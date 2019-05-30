@@ -52,6 +52,11 @@ magic_balloon_slide_dir = media + "Magic_instruction_slides/Balloon_instruction_
 mundane_keyboard_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_keyboard_instruction_slides/"
 mundane_mri_balloon_slide_dir = media + "Mundane_instruction_slides/Balloon_mri_instruction_slides/"
 
+# Sound check media (the chime from noise ratings)
+sound_check_sound = media + "Sounds/chime.wav"
+sound_check_slide_1 = media + "sound_check_slide_1.jpg"
+sound_check_slide_2 = media + "sound_check_slide_2.jpg"
+
 # Collision files show which x/y distances between objects should count as collisions
 balloon_wand_collision_file = project_dir + "/resources/balloon_wand_collision_map.pickle"
 egg_wand_collision_file = project_dir + "/resources/egg_wand_collision_map.pickle"
@@ -619,6 +624,30 @@ def run_slides(routine, slide_dir):
         else:
             slides.setImage("%s%s" % (slide_dir, slide_info_by_dir[slide_dir][current_slide]['name']))
 
+def start_sound_check(routine):
+    routine.start_component(slides)
+    slides.setImage(sound_check_slide_1)
+    routine.sound_time = None
+    routine.on_first_slide = True
+
+def run_sound_check(routine):
+    if routine.sound_time and routine.clock.getTime() > routine.sound_time + 1 and routine.on_first_slide:
+        slides.setImage(sound_check_slide_2)
+        routine.on_first_slide = False
+        return
+
+    key_events = event.getKeys()
+    if len(key_events) != 1:
+        return
+    if key_events[0] == 'space':
+        if not routine.sound_time:
+            routine.start_component(sound_check_sound)
+            routine.sound_time = routine.clock.getTime()
+        elif not routine.on_first_slide and routine.clock.getTime() > routine.sound_time + 2:
+            routine.stop_all_components()
+
+
+
 def implement_practice_startup(routine):
     routine.start_component(implement)
     routine.start_component(time_left_label)
@@ -945,6 +974,9 @@ def trial_shutdown(routine):
         target = visual.ImageStim(win = win, name = 'egg', units = 'pix', image = whole_egg_image, interpolate = True, depth = -3.0)
 # build a list of routines to run
 routines = []
+sound_check = Routine(window = win, run_frame = start_sound_check, run_frame = run_sound_check)
+routines.append(sound_check)
+
 if playing_magic_game:
     pass
     # instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
@@ -1046,6 +1078,8 @@ def finish_noise_ratings(routine):
         ratings.write("post_task_noise_stress\tpost_task_game_stress\n")
         ratings.write("%s\t%s\n" % (routine.responses[0], routine.responses[1]))
         ratings.flush()
+
+
 
 def start_avoidance_ratings(routine):
     routine.responses = []
