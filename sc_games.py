@@ -278,7 +278,7 @@ if mode == us:
         sys.exit()
     yoke_source = os.path.abspath(yoke_source)
     # read in the pickle from the source
-    with open(yoke_source, 'r') as y:
+    with open(yoke_source, 'rb') as y:
         time_of_catch_by_trial = pickle.load(y)
     # make sure the source participant had the same number of trials as the current run
     num_trials_in_yoke_source = len(time_of_catch_by_trial)
