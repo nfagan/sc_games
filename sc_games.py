@@ -1041,7 +1041,7 @@ for routine in routines:
 # Record aversive sound outcomes from cs condition for future yoked runs
 if mode == cs:
     yoking_file = "%s/yoking_file.pickle" % output_dir
-    with open (yoking_file, 'w') as y:
+    with open (yoking_file, 'wb') as y:
         pickle.dump(time_of_catch_by_trial, y)
         y.flush()
 
