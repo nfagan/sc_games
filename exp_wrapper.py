@@ -182,7 +182,7 @@ while True:
 	participant_id = input("Invalid ID. Legal characters are letters, numbers, hyphens, and underscores. Choose a new ID: ")
 
 debug_trial_mode = False
-if game_chosen is not noise_rating:	
+if game_chosen != noise_rating:	
 	if run_type == "Test Run":
 		print("\nTesting options:\n1) Full run\n2) Skip instructions\n3) Fast mode (short ITI/anticipatory periods)\n4) Skip instructions AND fast mode\n5) Test specific trial\n")
 		choice = input("Which test should be run? ")
@@ -318,7 +318,7 @@ print("Experiment: %s" % exp_name)
 print("Mode: %s" % chosen_task_info['ShortName'])
 print("Run type: %s" % run_type)
 print("Participant ID: %s" % participant_id)
-if game_chosen is not noise_rating:
+if game_chosen != noise_rating:
 	if game_chosen is balloon:
 		print("Stress type: %s" %(stress_condition))
 		if current_participant_is_yoked:
@@ -340,7 +340,7 @@ while True:
 
 # all three scripts require the arguments given with "--id", "--source_dir", and "--output_dir"
 script_with_args = "python '%s' --participant-id=%s  --output='%s'  --version=%s" %(chosen_task_info['Script'], participant_id, output_directory, version)
-if chosen_task_info['ShortName'] is not 'Noise Rating':
+if chosen_task_info['ShortName'] != 'Noise Rating':
 	script_with_args += " --game-type=%s --game-mode=%s %s" % (exp_type, game_mode, test_options)
 	if game_chosen is balloon and current_participant_is_yoked: script_with_args += " --yoke-source=%s" % yoking_source_file
 	if mri_mode: script_with_args += " --mri-mode"

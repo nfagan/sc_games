@@ -434,9 +434,9 @@ time_left_label = visual.TextStim(win=win, name='time_left_label', text=None, fo
 ITI = visual.ImageStim(win=win, name='ITI',units='pix', image=media + "iti_background.jpg", 
     pos=(0, 0), size=(screen_width, screen_height), interpolate=True, depth=-6.0)
 counter_background = visual.ImageStim(win=win, name='counter_background',units='pix', 
-    image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0, opacity=0)
+    image=media + "label_background.png", pos=(550, -435), size=(175, 45), interpolate=True, depth=-7.0, opacity=1)
 counter = visual.TextStim(win=win, name='counter', text=None, font='Arial', units='pix', pos=(550, -432), height=24,
-    wrapWidth=None, color=u'#053270', depth=-8.0, opacity=0)
+    wrapWidth=None, color=u'#053270', depth=-8.0, opacity=1)
 
 # Additional labels
 break_label = visual.TextStim(win=win, name='break_start', text="We're taking a break!", font='Arial', units='pix', pos=(0, 0), height=30)
@@ -741,7 +741,7 @@ def trial_startup(routine):
     implement.pos = implement_starting_position # becomes visible later
     target.setImage(whole_target_image) # becomes visible later
 
-    # Note that the counter is currently not being used (opacity has been set to 0)
+    # To avoid using counter, set counter opacity to 0 
     routine.start_component(antic_background)
     routine.start_component(counter_background)
     routine.start_component(counter)
@@ -789,7 +789,7 @@ def trial_run_frame(routine):
         # if anything of interest has happened, write to highlights file
         for field in (keyboard_used, keys_pressed, implement_move_direction, target_zigged, touching_test, just_made_magic, 
                 just_made_first_contact, just_froze, target_just_exited_catchable_area, aversive_noise_onset, antic_period_onset, avoid_period_onset, iti_onset, trial_offset):
-            if field is not "NA" and field is not "0":
+            if field != "NA" and field != "0":
                 h.write("\t".join(output_fields) + "\n")
                 h.flush()
                 break
@@ -943,7 +943,9 @@ def trial_run_frame(routine):
                 #routine.magic_has_happened = True
                 just_made_magic = '1'
                 if playing_egg_game:
-                    target.setColor(choice(("INDIANRED", "GOLD", "YELLOWGREEN", "DEEPSKYBLUE"))) # random.choice picks an element from a list randomly
+                    # INDIANRED no longer available; it may have been #cd5c5c
+                    # random.choice picks an element from a list randomly
+                    target.setColor(choice(("#cd5c5c", "GOLD", "YELLOWGREEN", "DEEPSKYBLUE"))) 
                 else:
                     routine.start_component(magic_sparks)
     else:
@@ -977,15 +979,11 @@ sound_check = Routine(window = win, startup = start_sound_check, run_frame = run
 if not fast_mode:
     routines.append(sound_check)
 
-if playing_magic_game:
-    pass
-    # instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 1, 14))
-    # instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, 15, 17))
-    # thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, 18, 18))
-else:
-    instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
-    instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
-    thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
+
+instructions_1 = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
+instructions_2 = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
+thanks = Routine(window = win, run_frame = lambda routine: run_slides(routine, instruction_slide_dir))
+
 implement_practice = Routine(window = win, startup = implement_practice_startup, run_frame = implement_practice_run_frame)
 
 # add instructions to routine list (save thanks for after trial routines)
@@ -1078,8 +1076,6 @@ def finish_noise_ratings(routine):
         ratings.write("post_task_noise_stress\tpost_task_game_stress\n")
         ratings.write("%s\t%s\n" % (routine.responses[0], routine.responses[1]))
         ratings.flush()
-
-
 
 def start_avoidance_ratings(routine):
     routine.responses = []

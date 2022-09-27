@@ -15,4 +15,4 @@ Slide14.jpg	space	break
 Slide15.jpg	space	continue
 Slide16.jpg	space	continue
 Slide17.jpg	space	break
-Slide17.jpg	space	break
+Slide18.jpg	space	break
