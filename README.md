@@ -11,4 +11,4 @@
 # Run
 
 * If not already activated, activate the `sc_magic` environment: `conda activate sc_magic`
-* Run a (the) task: `python iceberg.py`
+* Run a task, defined by the value of `TASK_TYPE` in `main.py`: `python main.py`
