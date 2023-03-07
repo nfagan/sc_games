@@ -7,11 +7,12 @@ class TaskLoopResult(object):
     self.dt = dt
 
 class Task(object):
-  def __init__(self, window):
+  def __init__(self, window, abort_crit):
     self.window = window
     self.state_t0 = 0
     self.last_t = 0
-    pass
+    self.abort_crit = abort_crit
+    self.pending_abort = False
 
   def enter_state(self):
     self.state_t0 = time.time()
@@ -26,6 +27,12 @@ class Task(object):
     self.last_t = curr_t
 
     self.window.flip()
+    
     keys = event.getKeys()
     event.clearEvents()
-    return TaskLoopResult(keys, dt)
+    loop_res = TaskLoopResult(keys, dt)
+
+    if self.abort_crit(loop_res):
+      self.pending_abort = True
+
+    return loop_res

@@ -1,3 +1,5 @@
+import random
+
 balloon_Y_start = 0
 balloon_Y_speed = 6
 egg_Y_start = 0
@@ -34,6 +36,24 @@ balloon_trajectory_info = [
     (650, balloon_Y_start, -8, balloon_Y_speed, [250, 675]),
     (650, balloon_Y_start, 0, balloon_Y_speed, [])]
 
+# # easy
+# balloon_trajectory_info = [balloon_trajectory_info[-7]] * 10
+
+# # easy-med
+# balloon_trajectory_info = [balloon_trajectory_info[0]] * 10
+
+# medium
+# balloon_trajectory_info = [balloon_trajectory_info[2]] * 10
+
+# # hard
+# balloon_trajectory_info = [balloon_trajectory_info[-5]]
+# for i in range(10):
+#   traj = list(balloon_trajectory_info[0])
+#   xoff = -250 * i
+#   traj[0] += xoff
+#   traj[4] = [x + xoff for x in traj[4]]
+#   balloon_trajectory_info.append(tuple(traj))
+
 egg_zigs = []
 egg_trajectory_info = [
     (0, egg_Y_start, 0, -4, egg_zigs),
@@ -69,7 +89,7 @@ egg_trajectory_info = [
 
 def balloon_zigs(tn):
   if tn < len(balloon_trajectory_info):
-    return balloon_trajectory_info[tn][4]
+    return balloon_trajectory_info[tn][4][:]
   else:
     return []
 

@@ -4,40 +4,6 @@ class InteractStateResult(object):
   def __init__(self, implement_hit_collider):
     self.implement_hit_collider = implement_hit_collider
 
-class TargetMovement(object):
-  def __init__(self) -> None:
-    pass
-
-  def tick(self, dt, pos, reached_target):
-    raise NotImplementedError
-
-class FixedDirectionMovement(TargetMovement):
-  def __init__(self, vel) -> None:
-    super().__init__()
-    self.vel = vel
-
-  def tick(self, dt, pos, reached_target):
-    if reached_target:
-      return [0, 0]
-    return [x * dt for x in self.vel]
-
-class ZigMovement(TargetMovement):
-  def __init__(self, vel, zigs) -> None:
-    super().__init__()
-    self.vel = vel
-    self.zigs = zigs
-  
-  def tick(self, dt, pos, reached_target):
-    if reached_target:
-      return [0, 0]
-    if len(self.zigs) > 0:
-      zig_line_position = self.zigs[0]
-      # if within 6 pixels of zigzag line, x-speed reverses (+/- 6 means condition always triggers since max speed is 9)
-      if abs(pos[0] - zig_line_position) < 6:
-        self.vel = (-self.vel[0], self.vel[1])
-        self.zigs.pop(0)
-    return [v for v in self.vel]
-
 def parse_key_movement(key_map, keys):
   if key_map['move_left'] in keys:
     return [-1, 0]
@@ -57,8 +23,8 @@ def static(task, drawables, t):
       stim.draw()
     _ = task.loop()
 
-def interactive_collider(
-  task, key_map, move_increment, 
+def interactive_collider(*,
+  task, key_map, move_increment,
   always_draw_stimuli, 
   aversive_sound, pleasant_sound,
   play_aversive_sound,
@@ -73,6 +39,7 @@ def interactive_collider(
   collider_did_reach_target = False
 
   implement_stim.setPos(implement_pos)
+  collider_stim.setPos(collider_pos)
 
   task.enter_state()
   while task.state_time() < t:
@@ -95,7 +62,8 @@ def interactive_collider(
       implement_pos = [x + y * float(move_increment) for x, y in zip(implement_pos, move)]
       implement_stim.setPos(implement_pos)
 
-    collider_move = collider_movement.tick(res.dt, collider_pos, collider_did_reach_target)
+    ft = max(0., min(1., task.state_time() / t))
+    collider_move = collider_movement.tick(res.dt, ft, collider_pos, collider_did_reach_target)
     collider_pos = [x + y for x, y in zip(collider_pos, collider_move)]
 
     if not collider_did_reach_target and collider_reached_target(collider_pos):
