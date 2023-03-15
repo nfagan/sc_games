@@ -8,8 +8,10 @@ from psychopy import visual, core
 import os
 from os import path
 
+NUM_TRIALS = 8
 SCREEN_WIDTH = 1440
 SCREEN_HEIGHT = 900
+BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
 FULL_SCREEN = False
 RES_ROOT = path.join(os.getcwd(), 'res')
 KEY_MAP = {
@@ -57,49 +59,28 @@ def create_iceberg_stimuli(win):
     'collided_stim': util.create_image_stim(win, res_path('images/pop_1.png'))
   }
 
-def gen_trajectory(gen_traj):
-  while True:
-    kps = gen_traj()
-    accept = all(map(lambda kp: kp[0] >= -1. and kp[0] <= 1. and kp[1] >= -1. and kp[1] <= 1., kps))
-    if accept:
-      return kps
-
-def hard_trajectory():
-  return gen_trajectory(
-    lambda: trajectory.gen_trajectory(nsteps=6, x_step_min=0.3, x_step_max=1., y_sigma=0.05))
-
-def med_trajectory():
-  return gen_trajectory(
-    lambda: trajectory.gen_trajectory(nsteps=3, x_step_min=0.4, x_step_max=0.8, y_sigma=0.025))
-
-def easy_trajectory():
-  return gen_trajectory(
-    lambda: trajectory.gen_trajectory(nsteps=2, x_step_min=0.2, x_step_max=0.4, y_sigma=0.025))
+def gen_keypoints(trial):
+  kp_fns = [trajectory.easy, trajectory.med, trajectory.hard, trajectory.extra_hard]
+  kp_fn = kp_fns[trial % len(kp_fns)]
+  kps = kp_fn()
+  kps = [[x[0] * SCREEN_WIDTH * 0.5, x[1] * SCREEN_HEIGHT * 0.5] for x in kps]
+  return kps
 
 def make_balloon_movement_info(stimuli):
   if True:
-    # kps = easy_trajectory()
-    kps = med_trajectory()
-    # kps = hard_trajectory()
-
-    kps = [[x[0] * SCREEN_WIDTH * 0.5, x[1] * SCREEN_HEIGHT * 0.5] for x in kps]
-    get_movement = lambda tn: KeypointMovement(kps[:])
-    get_position = lambda tn: kps[0]    
-
+    get_movement = lambda tn: KeypointMovement(gen_keypoints(tn))
   else:
-    get_movement = lambda tn: ZigMovement(data.balloon_velocity(tn), data.balloon_zigs(tn))
-    get_position = lambda tn: data.balloon_position(tn, SCREEN_HEIGHT)
-
+    get_movement = lambda tn: ZigMovement(
+      data.balloon_position(tn, SCREEN_HEIGHT), data.balloon_velocity(tn), data.balloon_zigs(tn))
   return {
     'get_movement': get_movement,
-    'get_position': get_position,
     'reached_target': lambda pos: pos[1] > SCREEN_HEIGHT * 0.5 - stimuli['collider_stim'].height * 0.5
   }
 
 def make_egg_movement_info(stimuli):
+  p0 = [0, SCREEN_HEIGHT * 0.5]
   return {
-    'get_movement': lambda tn: ZigMovement(data.egg_velocity(tn), data.egg_zigs(tn)),
-    'get_position': lambda tn: [0, SCREEN_HEIGHT * 0.5],
+    'get_movement': lambda tn: ZigMovement(p0, data.egg_velocity(tn), data.egg_zigs(tn)),
     'reached_target': lambda pos: pos[1] < -SCREEN_HEIGHT * 0.5 + stimuli['collider_stim'].height * 0.5
   }
 
@@ -135,8 +116,11 @@ def main():
   pleasant_sound = util.create_sound(res_path('sounds/magic_sound.wav'))
 
   spells_cast = 0
-  for trial in range(4):
+  for trial in range(NUM_TRIALS):
     states.static(task, [task_stimuli['background0']], t=1)
+
+    collider_movement = movement_info['get_movement'](trial)
+    trial_difficulty = ['easy', 'medium', 'hard', 'extra-hard'][trial % 4]
 
     interact_result = states.interactive_collider(
       task=task,
@@ -147,12 +131,13 @@ def main():
       pleasant_sound=pleasant_sound,
       play_aversive_sound='conditionally',
       counter_stim=counter_stim,
+      get_counter_stim_text=lambda count: '({}) spells cast: {}'.format(trial_difficulty, count),
       counter_value=spells_cast,
-      implement_stim=wand, implement_pos=[0, -SCREEN_HEIGHT * 0.5 + 40.],
+      implement_stim=wand, implement_pos=[0, -SCREEN_HEIGHT * 0.5 + wand.height * 0.5 + BORDER_WIDTH],
       collider_stim=task_stimuli['collider_stim'],
       collided_stim=task_stimuli['collided_stim'],
-      collider_pos=movement_info['get_position'](trial),
-      collider_movement=movement_info['get_movement'](trial), 
+      collider_pos=collider_movement.initial_position(),
+      collider_movement=collider_movement, 
       collider_reached_target=movement_info['reached_target'],
       sparkle_stim=sparkle, 
       t=8)

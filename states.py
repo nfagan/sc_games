@@ -28,7 +28,7 @@ def interactive_collider(*,
   always_draw_stimuli, 
   aversive_sound, pleasant_sound,
   play_aversive_sound,
-  counter_stim, counter_value,
+  counter_stim, get_counter_stim_text, counter_value,
   implement_stim, implement_pos, 
   collider_stim, collided_stim, collider_pos, collider_movement, collider_reached_target, 
   sparkle_stim, t):
@@ -43,7 +43,7 @@ def interactive_collider(*,
 
   task.enter_state()
   while task.state_time() < t:
-    counter_stim.text = 'spells cast: {}'.format(counter_value)
+    counter_stim.text = get_counter_stim_text(counter_value)
 
     for stim in always_draw_stimuli:
       stim.draw()
@@ -79,7 +79,8 @@ def interactive_collider(*,
     collider_bounds = util.stimulus_bounding_box(collider_stim)
     implement_bounds = util.stimulus_bounding_box(implement_stim)
 
-    if util.bounding_boxes_intersect(collider_bounds, implement_bounds):
+    if not collider_did_reach_target and \
+      util.bounding_boxes_intersect(collider_bounds, implement_bounds):
       if not implement_hit_collider:
         counter_value += 1
         pleasant_sound.play()      

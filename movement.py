@@ -8,6 +8,9 @@ class TargetMovement(object):
 
   def tick(self, dt, ft, pos, reached_target):
     raise NotImplementedError
+  
+  def initial_position(self):
+    raise NotImplementedError
 
 class FixedDirectionMovement(TargetMovement):
   def __init__(self, vel) -> None:
@@ -41,12 +44,20 @@ class KeypointMovement(TargetMovement):
     target_p = (p1 - p0) * kpt + p0
     vel = target_p - np.array(pos)
     return [v for v in vel]
+  
+  def initial_position(self):
+    assert len(self.points) > 0
+    return self.points[0][:]
 
 class ZigMovement(TargetMovement):
-  def __init__(self, vel, zigs) -> None:
+  def __init__(self, p0, vel, zigs) -> None:
     super().__init__()
+    self.p0 = p0
     self.vel = vel
     self.zigs = zigs
+
+  def initial_position(self):
+    return self.p0[:]
   
   def tick(self, dt, ft, pos, reached_target):
     if reached_target:
