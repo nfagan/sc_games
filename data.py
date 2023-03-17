@@ -1,4 +1,7 @@
 import random
+import os
+import json
+import numpy as np
 
 balloon_Y_start = 0
 balloon_Y_speed = 6
@@ -121,3 +124,10 @@ def egg_velocity(tn):
     return [egg_trajectory_info[tn][2], egg_trajectory_info[tn][3]]
   else:
     return [0, -1]
+  
+def load_trajectories(kind):
+  assert kind in ['easy', 'medium', 'hard', 'extra_hard']
+  data_p = os.path.join(os.getcwd(), 'res/trajectories', '{}.txt'.format(kind))
+  with open(data_p, 'r') as f:
+    s = f.read()
+  return json.loads(s)

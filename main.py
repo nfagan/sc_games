@@ -5,10 +5,11 @@ import data
 import trajectory
 from movement import ZigMovement, KeypointMovement
 from psychopy import visual, core
+import argparse
 import os
 from os import path
 
-NUM_TRIALS = 8
+DEBUG_NUM_TRIALS = 8
 SCREEN_WIDTH = 1440
 SCREEN_HEIGHT = 900
 BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
@@ -23,6 +24,7 @@ KEY_MAP = {
 }
 MOVE_INCR_PX = 80
 TASK_TYPE = 'balloon'
+CONTEXT = {'difficulty': '', 'trajectories': None}
 
 def res_path(p):
   return path.join(RES_ROOT, p)
@@ -60,9 +62,12 @@ def create_iceberg_stimuli(win):
   }
 
 def gen_keypoints(trial):
-  kp_fns = [trajectory.easy, trajectory.med, trajectory.hard, trajectory.extra_hard]
-  kp_fn = kp_fns[trial % len(kp_fns)]
-  kps = kp_fn()
+  if CONTEXT['trajectories'] is not None:
+    kps = CONTEXT['trajectories']['points'][trial][:]
+  else:
+    kp_fns = [trajectory.easy, trajectory.med, trajectory.hard, trajectory.extra_hard]
+    kp_fn = kp_fns[trial % len(kp_fns)]
+    kps = kp_fn()
   kps = [[x[0] * SCREEN_WIDTH * 0.5, x[1] * SCREEN_HEIGHT * 0.5] for x in kps]
   return kps
 
@@ -86,9 +91,29 @@ def make_egg_movement_info(stimuli):
 
 def make_iceberg_movement_info(stimuli):
   return make_egg_movement_info(stimuli)
+
+def get_counter_stim_text_fn(trial):
+  if CONTEXT['difficulty'] == 'debug':
+    trial_difficulty = ['easy', 'medium', 'hard', 'extra-hard'][trial % 4]
+    return lambda count: '({}) spells cast: {}'.format(trial_difficulty, count)
+  else:
+    return lambda count: 'spells cast: {}'.format(count)
   
 def main():
-  assert TASK_TYPE in ['egg', 'balloon', 'iceberg']
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-d', '--difficulty', choices=['easy', 'medium', 'hard', 'extra_hard', 'debug'])
+  parser.add_argument('-t', '--task', choices=['egg', 'balloon', 'iceberg'], default='balloon')
+  parser.add_argument('-ao', '--avoid_only', action='store_true', default=False)
+  args = parser.parse_args()
+
+  TASK_TYPE = args.task
+  CONTEXT['difficulty'] = args.difficulty
+  CONTEXT['avoid_only'] = args.avoid_only
+
+  num_trials = DEBUG_NUM_TRIALS
+  if not args.difficulty == 'debug':
+    CONTEXT['trajectories'] = data.load_trajectories(args.difficulty)
+    num_trials = len(CONTEXT['trajectories']['signs'])
 
   win = create_window()
   task = Task(win, lambda loop_res: KEY_MAP['stop'] in loop_res.keys)
@@ -116,12 +141,12 @@ def main():
   pleasant_sound = util.create_sound(res_path('sounds/magic_sound.wav'))
 
   spells_cast = 0
-  for trial in range(NUM_TRIALS):
-    states.static(task, [task_stimuli['background0']], t=1)
+  for trial in range(num_trials):
+    if not CONTEXT['avoid_only']:
+      states.static(task, [task_stimuli['background0']], t=1)
 
     collider_movement = movement_info['get_movement'](trial)
-    trial_difficulty = ['easy', 'medium', 'hard', 'extra-hard'][trial % 4]
-
+    
     interact_result = states.interactive_collider(
       task=task,
       key_map=KEY_MAP, 
@@ -131,7 +156,7 @@ def main():
       pleasant_sound=pleasant_sound,
       play_aversive_sound='conditionally',
       counter_stim=counter_stim,
-      get_counter_stim_text=lambda count: '({}) spells cast: {}'.format(trial_difficulty, count),
+      get_counter_stim_text=get_counter_stim_text_fn(trial),
       counter_value=spells_cast,
       implement_stim=wand, implement_pos=[0, -SCREEN_HEIGHT * 0.5 + wand.height * 0.5 + BORDER_WIDTH],
       collider_stim=task_stimuli['collider_stim'],
@@ -142,7 +167,8 @@ def main():
       sparkle_stim=sparkle, 
       t=8)
 
-    states.static(task, [iti_background], t=2)
+    if not CONTEXT['avoid_only']:
+      states.static(task, [iti_background], t=10)
 
     if interact_result.implement_hit_collider:
       spells_cast += 1
