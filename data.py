@@ -1,7 +1,22 @@
+from states import MovementHistoryRecord, InteractStateResult, StaticStateResult
+from task import KeyEvent
 import random
 import os
 import json
 import numpy as np
+from dataclasses import dataclass
+from typing import List, Optional
+
+@dataclass
+class TrialRecord(object):
+  present_background: Optional[StaticStateResult]
+  interact: Optional[InteractStateResult]
+  iti: Optional[StaticStateResult]
+
+@dataclass
+class TaskData(object):
+  trials: List[TrialRecord]
+  events: List[KeyEvent]
 
 balloon_Y_start = 0
 balloon_Y_speed = 6

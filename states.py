@@ -1,8 +1,28 @@
 import util
+from task import Task
+from dataclasses import dataclass
+from typing import Optional, List
 
+@dataclass
+class MovementHistoryRecord(object):
+  timestamp: float
+  point: List[float]
+  movement: List[int]
+
+@dataclass
 class InteractStateResult(object):
-  def __init__(self, implement_hit_collider):
-    self.implement_hit_collider = implement_hit_collider
+  entered_timestamp: float
+  exited_timestamp: float
+  implement_movements: List[MovementHistoryRecord]
+  implement_hit_collider: bool
+  implement_hit_timestamp: Optional[float]
+  collider_did_reach_target: bool
+  collider_hit_timestamp: Optional[float]
+
+@dataclass
+class StaticStateResult(object):
+  entered_timestamp: float
+  exited_timestamp: float
 
 def parse_key_movement(key_map, keys):
   if key_map['move_left'] in keys:
@@ -16,15 +36,18 @@ def parse_key_movement(key_map, keys):
   else:
     return None
 
-def static(task, drawables, t):
+def static(task: Task, drawables, t):
+  entry_t = task.task_time()
   task.enter_state()
   while task.state_time() < t:
     for stim in drawables:
       stim.draw()
     _ = task.loop()
+  exit_t = task.task_time()
+  return StaticStateResult(entry_t, exit_t)
 
 def interactive_collider(*,
-  task, key_map, move_increment,
+  task: Task, key_map, move_increment,
   always_draw_stimuli, 
   aversive_sound, pleasant_sound,
   play_aversive_sound,
@@ -35,11 +58,17 @@ def interactive_collider(*,
   #
   assert play_aversive_sound in ['always', 'never', 'conditionally']
 
+  implement_move_history = [MovementHistoryRecord(task.task_time(), implement_pos[:], [0, 0])]
   implement_hit_collider = False
+  implement_hit_timestamp = None
+
   collider_did_reach_target = False
+  collider_hit_timestamp = None
 
   implement_stim.setPos(implement_pos)
   collider_stim.setPos(collider_pos)
+
+  entry_time = task.task_time()
 
   task.enter_state()
   while task.state_time() < t:
@@ -61,6 +90,7 @@ def interactive_collider(*,
     if move is not None:
       implement_pos = [x + y * float(move_increment) for x, y in zip(implement_pos, move)]
       implement_stim.setPos(implement_pos)
+      implement_move_history.append(MovementHistoryRecord(task.task_time(), implement_pos[:], move[:]))
 
     ft = max(0., min(1., task.state_time() / t))
     collider_move = collider_movement.tick(res.dt, ft, collider_pos, collider_did_reach_target)
@@ -68,6 +98,7 @@ def interactive_collider(*,
 
     if not collider_did_reach_target and collider_reached_target(collider_pos):
       collider_did_reach_target = True
+      collider_hit_timestamp = task.task_time()
       if play_aversive_sound == 'always' or \
         (play_aversive_sound == 'conditionally' and not implement_hit_collider):
         aversive_sound.play()
@@ -82,8 +113,13 @@ def interactive_collider(*,
     if not collider_did_reach_target and \
       util.bounding_boxes_intersect(collider_bounds, implement_bounds):
       if not implement_hit_collider:
+        implement_hit_timestamp = task.task_time()
         counter_value += 1
         pleasant_sound.play()      
       implement_hit_collider = True
 
-  return InteractStateResult(implement_hit_collider)
+  exit_time = task.task_time()
+  return InteractStateResult(
+    entry_time, exit_time, 
+    implement_move_history, implement_hit_collider, implement_hit_timestamp,
+    collider_did_reach_target, collider_hit_timestamp)

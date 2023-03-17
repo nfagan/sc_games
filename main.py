@@ -8,6 +8,10 @@ from psychopy import visual, core
 import argparse
 import os
 from os import path
+from typing import List
+import dataclasses
+from datetime import datetime
+import json
 
 DEBUG_NUM_TRIALS = 8
 SCREEN_WIDTH = 1440
@@ -99,16 +103,29 @@ def get_counter_stim_text_fn(trial):
   else:
     return lambda count: 'spells cast: {}'.format(count)
   
+def save_data(task, trial_records):
+  if CONTEXT['store_data']:
+    task_data = dataclasses.asdict(data.TaskData(trial_records, task.get_key_events()))
+    if 'trajectories' in CONTEXT:
+      task_data['trajectories'] = CONTEXT['trajectories']
+    
+    filename = '{}.json'.format(datetime.now().strftime('%m_%d_%Y_%H_%M_%S'))
+    filep = os.path.join(os.getcwd(), 'data', filename)
+    with open(filep, 'w') as f:
+      f.write(json.dumps(task_data))
+  
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--difficulty', choices=['easy', 'medium', 'hard', 'extra_hard', 'debug'])
   parser.add_argument('-t', '--task', choices=['egg', 'balloon', 'iceberg'], default='balloon')
   parser.add_argument('-ao', '--avoid_only', action='store_true', default=False)
+  parser.add_argument('-nd', '--no_data', action='store_true', default=False)
   args = parser.parse_args()
 
   TASK_TYPE = args.task
   CONTEXT['difficulty'] = args.difficulty
   CONTEXT['avoid_only'] = args.avoid_only
+  CONTEXT['store_data'] = not args.no_data
 
   num_trials = DEBUG_NUM_TRIALS
   if not args.difficulty == 'debug':
@@ -141,12 +158,15 @@ def main():
   pleasant_sound = util.create_sound(res_path('sounds/magic_sound.wav'))
 
   spells_cast = 0
+  trial_records: List[data.TrialRecord] = []
+
   for trial in range(num_trials):
+    present_result = None
     if not CONTEXT['avoid_only']:
-      states.static(task, [task_stimuli['background0']], t=1)
+      present_result = states.static(task, [task_stimuli['background0']], t=1)
 
     collider_movement = movement_info['get_movement'](trial)
-    
+
     interact_result = states.interactive_collider(
       task=task,
       key_map=KEY_MAP, 
@@ -167,8 +187,11 @@ def main():
       sparkle_stim=sparkle, 
       t=8)
 
+    iti_result = None
     if not CONTEXT['avoid_only']:
-      states.static(task, [iti_background], t=10)
+      iti_result = states.static(task, [iti_background], t=10)
+
+    trial_records.append(data.TrialRecord(present_result, interact_result, iti_result))
 
     if interact_result.implement_hit_collider:
       spells_cast += 1
@@ -176,6 +199,8 @@ def main():
     if task.pending_abort:
       print('Aborting trial sequence.')
       break
+
+  save_data(task, trial_records)
 
   win.close()
   core.quit()
