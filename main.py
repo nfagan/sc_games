@@ -73,7 +73,6 @@ def create_iceberg_stimuli(win):
 
 def gen_keypoints(trial, trajectories):
   if trajectories is not None:
-    import pdb; pdb.set_trace()
     kps = trajectories['points'][trial][:]
   else:
     kp_fns = [trajectory.easy, trajectory.med, trajectory.hard, trajectory.extra_hard]
