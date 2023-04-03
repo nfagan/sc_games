@@ -20,15 +20,21 @@ BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
 FULL_SCREEN = False
 RES_ROOT = path.join(os.getcwd(), 'res')
 KEY_MAP = {
-  'move_left': 'a',
-  'move_right': 'd',
-  'move_down': 's',
-  'move_up': 'w',
+  'move_left': '4',
+  'move_right': '2',
+  'move_down': '3',
+  'move_up': '1',
   'stop': 'escape'
 }
 MOVE_INCR_PX = 80
 TASK_TYPE = 'balloon'
 CONTEXT = {'difficulty': '', 'trajectories': None}
+
+def set_debug_keys():
+  KEY_MAP['move_left'] = 'a'
+  KEY_MAP['move_right'] = 'd'
+  KEY_MAP['move_up'] = 'w'
+  KEY_MAP['move_down'] = 's'
 
 def res_path(p):
   return path.join(RES_ROOT, p)
@@ -65,9 +71,10 @@ def create_iceberg_stimuli(win):
     'collided_stim': util.create_image_stim(win, res_path('images/pop_1.png'))
   }
 
-def gen_keypoints(trial):
-  if CONTEXT['trajectories'] is not None:
-    kps = CONTEXT['trajectories']['points'][trial][:]
+def gen_keypoints(trial, trajectories):
+  if trajectories is not None:
+    import pdb; pdb.set_trace()
+    kps = trajectories['points'][trial][:]
   else:
     kp_fns = [trajectory.easy, trajectory.med, trajectory.hard, trajectory.extra_hard]
     kp_fn = kp_fns[trial % len(kp_fns)]
@@ -75,9 +82,9 @@ def gen_keypoints(trial):
   kps = [[x[0] * SCREEN_WIDTH * 0.5, x[1] * SCREEN_HEIGHT * 0.5] for x in kps]
   return kps
 
-def make_balloon_movement_info(stimuli):
+def make_balloon_movement_info(stimuli, trajectories):
   if True:
-    get_movement = lambda tn: KeypointMovement(gen_keypoints(tn))
+    get_movement = lambda tn: KeypointMovement(gen_keypoints(tn, trajectories))
   else:
     get_movement = lambda tn: ZigMovement(
       data.balloon_position(tn, SCREEN_HEIGHT), data.balloon_velocity(tn), data.balloon_zigs(tn))
@@ -113,35 +120,60 @@ def save_data(task, trial_records):
     filep = os.path.join(os.getcwd(), 'data', filename)
     with open(filep, 'w') as f:
       f.write(json.dumps(task_data))
-  
-def main():
+
+def get_identity_collider_bounds(collider):
+  return collider
+
+def get_balloon_collider_bounds(collider):
+  h = collider[3] - collider[1]
+  w = collider[2] - collider[0]
+  ws = 0.25
+  y1 = collider[1] + h
+  y0 = y1 - h * 0.5
+  x0 = collider[0] + w * 0.5 - w * ws
+  x1 = collider[0] + w * 0.5 + w * ws  
+  return [x0, y0, x1, y1]
+
+def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--difficulty', choices=['easy', 'medium', 'hard', 'extra_hard', 'debug'])
   parser.add_argument('-t', '--task', choices=['egg', 'balloon', 'iceberg'], default='balloon')
   parser.add_argument('-ao', '--avoid_only', action='store_true', default=False)
   parser.add_argument('-nd', '--no_data', action='store_true', default=False)
-  args = parser.parse_args()
+  parser.add_argument('-dt', '--debug_target', action='store_true', default=False)
+  parser.add_argument('-dk', '--debug_keys', action='store_true', default=False)
+  return parser.parse_args()
+  
+def main():
+  args = parse_args()  
 
   TASK_TYPE = args.task
   CONTEXT['difficulty'] = args.difficulty
   CONTEXT['avoid_only'] = args.avoid_only
   CONTEXT['store_data'] = not args.no_data
 
+  if args.debug_keys:
+    set_debug_keys()
+
   num_trials = DEBUG_NUM_TRIALS
+  trajectories = None
   if not args.difficulty == 'debug':
-    CONTEXT['trajectories'] = data.load_trajectories(args.difficulty)
-    num_trials = len(CONTEXT['trajectories']['signs'])
+    trajectories = data.load_trajectories(args.difficulty)
+    num_trials = len(trajectories['signs'])
+    CONTEXT['trajectories'] = trajectories
 
   win = create_window()
   task = Task(win, lambda loop_res: KEY_MAP['stop'] in loop_res.keys)
 
+  get_collider_bounds = get_identity_collider_bounds
   if TASK_TYPE == 'egg':
     task_stimuli = create_egg_stimuli(win)
     movement_info = make_egg_movement_info(task_stimuli)
 
   elif TASK_TYPE == 'balloon':
     task_stimuli = create_balloon_stimuli(win)
-    movement_info = make_balloon_movement_info(task_stimuli)
+    movement_info = make_balloon_movement_info(task_stimuli, trajectories)
+    get_collider_bounds = get_balloon_collider_bounds
 
   else:
     task_stimuli = create_iceberg_stimuli(win)
@@ -150,9 +182,10 @@ def main():
   wand = util.create_image_stim(win, res_path('images/magic_wand.png'))
   sparkle = util.create_image_stim(win, res_path('images/magic_effect.png'))
   iti_background = create_fullscreen_image_stim(win, res_path('images/iti_background.jpg'))
+  debug_collider_bounds_stim = util.create_rect_stim(win) if args.debug_target else None
 
-  counter_stim = util.create_text_stim(win, 'spells cast: 0')
-  counter_stim.setPos([-SCREEN_WIDTH * 0.5 + 100, SCREEN_HEIGHT * 0.5 - 100])
+  counter_stim = util.create_text_stim(win, 'spells cast: 0', height=32.0)
+  counter_stim.setPos([SCREEN_WIDTH * 0.5 - 150, SCREEN_HEIGHT * 0.5 - 75])
 
   aversive_sound = util.create_sound(res_path('sounds/balloon_pop.wav'))
   pleasant_sound = util.create_sound(res_path('sounds/magic_sound.wav'))
@@ -185,6 +218,8 @@ def main():
       collider_movement=collider_movement, 
       collider_reached_target=movement_info['reached_target'],
       sparkle_stim=sparkle, 
+      get_collider_bounds=get_collider_bounds, 
+      debug_collider_bounds_stim=debug_collider_bounds_stim,
       t=8)
 
     iti_result = None

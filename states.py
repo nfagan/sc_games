@@ -46,6 +46,14 @@ def static(task: Task, drawables, t):
   exit_t = task.task_time()
   return StaticStateResult(entry_t, exit_t)
 
+def _draw_debug_collider_bounds_stim(stim, bounds):
+  stim.width = bounds[2] - bounds[0]
+  stim.height = bounds[3] - bounds[1]
+  x = bounds[0] + stim.width * 0.5
+  y = bounds[1] + stim.height * 0.5
+  stim.setPos([x, y])
+  stim.draw()
+
 def interactive_collider(*,
   task: Task, key_map, move_increment,
   always_draw_stimuli, 
@@ -54,6 +62,7 @@ def interactive_collider(*,
   counter_stim, get_counter_stim_text, counter_value,
   implement_stim, implement_pos, 
   collider_stim, collided_stim, collider_pos, collider_movement, collider_reached_target, 
+  get_collider_bounds, debug_collider_bounds_stim,
   sparkle_stim, t):
   #
   assert play_aversive_sound in ['always', 'never', 'conditionally']
@@ -69,6 +78,7 @@ def interactive_collider(*,
   collider_stim.setPos(collider_pos)
 
   entry_time = task.task_time()
+  collider_bounds = None
 
   task.enter_state()
   while task.state_time() < t:
@@ -84,6 +94,9 @@ def interactive_collider(*,
       collided_stim.draw()
     else:
       collider_stim.draw()
+
+    if debug_collider_bounds_stim is not None and collider_bounds is not None:
+      _draw_debug_collider_bounds_stim(debug_collider_bounds_stim, collider_bounds)
 
     res = task.loop()
     move = parse_key_movement(key_map, res.keys)
@@ -107,11 +120,12 @@ def interactive_collider(*,
     sparkle_stim.setPos(collider_pos)
     collided_stim.setPos(collider_pos)
 
-    collider_bounds = util.stimulus_bounding_box(collider_stim)
+    collider_bounds = get_collider_bounds(util.stimulus_bounding_box(collider_stim))
     implement_bounds = util.stimulus_bounding_box(implement_stim)
 
     if not collider_did_reach_target and \
       util.bounding_boxes_intersect(collider_bounds, implement_bounds):
+      #
       if not implement_hit_collider:
         implement_hit_timestamp = task.task_time()
         counter_value += 1

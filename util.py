@@ -26,8 +26,8 @@ def bounding_boxes_intersect(r0, r1):
     return False
   return True
 
-def create_text_stim(win, text):
-  return visual.TextStim(win, text)
+def create_text_stim(win, text, **kwargs):
+  return visual.TextStim(win, text, **kwargs)
 
 def create_image_stim(win, file_path, width=None, height=None):
   stim = visual.ImageStim(
