@@ -1,12 +1,6 @@
+from common_types import KeyEvent
 from psychopy import event
 import time
-from typing import List
-from dataclasses import dataclass
-
-@dataclass
-class KeyEvent(object):
-  timestamp: float
-  keys: List[str]
 
 class TaskLoopResult(object):
   def __init__(self, keys, dt):

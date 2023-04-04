@@ -38,8 +38,8 @@ def create_image_stim(win, file_path, width=None, height=None):
     stim.height = height
   return stim
 
-def create_rect_stim(win):
-  return visual.Rect(win, pos=[0, 0], width=64, height=64, units='pix', fillColor=[255, 0, 0])
+def create_rect_stim(win, width=64, height=64, fill=[255, 0, 0]):
+  return visual.Rect(win, pos=[0, 0], width=width, height=height, units='pix', fillColor=fill)
 
 def create_sound(file_path):
   return sound.Sound(file_path, secs=-1, volume=1.0)

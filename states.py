@@ -1,28 +1,7 @@
 import util
 from task import Task
-from dataclasses import dataclass
+from common_types import YokeRecord, MovementHistoryRecord, InteractStateResult, StaticStateResult
 from typing import Optional, List
-
-@dataclass
-class MovementHistoryRecord(object):
-  timestamp: float
-  point: List[float]
-  movement: List[int]
-
-@dataclass
-class InteractStateResult(object):
-  entered_timestamp: float
-  exited_timestamp: float
-  implement_movements: List[MovementHistoryRecord]
-  implement_hit_collider: bool
-  implement_hit_timestamp: Optional[float]
-  collider_did_reach_target: bool
-  collider_hit_timestamp: Optional[float]
-
-@dataclass
-class StaticStateResult(object):
-  entered_timestamp: float
-  exited_timestamp: float
 
 def parse_key_movement(key_map, keys):
   if key_map['move_left'] in keys:
@@ -63,9 +42,12 @@ def interactive_collider(*,
   implement_stim, implement_pos, 
   collider_stim, collided_stim, collider_pos, collider_movement, collider_reached_target, 
   get_collider_bounds, debug_collider_bounds_stim,
-  sparkle_stim, t):
+  sparkle_stim, t, yoke_to: Optional[YokeRecord]):
   #
   assert play_aversive_sound in ['always', 'never', 'conditionally']
+
+  is_yoked = yoke_to is not None
+  is_yoked_implement_hit_collider = is_yoked and yoke_to.implement_hit
 
   implement_move_history = [MovementHistoryRecord(task.task_time(), implement_pos[:], [0, 0])]
   implement_hit_collider = False
@@ -100,18 +82,29 @@ def interactive_collider(*,
 
     res = task.loop()
     move = parse_key_movement(key_map, res.keys)
+
     if move is not None:
       implement_pos = [x + y * float(move_increment) for x, y in zip(implement_pos, move)]
       implement_stim.setPos(implement_pos)
-      implement_move_history.append(MovementHistoryRecord(task.task_time(), implement_pos[:], move[:]))
+      implement_move_history.append(
+        MovementHistoryRecord(task.task_time(), implement_pos[:], move[:]))
 
-    ft = max(0., min(1., task.state_time() / t))
-    collider_move = collider_movement.tick(res.dt, ft, collider_pos, collider_did_reach_target)
-    collider_pos = [x + y for x, y in zip(collider_pos, collider_move)]
+    if not collider_did_reach_target:
+      ft = max(0., min(1., task.state_time() / t))
+      collider_move = collider_movement.tick(res.dt, ft, collider_pos, collider_did_reach_target)
+      collider_pos = [x + y for x, y in zip(collider_pos, collider_move)]
 
+    # Check for collision between collider and its target (e.g., top of screen in balloon task).
+    evaluate_collider_hit = False
     if not collider_did_reach_target and collider_reached_target(collider_pos):
+      if not is_yoked or (is_yoked and not is_yoked_implement_hit_collider):
+        evaluate_collider_hit = True
+
+    # Just hit the target, determine whether to play the aversive sound.
+    if evaluate_collider_hit:
       collider_did_reach_target = True
       collider_hit_timestamp = task.task_time()
+
       if play_aversive_sound == 'always' or \
         (play_aversive_sound == 'conditionally' and not implement_hit_collider):
         aversive_sound.play()
@@ -123,13 +116,20 @@ def interactive_collider(*,
     collider_bounds = get_collider_bounds(util.stimulus_bounding_box(collider_stim))
     implement_bounds = util.stimulus_bounding_box(implement_stim)
 
-    if not collider_did_reach_target and \
-      util.bounding_boxes_intersect(collider_bounds, implement_bounds):
-      #
-      if not implement_hit_collider:
-        implement_hit_timestamp = task.task_time()
-        counter_value += 1
-        pleasant_sound.play()      
+    # Check whether the implement has struck its target (e.g., check whether the wand has struck 
+    # the balloon in the balloon task)
+    evaluate_implement_hit = False
+    if (not collider_did_reach_target) and (not implement_hit_collider):
+      if is_yoked:
+        if is_yoked_implement_hit_collider and task.state_time() >= yoke_to.timestamp:
+          evaluate_implement_hit = True
+      elif util.bounding_boxes_intersect(collider_bounds, implement_bounds):
+        evaluate_implement_hit = True
+    
+    if evaluate_implement_hit:
+      implement_hit_timestamp = task.task_time()
+      counter_value += 1
+      pleasant_sound.play()
       implement_hit_collider = True
 
   exit_time = task.task_time()

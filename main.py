@@ -1,4 +1,5 @@
 from task import Task
+from common_types import TaskData, TrialRecord
 import states
 import util
 import data
@@ -111,7 +112,7 @@ def get_counter_stim_text_fn(trial):
   
 def save_data(task, trial_records):
   if CONTEXT['store_data']:
-    task_data = dataclasses.asdict(data.TaskData(trial_records, task.get_key_events()))
+    task_data = dataclasses.asdict(TaskData(trial_records, task.get_key_events()))
     if 'trajectories' in CONTEXT:
       task_data['trajectories'] = CONTEXT['trajectories']
     
@@ -133,6 +134,14 @@ def get_balloon_collider_bounds(collider):
   x1 = collider[0] + w * 0.5 + w * ws  
   return [x0, y0, x1, y1]
 
+def load_yoke_file(yf: str):
+  if yf.endswith('.pickle'):
+    with open(yf, 'rb') as f:
+      return data.decode_pickled_yoke_file(f)
+  else:
+    with open(yf, 'rt') as f:
+      return data.decode_json_yoke_file_source(f.read())
+
 def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--difficulty', choices=['easy', 'medium', 'hard', 'extra_hard', 'debug'])
@@ -141,6 +150,7 @@ def parse_args():
   parser.add_argument('-nd', '--no_data', action='store_true', default=False)
   parser.add_argument('-dt', '--debug_target', action='store_true', default=False)
   parser.add_argument('-dk', '--debug_keys', action='store_true', default=False)
+  parser.add_argument('-yf', '--yoke_file')
   return parser.parse_args()
   
 def main():
@@ -154,11 +164,20 @@ def main():
   if args.debug_keys:
     set_debug_keys()
 
+  max_num_trials = int(1e6)
   num_trials = DEBUG_NUM_TRIALS
   trajectories = None
+
+  # Optionally load a prior participant's results to yoke-to.
+  yoke_to = None
+  if args.yoke_file is not None:
+    yoke_to = load_yoke_file(args.yoke_file)
+    max_num_trials = len(yoke_to)
+
+  # Load the predefined trajectories for this run corresponding to the specified difficulty.
   if not args.difficulty == 'debug':
     trajectories = data.load_trajectories(args.difficulty)
-    num_trials = len(trajectories['signs'])
+    num_trials = min(max_num_trials, len(trajectories['signs']))
     CONTEXT['trajectories'] = trajectories
 
   win = create_window()
@@ -185,6 +204,8 @@ def main():
 
   counter_stim = util.create_text_stim(win, 'spells cast: 0', height=32.0)
   counter_stim.setPos([SCREEN_WIDTH * 0.5 - 150, SCREEN_HEIGHT * 0.5 - 75])
+  counter_background = util.create_rect_stim(win, width=195., height=48., fill=[0, 0, 0])
+  counter_background.setPos(counter_stim.pos[:])
 
   aversive_sound = util.create_sound(res_path('sounds/balloon_pop.wav'))
   pleasant_sound = util.create_sound(res_path('sounds/magic_sound.wav'))
@@ -198,12 +219,13 @@ def main():
       present_result = states.static(task, [task_stimuli['background0']], t=1)
 
     collider_movement = movement_info['get_movement'](trial)
+    yoke_trial = None if yoke_to is None else yoke_to[trial]
 
     interact_result = states.interactive_collider(
       task=task,
       key_map=KEY_MAP, 
       move_increment=MOVE_INCR_PX,
-      always_draw_stimuli=[task_stimuli['background1'], wand, counter_stim],
+      always_draw_stimuli=[task_stimuli['background1'], wand, counter_background, counter_stim],
       aversive_sound=aversive_sound,
       pleasant_sound=pleasant_sound,
       play_aversive_sound='conditionally',
@@ -219,13 +241,14 @@ def main():
       sparkle_stim=sparkle, 
       get_collider_bounds=get_collider_bounds, 
       debug_collider_bounds_stim=debug_collider_bounds_stim,
+      yoke_to=yoke_trial,
       t=8)
 
     iti_result = None
     if not CONTEXT['avoid_only']:
       iti_result = states.static(task, [iti_background], t=10)
 
-    trial_records.append(data.TrialRecord(present_result, interact_result, iti_result))
+    trial_records.append(TrialRecord(present_result, interact_result, iti_result))
 
     if interact_result.implement_hit_collider:
       spells_cast += 1

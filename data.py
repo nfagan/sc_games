@@ -1,22 +1,11 @@
-from states import MovementHistoryRecord, InteractStateResult, StaticStateResult
-from task import KeyEvent
+from common_types import YokeRecord
 import random
 import os
 import json
 import numpy as np
-from dataclasses import dataclass
+import math
+import pickle
 from typing import List, Optional
-
-@dataclass
-class TrialRecord(object):
-  present_background: Optional[StaticStateResult]
-  interact: Optional[InteractStateResult]
-  iti: Optional[StaticStateResult]
-
-@dataclass
-class TaskData(object):
-  trials: List[TrialRecord]
-  events: List[KeyEvent]
 
 balloon_Y_start = 0
 balloon_Y_speed = 6
@@ -146,3 +135,25 @@ def load_trajectories(kind):
   with open(data_p, 'r') as f:
     s = f.read()
   return json.loads(s)
+
+def decode_pickled_yoke_file(b: bytes) -> List[YokeRecord]:
+  y = pickle.load(b)
+  k = [*sorted([*y.keys()])]
+  res = []
+  for i in k:
+    ts = y[i]
+    if ts is None:
+      res.append(YokeRecord(False, None))
+    else:
+      res.append(YokeRecord(True, ts))
+  return res
+
+def decode_json_yoke_file_source(s: str) -> List[YokeRecord]:
+  y = json.loads(s)
+  assert isinstance(y, list)
+  res = []
+  for entry in y:
+    ts = entry['timestamp']
+    ts = None if math.isnan(ts) else ts
+    res.append(YokeRecord(entry['implement_hit'], ts))
+  return res
