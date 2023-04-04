@@ -49,11 +49,12 @@ def create_fullscreen_image_stim(win, p):
   return util.create_image_stim(win, p, width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
 
 def create_balloon_stimuli(win):
+  string_suffix = '_no_string'
   return {
     'background0': create_fullscreen_image_stim(win, res_path('images/Balloon_anticipatory_background.jpg')),
     'background1': create_fullscreen_image_stim(win, res_path('images/Balloon_avoidance_background.jpg')),
-    'collider_stim': util.create_image_stim(win, res_path('images/pink_balloon.png')),
-    'collided_stim': util.create_image_stim(win, res_path('images/pop_1.png'))
+    'collider_stim': util.create_image_stim(win, res_path('images/pink_balloon{}.png'.format(string_suffix))),
+    'collided_stim': util.create_image_stim(win, res_path('images/pop_1{}.png'.format(string_suffix)))
   }
 
 def create_egg_stimuli(win):
@@ -204,7 +205,8 @@ def main():
 
   counter_stim = util.create_text_stim(win, 'spells cast: 0', height=32.0)
   counter_stim.setPos([SCREEN_WIDTH * 0.5 - 150, SCREEN_HEIGHT * 0.5 - 75])
-  counter_background = util.create_rect_stim(win, width=195., height=48., fill=[0, 0, 0])
+  counter_background = util.create_rect_stim(win, width=195., height=48.)
+  counter_background.setColor((0, 0, 0), 'rgb255')
   counter_background.setPos(counter_stim.pos[:])
 
   aversive_sound = util.create_sound(res_path('sounds/balloon_pop.wav'))
