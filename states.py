@@ -63,6 +63,8 @@ def interactive_collider(*,
   entry_time = task.task_time()
   collider_bounds = None
 
+  event_handler('avoidance_onset', entry_time)
+
   task.enter_state()
   while task.state_time() < t:
     counter_stim.text = get_counter_stim_text(counter_value)
