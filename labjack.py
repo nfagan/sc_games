@@ -5,7 +5,7 @@ import time
 from typing import Dict
 
 HAS_U3 = True
-LOCAL_U3 = True
+LOCAL_U3 = False
 DEBUG_U3 = True
 
 if HAS_U3:
