@@ -2,3 +2,4 @@ __pycache__/
 *.DS_Store
 data/*.json
 data/yoke/*.json
+run.sh

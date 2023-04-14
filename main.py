@@ -114,8 +114,9 @@ def get_counter_stim_text_fn(trial):
 def save_data(task, trial_records):
   if CONTEXT['store_data']:
     task_data = dataclasses.asdict(TaskData(trial_records, task.get_key_events()))
-    if 'trajectories' in CONTEXT:
-      task_data['trajectories'] = CONTEXT['trajectories']
+    opt_args = ['trajectories', 'participant_id', 'yoke_file']
+    for arg in opt_args:
+      task_data[arg] = CONTEXT[arg] if arg in CONTEXT else None
     
     filename = '{}.json'.format(datetime.now().strftime('%m_%d_%Y_%H_%M_%S'))
     filep = os.path.join(os.getcwd(), 'data', filename)
@@ -152,6 +153,7 @@ def parse_args():
   parser.add_argument('-dt', '--debug_target', action='store_true', default=False)
   parser.add_argument('-dk', '--debug_keys', action='store_true', default=False)
   parser.add_argument('-yf', '--yoke_file')
+  parser.add_argument('-pid', '--participant_id')
   return parser.parse_args()
   
 def main():
@@ -161,6 +163,8 @@ def main():
   CONTEXT['difficulty'] = args.difficulty
   CONTEXT['avoid_only'] = args.avoid_only
   CONTEXT['store_data'] = not args.no_data
+  CONTEXT['participant_id'] = args.participant_id
+  CONTEXT['yoke_file'] = args.yoke_file
 
   if args.debug_keys:
     set_debug_keys()
