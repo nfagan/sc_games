@@ -1,7 +1,7 @@
 import util
 from task import Task
 from common_types import YokeRecord, MovementHistoryRecord, InteractStateResult, StaticStateResult
-from typing import Optional, List
+from typing import Optional, List, Callable
 
 def parse_key_movement(key_map, keys):
   if key_map['move_left'] in keys:
@@ -42,6 +42,7 @@ def interactive_collider(*,
   implement_stim, implement_pos, 
   collider_stim, collided_stim, collider_pos, collider_movement, collider_reached_target, 
   get_collider_bounds, debug_collider_bounds_stim,
+  event_handler: Callable[[str, float], None],
   sparkle_stim, t, yoke_to: Optional[YokeRecord]):
   #
   assert play_aversive_sound in ['always', 'never', 'conditionally']
@@ -108,6 +109,9 @@ def interactive_collider(*,
       if play_aversive_sound == 'always' or \
         (play_aversive_sound == 'conditionally' and not implement_hit_collider):
         aversive_sound.play()
+        event_handler('aversive_sound', collider_hit_timestamp)
+      else:
+        event_handler('no_aversive_sound', collider_hit_timestamp)
 
     collider_stim.setPos(collider_pos)
     sparkle_stim.setPos(collider_pos)
@@ -128,6 +132,7 @@ def interactive_collider(*,
     
     if evaluate_implement_hit:
       implement_hit_timestamp = task.task_time()
+      event_handler('first_contact', implement_hit_timestamp)
       counter_value += 1
       pleasant_sound.play()
       implement_hit_collider = True

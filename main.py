@@ -4,6 +4,7 @@ import states
 import util
 import data
 import trajectory
+from labjack import LabJack
 from movement import ZigMovement, KeypointMovement
 from psychopy import visual, core
 import argparse
@@ -111,6 +112,9 @@ def get_counter_stim_text_fn(trial):
   else:
     return lambda count: 'spells cast: {}'.format(count)
   
+def str_timestamp():
+  return datetime.now().strftime('%m_%d_%Y_%H_%M_%S')
+  
 def save_data(task, trial_records):
   if CONTEXT['store_data']:
     task_data = dataclasses.asdict(TaskData(trial_records, task.get_key_events()))
@@ -118,7 +122,7 @@ def save_data(task, trial_records):
     for arg in opt_args:
       task_data[arg] = CONTEXT[arg] if arg in CONTEXT else None
     
-    filename = '{}.json'.format(datetime.now().strftime('%m_%d_%Y_%H_%M_%S'))
+    filename = '{}.json'.format(str_timestamp())
     filep = os.path.join(os.getcwd(), 'data', filename)
     with open(filep, 'w') as f:
       f.write(json.dumps(task_data))
@@ -143,6 +147,12 @@ def load_yoke_file(yf: str):
   else:
     with open(yf, 'rt') as f:
       return data.decode_json_yoke_file_source(f.read())
+    
+def create_labjack(enable: bool) -> LabJack:
+  log_file_p = os.path.join(os.getcwd(), 'data/log/log-{}.txt'.format(str_timestamp()))
+  labjack_events = {"avoidance_onset": 4, "first_contact": 5, "aversive_sound": 6, "no_aversive_sound": 7, "target_frozen": 7}
+  labjack_impl = LabJack(enable=enable, events=labjack_events, log_file_path=log_file_p)
+  return labjack_impl
 
 def parse_args():
   parser = argparse.ArgumentParser()
@@ -154,6 +164,7 @@ def parse_args():
   parser.add_argument('-dk', '--debug_keys', action='store_true', default=False)
   parser.add_argument('-yf', '--yoke_file')
   parser.add_argument('-pid', '--participant_id')
+  parser.add_argument('-nlj', '--no_labjack', action='store_true', default=False)
   return parser.parse_args()
   
 def main():
@@ -168,6 +179,9 @@ def main():
 
   if args.debug_keys:
     set_debug_keys()
+
+  labjack = create_labjack(not args.no_labjack)
+  labjack_event_handler = lambda identifier, time: labjack.send_event(identifier, time)
 
   max_num_trials = int(1e6)
   num_trials = DEBUG_NUM_TRIALS
@@ -248,6 +262,7 @@ def main():
       get_collider_bounds=get_collider_bounds, 
       debug_collider_bounds_stim=debug_collider_bounds_stim,
       yoke_to=yoke_trial,
+      event_handler=labjack_event_handler,
       t=8)
 
     iti_result = None
@@ -263,6 +278,7 @@ def main():
       print('Aborting trial sequence.')
       break
 
+  labjack.shutdown()
   save_data(task, trial_records)
 
   win.close()

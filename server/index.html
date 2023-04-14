@@ -49,6 +49,18 @@
         </div>
       </fieldset>
 
+      <fieldset id="labjack_input">
+        <legend>labjack:</legend>
+        <div>
+          <input type="radio" id="labjack_disabled" name="labjack_enabled" value="disabled" checked>
+          <label for="labjack_disabled">disabled</label>
+        </div>
+        <div>
+          <input type="radio" id="labjack_enabled" name="labjack_enabled" value="enabled">
+          <label for="labjack_enabled">enabled</label>
+        </div>
+      </fieldset>
+
       <fieldset id="debug_input">
         <legend>debug:</legend>
         <div>
@@ -70,6 +82,7 @@
             'yoking': get_yoking_info(),
             'debug': get_debug_info(),
             'participant': get_participant_info(),
+            'labjack': get_labjack_info()
           }
         }
 
@@ -101,6 +114,13 @@
             }
           }
           return 'easy';
+        }
+
+        function get_labjack_info() {
+          const lj_enabled = document.getElementById('labjack_enabled').checked; 
+          return {
+            'enabled': lj_enabled
+          }
         }
 
         const upload_button = document.getElementById('upload_button');

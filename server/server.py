@@ -16,6 +16,9 @@ def gen_run_command(response):
   if response['debug']['enabled']:
     cmd = '{} --debug_keys'.format(cmd)
 
+  if not response['labjack']['enabled']:
+    cmd = '{} --no_labjack'.format(cmd)
+
   with open(os.path.join(os.getcwd(), '../run.sh'), 'w') as f:
     f.write(cmd)
 

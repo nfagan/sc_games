@@ -1,5 +1,6 @@
 __pycache__/
 *.DS_Store
 data/*.json
+data/log/*.txt
 data/yoke/*.json
 run.sh
