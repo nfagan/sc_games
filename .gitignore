@@ -3,4 +3,5 @@ __pycache__/
 data/*.json
 data/log/*.txt
 data/yoke/*.json
+data/original_format/*.txt
 run.sh

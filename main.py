@@ -253,7 +253,7 @@ def main():
   trial_records: List[data.TrialRecord] = []
 
   for trial in range(num_trials):
-    task.wait_for_mri_tr()
+    task.wait_for_mri_tr(task.task_time())  # wait for next TR
 
     present_result = None
     if not CONTEXT['avoid_only']:

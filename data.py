@@ -247,7 +247,7 @@ def convert_trial_data_to_original_data_structure(
 
     tr = None
     for i in range(len(trs)):
-      if timestamp >= trs[i]:
+      if timestamp >= trs[i]['timestamp']:
         tr = trs[i]['index']
     if tr is not None:
       row['last_tr_num'] = tr

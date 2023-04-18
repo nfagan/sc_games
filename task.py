@@ -32,8 +32,8 @@ class Task(object):
   def task_time(self):
     return time.time() - self.task_t0
   
-  def wait_for_mri_tr(self):
-    self.mri_interface.wait_for_new_tr(lambda: self.loop())
+  def wait_for_mri_tr(self, ts: float):
+    self.mri_interface.wait_for_new_tr(lambda: self.loop(), ts)
 
   def get_mri_trs(self):
     return self.mri_interface.get_trs()

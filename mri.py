@@ -28,9 +28,11 @@ class MRIInterface(object):
   def get_trs(self) -> List[MRI_TR]:
     return [*map(lambda rec: dataclasses.asdict(rec), self.trs)]
 
-  def wait_for_new_tr(self, wait_cb):
+  def wait_for_new_tr(self, wait_cb, ts: float):
     if not self.enabled:
       return
 
-    while not self.check_for_new_tr():
+    while True:
+      if self.check_for_new_tr() and self.trs[-1].timestamp > ts:
+        break
       wait_cb()
