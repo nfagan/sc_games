@@ -1,4 +1,5 @@
 from common_types import KeyEvent
+from mri import MRIInterface
 from psychopy import event
 import time
 
@@ -8,7 +9,7 @@ class TaskLoopResult(object):
     self.dt = dt
 
 class Task(object):
-  def __init__(self, window, abort_crit):
+  def __init__(self, *, window, abort_crit, mri_interface: MRIInterface):
     self.window = window
     self.state_t0 = 0
     self.task_t0 = time.time()
@@ -16,6 +17,7 @@ class Task(object):
     self.abort_crit = abort_crit
     self.pending_abort = False
     self.key_events = []
+    self.mri_interface = mri_interface
 
   def get_key_events(self):
     return self.key_events[:]
@@ -29,6 +31,12 @@ class Task(object):
   
   def task_time(self):
     return time.time() - self.task_t0
+  
+  def wait_for_mri_tr(self):
+    self.mri_interface.wait_for_new_tr(lambda: self.loop())
+
+  def get_mri_trs(self):
+    return self.mri_interface.get_trs()
 
   def loop(self):
     curr_t = time.time()
@@ -42,7 +50,9 @@ class Task(object):
     loop_res = TaskLoopResult(keys, dt)
 
     if len(keys) > 0:
-      self.key_events.append(KeyEvent(self.task_time(), keys[:]))
+      t = self.task_time()
+      self.mri_interface.listen_for_tr(keys, t)
+      self.key_events.append(KeyEvent(t, keys[:]))
 
     if self.abort_crit(loop_res):
       self.pending_abort = True

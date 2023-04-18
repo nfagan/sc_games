@@ -5,6 +5,7 @@ import util
 import data
 import trajectory
 from labjack import LabJack
+from mri import MRIInterface
 from movement import ZigMovement, KeypointMovement
 from psychopy import visual, core
 import argparse
@@ -115,17 +116,26 @@ def get_counter_stim_text_fn(trial):
 def str_timestamp():
   return datetime.now().strftime('%m_%d_%Y_%H_%M_%S')
   
-def save_data(task, trial_records):
-  if CONTEXT['store_data']:
-    task_data = dataclasses.asdict(TaskData(trial_records, task.get_key_events()))
-    opt_args = ['trajectories', 'participant_id', 'yoke_file']
-    for arg in opt_args:
-      task_data[arg] = CONTEXT[arg] if arg in CONTEXT else None
-    
-    filename = '{}.json'.format(str_timestamp())
-    filep = os.path.join(os.getcwd(), 'data', filename)
-    with open(filep, 'w') as f:
-      f.write(json.dumps(task_data))
+def save_data(task: Task, trial_records):
+  if not CONTEXT['store_data']:
+    return
+  
+  task_data = dataclasses.asdict(TaskData(trial_records, task.get_key_events()))
+  opt_args = ['trajectories', 'participant_id', 'yoke_file']
+  for arg in opt_args:
+    task_data[arg] = CONTEXT[arg] if arg in CONTEXT else None
+
+  task_data['mri_trs'] = task.get_mri_trs()
+  
+  filename = '{}.json'.format(str_timestamp())
+  filep = os.path.join(os.getcwd(), 'data', filename)
+  with open(filep, 'w') as f:
+    f.write(json.dumps(task_data))
+
+  orig_data = data.convert_json_trial_data_to_original_data_structure(task_data, True)
+  orig_filep = os.path.join(os.getcwd(), 'data', 'original_format', filename.replace('.json', '.txt'))
+  with open(orig_filep, 'w') as f:
+    f.write(orig_data)
 
 def get_identity_collider_bounds(collider):
   return collider
@@ -154,6 +164,9 @@ def create_labjack(enable: bool) -> LabJack:
   labjack_impl = LabJack(enable=enable, events=labjack_events, log_file_path=log_file_p)
   return labjack_impl
 
+def create_mri_interface(enable: bool) -> MRIInterface:
+  return MRIInterface(enable)
+
 def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--difficulty', choices=['easy', 'medium', 'hard', 'extra_hard', 'debug'])
@@ -165,10 +178,11 @@ def parse_args():
   parser.add_argument('-yf', '--yoke_file')
   parser.add_argument('-pid', '--participant_id')
   parser.add_argument('-nlj', '--no_labjack', action='store_true', default=False)
+  parser.add_argument('-mri', '--mri', action='store_true', default=False)
   return parser.parse_args()
   
 def main():
-  args = parse_args()  
+  args = parse_args()
 
   TASK_TYPE = args.task
   CONTEXT['difficulty'] = args.difficulty
@@ -182,6 +196,8 @@ def main():
 
   labjack = create_labjack(not args.no_labjack)
   labjack_event_handler = lambda identifier, time: labjack.send_event(identifier, time)
+
+  mri_interface = create_mri_interface(args.mri)
 
   max_num_trials = int(1e6)
   num_trials = DEBUG_NUM_TRIALS
@@ -200,7 +216,10 @@ def main():
     CONTEXT['trajectories'] = trajectories
 
   win = create_window()
-  task = Task(win, lambda loop_res: KEY_MAP['stop'] in loop_res.keys)
+  task = Task(
+    window=win, 
+    abort_crit=lambda loop_res: KEY_MAP['stop'] in loop_res.keys,
+    mri_interface=mri_interface)
 
   get_collider_bounds = get_identity_collider_bounds
   if TASK_TYPE == 'egg':
@@ -234,11 +253,15 @@ def main():
   trial_records: List[data.TrialRecord] = []
 
   for trial in range(num_trials):
+    task.wait_for_mri_tr()
+
     present_result = None
     if not CONTEXT['avoid_only']:
       present_result = states.static(task, [task_stimuli['background0']], t=1)
 
     collider_movement = movement_info['get_movement'](trial)
+    collider_movement.reset()
+
     yoke_trial = None if yoke_to is None else yoke_to[trial]
 
     interact_result = states.interactive_collider(

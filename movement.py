@@ -11,6 +11,9 @@ class TargetMovement(object):
   
   def initial_position(self):
     raise NotImplementedError
+  
+  def reset(self):
+    pass
 
 class FixedDirectionMovement(TargetMovement):
   def __init__(self, vel) -> None:
@@ -19,8 +22,8 @@ class FixedDirectionMovement(TargetMovement):
 
   def tick(self, dt, ft, pos, reached_target):
     if reached_target:
-      return [0, 0]
-    return [x * dt for x in self.vel]
+      return [0, 0], False
+    return [x * dt for x in self.vel], False
   
 class KeypointMovement(TargetMovement):
   def __init__(self, kps: List[Tuple[float, float]]) -> None:
@@ -28,10 +31,14 @@ class KeypointMovement(TargetMovement):
     self.points = kps
     self.t = 0
     self.speed = 2.
+    self.last_p0 = 0
+
+  def reset(self):
+    self.last_p0 = 0
 
   def tick(self, dt, ft, pos, reached_target):
     if reached_target:
-      return [0, 0]
+      return [0, 0], False
 
     # self.t = max(0., min(1., self.t + dt * self.speed))
     self.t = max(0., min(1., ft * self.speed))
@@ -43,7 +50,11 @@ class KeypointMovement(TargetMovement):
     p1 = np.array(self.points[kp1])
     target_p = (p1 - p0) * kpt + p0
     vel = target_p - np.array(pos)
-    return [v for v in vel]
+
+    is_new = kp0 != self.last_p0
+    self.last_p0 = kp0
+
+    return [v for v in vel], is_new
   
   def initial_position(self):
     assert len(self.points) > 0
@@ -61,11 +72,13 @@ class ZigMovement(TargetMovement):
   
   def tick(self, dt, ft, pos, reached_target):
     if reached_target:
-      return [0, 0]
+      return [0, 0], False
+    is_new = False
     if len(self.zigs) > 0:
       zig_line_position = self.zigs[0]
       # if within 6 pixels of zigzag line, x-speed reverses (+/- 6 means condition always triggers since max speed is 9)
       if abs(pos[0] - zig_line_position) < 6:
         self.vel = (-self.vel[0], self.vel[1])
         self.zigs.pop(0)
-    return self.vel[:]
+        is_new = True
+    return self.vel[:], is_new

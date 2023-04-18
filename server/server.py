@@ -19,6 +19,9 @@ def gen_run_command(response):
   if not response['labjack']['enabled']:
     cmd = '{} --no_labjack'.format(cmd)
 
+  if response['mri']['enabled']:
+    cmd = '{} --mri'.format(cmd)
+
   with open(os.path.join(os.getcwd(), '../run.sh'), 'w') as f:
     f.write(cmd)
 

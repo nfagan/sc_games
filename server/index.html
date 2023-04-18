@@ -61,6 +61,18 @@
         </div>
       </fieldset>
 
+      <fieldset id="mri_input">
+        <legend>mri:</legend>
+        <div>
+          <input type="radio" id="mri_disabled" name="mri_enabled" value="disabled" checked>
+          <label for="mri_disabled">disabled</label>
+        </div>
+        <div>
+          <input type="radio" id="mri_enabled" name="mri_enabled" value="enabled">
+          <label for="mri_enabled">enabled</label>
+        </div>
+      </fieldset>
+
       <fieldset id="debug_input">
         <legend>debug:</legend>
         <div>
@@ -82,7 +94,8 @@
             'yoking': get_yoking_info(),
             'debug': get_debug_info(),
             'participant': get_participant_info(),
-            'labjack': get_labjack_info()
+            'labjack': get_labjack_info(),
+            'mri': get_mri_info(),
           }
         }
 
@@ -120,6 +133,13 @@
           const lj_enabled = document.getElementById('labjack_enabled').checked; 
           return {
             'enabled': lj_enabled
+          }
+        }
+
+        function get_mri_info() {
+          const mri_enabled = document.getElementById('mri_enabled').checked; 
+          return {
+            'enabled': mri_enabled
           }
         }
 

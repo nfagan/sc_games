@@ -1,6 +1,7 @@
 import util
 from task import Task
 from common_types import YokeRecord, MovementHistoryRecord, InteractStateResult, StaticStateResult
+from movement import TargetMovement
 from typing import Optional, List, Callable
 
 def parse_key_movement(key_map, keys):
@@ -40,7 +41,7 @@ def interactive_collider(*,
   play_aversive_sound,
   counter_stim, get_counter_stim_text, counter_value,
   implement_stim, implement_pos, 
-  collider_stim, collided_stim, collider_pos, collider_movement, collider_reached_target, 
+  collider_stim, collided_stim, collider_pos, collider_movement: TargetMovement, collider_reached_target, 
   get_collider_bounds, debug_collider_bounds_stim,
   event_handler: Callable[[str, float], None],
   sparkle_stim, t, yoke_to: Optional[YokeRecord]):
@@ -50,9 +51,11 @@ def interactive_collider(*,
   is_yoked = yoke_to is not None
   is_yoked_implement_hit_collider = is_yoked and yoke_to.implement_hit
 
-  implement_move_history = [MovementHistoryRecord(task.task_time(), implement_pos[:], [0, 0])]
+  implement_move_history = [MovementHistoryRecord(task.task_time(), implement_pos[:], [0, 0], collider_pos[:])]
   implement_hit_collider = False
   implement_hit_timestamp = None
+
+  aversive_sound_timestamp = None
 
   collider_did_reach_target = False
   collider_hit_timestamp = None
@@ -65,8 +68,14 @@ def interactive_collider(*,
 
   event_handler('avoidance_onset', entry_time)
 
+  is_touching_target = False
+  began_touching_target_timestamps: List[float] = []
+  stopped_touching_target_timestamps: List[float] = []
+  zig_timestamps: List[float] = []
+
   task.enter_state()
   while task.state_time() < t:
+    # draw stimuli
     counter_stim.text = get_counter_stim_text(counter_value)
 
     for stim in always_draw_stimuli:
@@ -83,19 +92,24 @@ def interactive_collider(*,
     if debug_collider_bounds_stim is not None and collider_bounds is not None:
       _draw_debug_collider_bounds_stim(debug_collider_bounds_stim, collider_bounds)
 
+    # update the task
     res = task.loop()
     move = parse_key_movement(key_map, res.keys)
 
+    # check for implement movement
     if move is not None:
       implement_pos = [x + y * float(move_increment) for x, y in zip(implement_pos, move)]
       implement_stim.setPos(implement_pos)
       implement_move_history.append(
-        MovementHistoryRecord(task.task_time(), implement_pos[:], move[:]))
+        MovementHistoryRecord(task.task_time(), implement_pos[:], move[:], collider_pos[:]))
 
+    # check for collider movement
     if not collider_did_reach_target:
       ft = max(0., min(1., task.state_time() / t))
-      collider_move = collider_movement.tick(res.dt, ft, collider_pos, collider_did_reach_target)
+      collider_move, is_zig = collider_movement.tick(res.dt, ft, collider_pos, collider_did_reach_target)
       collider_pos = [x + y for x, y in zip(collider_pos, collider_move)]
+      if is_zig:
+        zig_timestamps.append(task.task_time())
 
     # Check for collision between collider and its target (e.g., top of screen in balloon task).
     evaluate_collider_hit = False
@@ -112,6 +126,7 @@ def interactive_collider(*,
         (play_aversive_sound == 'conditionally' and not implement_hit_collider):
         aversive_sound.play()
         event_handler('aversive_sound', collider_hit_timestamp)
+        aversive_sound_timestamp = collider_hit_timestamp
       else:
         event_handler('no_aversive_sound', collider_hit_timestamp)
 
@@ -124,12 +139,14 @@ def interactive_collider(*,
 
     # Check whether the implement has struck its target (e.g., check whether the wand has struck 
     # the balloon in the balloon task)
+    touching_target = util.bounding_boxes_intersect(collider_bounds, implement_bounds)
+
     evaluate_implement_hit = False
     if (not collider_did_reach_target) and (not implement_hit_collider):
       if is_yoked:
         if is_yoked_implement_hit_collider and task.state_time() >= yoke_to.timestamp:
           evaluate_implement_hit = True
-      elif util.bounding_boxes_intersect(collider_bounds, implement_bounds):
+      elif touching_target:
         evaluate_implement_hit = True
     
     if evaluate_implement_hit:
@@ -139,8 +156,19 @@ def interactive_collider(*,
       pleasant_sound.play()
       implement_hit_collider = True
 
+    # Event timestamps for newly touching / not touching target
+    if touching_target and not is_touching_target:
+      is_touching_target = True
+      began_touching_target_timestamps.append(task.task_time())
+    elif not touching_target and is_touching_target:
+      is_touching_target = False
+      stopped_touching_target_timestamps.append(task.task_time())
+
   exit_time = task.task_time()
   return InteractStateResult(
     entry_time, exit_time, 
+    aversive_sound_timestamp,
     implement_move_history, implement_hit_collider, implement_hit_timestamp,
-    collider_did_reach_target, collider_hit_timestamp)
+    collider_did_reach_target, collider_hit_timestamp, 
+    began_touching_target_timestamps, stopped_touching_target_timestamps,
+    zig_timestamps)
