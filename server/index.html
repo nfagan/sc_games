@@ -130,7 +130,7 @@
         function get_yoking_src_data_filename() {
           const filename = document.getElementById('generate_yoking_file').value
           if (filename === '') {
-            const err_text = 'Expected non-empty yoking src data filename id.';
+            const err_text = 'Expected non-empty yoking src data filename.';
             alert(err_text);
             throw new Error(err_text);
           }
@@ -147,6 +147,11 @@
         function get_yoking_info() {
           const yoke_file_path = document.getElementById('yoking_file_name').value;
           const yoke_enabled = document.getElementById('yoking_enabled').checked;
+          if (yoke_enabled && yoke_file_path === '') {
+            const err_text = 'Expected non-empty yoking filename.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
           return {
             'enabled': yoke_enabled,
             'file_name': yoke_file_path
