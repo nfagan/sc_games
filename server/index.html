@@ -37,7 +37,17 @@
         </div>
         <div>
           <input type="text" id="yoking_file_name" name="file_name">
-          <label for="yoking_file_name">filename</label>
+          <label for="yoking_file_name">yoking filename</label>
+        </div>
+        <div>
+          <span>generate from data:</span>
+        </div>
+        <div>
+          <input type="text" id="generate_yoking_file" name="generate_yoking_file">
+          <label for="generate_yoking_file">source data filename</label>
+        </div>
+        <div>
+          <button type="text" id="generate_yoking_file_button">generate yoking file</button>
         </div>
       </fieldset>
 
@@ -106,6 +116,7 @@
       <script>
         function gen_json_task_command() {
           return {
+            'command_type': 'gen_json_task_command',
             'difficulty': get_difficulty(),
             'yoking': get_yoking_info(),
             'debug': get_debug_info(),
@@ -113,6 +124,23 @@
             'labjack': get_labjack_info(),
             'mri': get_mri_info(),
             'screen': get_screen_info()
+          }
+        }
+
+        function get_yoking_src_data_filename() {
+          const filename = document.getElementById('generate_yoking_file').value
+          if (filename === '') {
+            const err_text = 'Expected non-empty yoking src data filename id.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+          return filename;
+        }
+
+        function gen_yoke_file_command() {
+          return {
+            'command_type': 'gen_yoke_file_command',
+            'src_filename': get_yoking_src_data_filename(),
           }
         }
 
@@ -188,6 +216,14 @@
           req.open('POST', 'http://localhost:8080');
           req.setRequestHeader('Content-type', 'application/json');
           req.send(JSON.stringify(gen_json_task_command()))
+        }
+
+        const gen_yoke_file_button = document.getElementById('generate_yoking_file_button');
+        gen_yoke_file_button.onclick = () => {
+          const req = new XMLHttpRequest();
+          req.open('POST', 'http://localhost:8080');
+          req.setRequestHeader('Content-type', 'application/json');
+          req.send(JSON.stringify(gen_yoke_file_command()))
         }
 
       </script>

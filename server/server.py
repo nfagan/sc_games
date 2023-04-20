@@ -1,8 +1,15 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import json
+import subprocess
 
 port = 8080
+
+def gen_yoking_file(response):
+  filename = response['src_filename']
+  script = '../tool/create_yoke_file.py'
+  arg = os.path.join(os.path.split(os.getcwd())[0], 'data', filename)
+  subprocess.run(['python', script, arg])
 
 def gen_run_command(response):
   cmd = 'python main.py'
@@ -49,7 +56,12 @@ class Server(BaseHTTPRequestHandler):
     content = self.rfile.read(content_len)
     json_content = json.loads(str(content, 'utf8'))
     print('Received: ', json_content)
-    gen_run_command(json_content)
+
+    if json_content['command_type'] == 'gen_json_task_command':
+      gen_run_command(json_content)
+
+    elif json_content['command_type'] == 'gen_yoke_file_command':
+      gen_yoking_file(json_content)
 
 if __name__ == "__main__":
   server = HTTPServer(('localhost', port), Server)
