@@ -11,7 +11,8 @@ def gen_run_command(response):
   if response['yoking']['enabled']:
     cmd = '{} --yoke_file "{}"'.format(cmd, os.path.join('data', 'yoke', response['yoking']['file_name']))
 
-  cmd = '{} --participant_id "{}"'.format(cmd, response['participant']['id'])
+  part_id = response['participant']['id']
+  cmd = '{} --participant_id "{}"'.format(cmd, part_id)
 
   if response['debug']['enabled']:
     cmd = '{} --debug_keys'.format(cmd)
@@ -22,7 +23,17 @@ def gen_run_command(response):
   if response['mri']['enabled']:
     cmd = '{} --mri'.format(cmd)
 
+  scr_info = response['screen']
+  if scr_info['full_screen']:
+    cmd = '{} --full_screen'.format(cmd)
+
+  cmd = '{} --screen_width {}'.format(cmd, scr_info['width'])
+  cmd = '{} --screen_height {}'.format(cmd, scr_info['height'])
+
   with open(os.path.join(os.getcwd(), '../run.sh'), 'w') as f:
+    f.write(cmd)
+
+  with open(os.path.join(os.getcwd(), '../run-{}.sh'.format(part_id)), 'w') as f:
     f.write(cmd)
 
 class Server(BaseHTTPRequestHandler):

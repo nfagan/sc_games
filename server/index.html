@@ -49,6 +49,22 @@
         </div>
       </fieldset>
 
+      <fieldset id="screen_input">
+        <legend>screen:</legend>
+        <div>
+          <input type="text" id="screen_width" name="screen_width">
+          <label for="screen_width">screen width</label>
+        </div>
+        <div>
+          <input type="text" id="screen_height" name="screen_height">
+          <label for="screen_height">screen height</label>
+        </div>
+        <div>
+          <input type="checkbox" id="full_screen" name="full_screen">
+          <label for="full_screen">full screen</label>
+        </div>
+      </fieldset>
+
       <fieldset id="labjack_input">
         <legend>labjack:</legend>
         <div>
@@ -96,6 +112,7 @@
             'participant': get_participant_info(),
             'labjack': get_labjack_info(),
             'mri': get_mri_info(),
+            'screen': get_screen_info()
           }
         }
 
@@ -116,6 +133,12 @@
 
         function get_participant_info() {
           const part_id = document.getElementById('participant_id').value
+          if (part_id === '') {
+            const err_text = 'Expected non-empty participant id.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+
           return {'id': part_id}
         }
 
@@ -140,6 +163,22 @@
           const mri_enabled = document.getElementById('mri_enabled').checked; 
           return {
             'enabled': mri_enabled
+          }
+        }
+        
+        function get_screen_info() {
+          const w = parseInt(document.getElementById('screen_width').value);
+          const h = parseInt(document.getElementById('screen_height').value);
+          if (isNaN(w) || isNaN(h)) {
+            const err_text = 'Neither screen width nor height can be empty, and must be integers.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+          const full_screen = document.getElementById('full_screen').checked; 
+          return {
+            'width': w,
+            'height': h,
+            'full_screen': full_screen
           }
         }
 

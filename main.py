@@ -11,16 +11,19 @@ from psychopy import visual, core
 import argparse
 import os
 from os import path
+import sys
 from typing import List
 import dataclasses
 from datetime import datetime
 import json
 
+SCREEN_INFO = {
+  'width': 1440,
+  'height': 900,
+  'fullscreen': False
+}
 DEBUG_NUM_TRIALS = 8
-SCREEN_WIDTH = 1440
-SCREEN_HEIGHT = 900
 BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
-FULL_SCREEN = False
 RES_ROOT = path.join(os.getcwd(), 'res')
 KEY_MAP = {
   'move_left': '4',
@@ -30,8 +33,17 @@ KEY_MAP = {
   'stop': 'escape'
 }
 MOVE_INCR_PX = 80
-TASK_TYPE = 'balloon'
+TASK_TYPE = 'balloon' # @TODO: Add to GUI.
 CONTEXT = {'difficulty': '', 'trajectories': None}
+
+def screen_width() -> int:
+  return SCREEN_INFO['width']
+
+def screen_height() -> int:
+  return SCREEN_INFO['height']
+
+def is_full_screen() -> bool:
+  return SCREEN_INFO['fullscreen']
 
 def set_debug_keys():
   KEY_MAP['move_left'] = 'a'
@@ -44,11 +56,11 @@ def res_path(p):
 
 def create_window():
   return visual.Window(
-    size=(SCREEN_WIDTH, SCREEN_HEIGHT), monitor = 'testMonitor', allowGUI=False, 
-    fullscr=FULL_SCREEN, useFBO=False, units='pix')
+    size=(screen_width(), screen_height()), monitor = 'testMonitor', allowGUI=False, 
+    fullscr=is_full_screen(), useFBO=False, units='pix')
 
 def create_fullscreen_image_stim(win, p):
-  return util.create_image_stim(win, p, width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+  return util.create_image_stim(win, p, width=screen_width(), height=screen_height())
 
 def create_balloon_stimuli(win):
   string_suffix = '_no_string'
@@ -82,7 +94,7 @@ def gen_keypoints(trial, trajectories):
     kp_fns = [trajectory.easy, trajectory.med, trajectory.hard, trajectory.extra_hard]
     kp_fn = kp_fns[trial % len(kp_fns)]
     kps = kp_fn()
-  kps = [[x[0] * SCREEN_WIDTH * 0.5, x[1] * SCREEN_HEIGHT * 0.5] for x in kps]
+  kps = [[x[0] * screen_width() * 0.5, x[1] * screen_height() * 0.5] for x in kps]
   return kps
 
 def make_balloon_movement_info(stimuli, trajectories):
@@ -90,17 +102,17 @@ def make_balloon_movement_info(stimuli, trajectories):
     get_movement = lambda tn: KeypointMovement(gen_keypoints(tn, trajectories))
   else:
     get_movement = lambda tn: ZigMovement(
-      data.balloon_position(tn, SCREEN_HEIGHT), data.balloon_velocity(tn), data.balloon_zigs(tn))
+      data.balloon_position(tn, screen_height()), data.balloon_velocity(tn), data.balloon_zigs(tn))
   return {
     'get_movement': get_movement,
-    'reached_target': lambda pos: pos[1] > SCREEN_HEIGHT * 0.5 - stimuli['collider_stim'].height * 0.5
+    'reached_target': lambda pos: pos[1] > screen_height() * 0.5 - stimuli['collider_stim'].height * 0.5
   }
 
 def make_egg_movement_info(stimuli):
-  p0 = [0, SCREEN_HEIGHT * 0.5]
+  p0 = [0, screen_height() * 0.5]
   return {
     'get_movement': lambda tn: ZigMovement(p0, data.egg_velocity(tn), data.egg_zigs(tn)),
-    'reached_target': lambda pos: pos[1] < -SCREEN_HEIGHT * 0.5 + stimuli['collider_stim'].height * 0.5
+    'reached_target': lambda pos: pos[1] < -screen_height() * 0.5 + stimuli['collider_stim'].height * 0.5
   }
 
 def make_iceberg_movement_info(stimuli):
@@ -116,9 +128,11 @@ def get_counter_stim_text_fn(trial):
 def str_timestamp():
   return datetime.now().strftime('%m_%d_%Y_%H_%M_%S')
   
-def save_data(task: Task, trial_records):
+def save_data(task: Task, trial_records, command_line: str):
   if not CONTEXT['store_data']:
     return
+  
+  part_id = '' if 'participant_id' not in CONTEXT else CONTEXT['participant_id']
   
   task_data = dataclasses.asdict(TaskData(trial_records, task.get_key_events()))
   opt_args = ['trajectories', 'participant_id', 'yoke_file']
@@ -126,8 +140,9 @@ def save_data(task: Task, trial_records):
     task_data[arg] = CONTEXT[arg] if arg in CONTEXT else None
 
   task_data['mri_trs'] = task.get_mri_trs()
+  task_data['command_line'] = command_line
   
-  filename = '{}.json'.format(str_timestamp())
+  filename = 'participant_id_{}-{}.json'.format(part_id, str_timestamp())
   filep = os.path.join(os.getcwd(), 'data', filename)
   with open(filep, 'w') as f:
     f.write(json.dumps(task_data))
@@ -179,10 +194,24 @@ def parse_args():
   parser.add_argument('-pid', '--participant_id')
   parser.add_argument('-nlj', '--no_labjack', action='store_true', default=False)
   parser.add_argument('-mri', '--mri', action='store_true', default=False)
+  parser.add_argument('-sw', '--screen_width')
+  parser.add_argument('-sh', '--screen_height')
+  parser.add_argument('-fs', '--full_screen', action='store_true', default=False)
   return parser.parse_args()
+
+def set_screen_info(args):
+  if args.full_screen:
+    SCREEN_INFO['fullscreen'] = True
+  if args.screen_width is not None:
+    SCREEN_INFO['width'] = int(args.screen_width)
+  if args.screen_height is not None:
+    SCREEN_INFO['height'] = int(args.screen_height)
   
 def main():
+  command_line = ' '.join(sys.argv)
+
   args = parse_args()
+  set_screen_info(args)
 
   TASK_TYPE = args.task
   CONTEXT['difficulty'] = args.difficulty
@@ -241,7 +270,7 @@ def main():
   debug_collider_bounds_stim = util.create_rect_stim(win) if args.debug_target else None
 
   counter_stim = util.create_text_stim(win, 'spells cast: 0', height=32.0)
-  counter_stim.setPos([SCREEN_WIDTH * 0.5 - 150, SCREEN_HEIGHT * 0.5 - 75])
+  counter_stim.setPos([screen_width() * 0.5 - 150, screen_height() * 0.5 - 75])
   counter_background = util.create_rect_stim(win, width=195., height=48.)
   counter_background.setColor((0, 0, 0), 'rgb255')
   counter_background.setPos(counter_stim.pos[:])
@@ -275,7 +304,7 @@ def main():
       counter_stim=counter_stim,
       get_counter_stim_text=get_counter_stim_text_fn(trial),
       counter_value=spells_cast,
-      implement_stim=wand, implement_pos=[0, -SCREEN_HEIGHT * 0.5 + wand.height * 0.5 + BORDER_WIDTH],
+      implement_stim=wand, implement_pos=[0, -screen_height() * 0.5 + wand.height * 0.5 + BORDER_WIDTH],
       collider_stim=task_stimuli['collider_stim'],
       collided_stim=task_stimuli['collided_stim'],
       collider_pos=collider_movement.initial_position(),
@@ -302,7 +331,7 @@ def main():
       break
 
   labjack.shutdown()
-  save_data(task, trial_records)
+  save_data(task, trial_records, command_line)
 
   win.close()
   core.quit()
