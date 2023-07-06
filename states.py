@@ -1,6 +1,6 @@
 import util
 from task import Task
-from common_types import YokeRecord, MovementHistoryRecord, InteractStateResult, StaticStateResult
+from common_types import YokeRecord, MovementHistoryRecord, InteractStateResult, StaticStateResult, KeyPressStateResult
 from movement import TargetMovement
 from typing import Optional, List, Callable
 
@@ -15,6 +15,20 @@ def parse_key_movement(key_map, keys):
     return [0, 1]
   else:
     return None
+  
+def key_press(task: Task, key: str, drawables) -> KeyPressStateResult:
+  entry_t = task.task_time()
+  task.enter_state()
+  pressed_t = -1.0
+  while True:
+    for stim in drawables:
+      stim.draw()
+    loop_res = task.loop()
+    if key in loop_res.keys:
+      pressed_t = task.task_time()
+      break
+  exit_t = task.task_time()
+  return KeyPressStateResult(entry_t, exit_t, pressed_t)
 
 def static(task: Task, drawables, t):
   entry_t = task.task_time()

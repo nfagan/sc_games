@@ -206,6 +206,26 @@ def set_screen_info(args):
     SCREEN_INFO['width'] = int(args.screen_width)
   if args.screen_height is not None:
     SCREEN_INFO['height'] = int(args.screen_height)
+
+def create_instruction_slides(win, task_type: str):
+  instr_slide_info = [
+    {'p': 'images/instructions/instruction1.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction2.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction3.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction4.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction5.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction6.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction7.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction8.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction9.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction10.png', 'key': 'space'},
+    {'p': 'images/instructions/instruction11.png', 'key': 'space'},
+  ]
+
+  for slide in instr_slide_info:
+    slide['stim'] = create_fullscreen_image_stim(win, res_path(slide['p']))
+
+  return instr_slide_info
   
 def main():
   command_line = ' '.join(sys.argv)
@@ -282,6 +302,12 @@ def main():
   spells_cast = 0
   trial_records: List[data.TrialRecord] = []
 
+  # instructions
+  instr_slides = create_instruction_slides(win, TASK_TYPE)
+  for slide in instr_slides:
+    states.key_press(task, slide['key'], [slide['stim']])
+
+  # main task
   for trial in range(num_trials):
     task.wait_for_mri_tr(task.task_time())  # wait for next TR
 

@@ -38,6 +38,12 @@ class StaticStateResult(object):
   exited_timestamp: float
 
 @dataclass
+class KeyPressStateResult(object):
+  entered_timestamp: float
+  exited_timestamp: float
+  pressed_timestamp: float
+
+@dataclass
 class TrialRecord(object):
   present_background: Optional[StaticStateResult]
   interact: Optional[InteractStateResult]
