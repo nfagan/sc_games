@@ -185,7 +185,7 @@ def create_mri_interface(enable: bool) -> MRIInterface:
 def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--difficulty', choices=['easy', 'medium', 'hard', 'extra_hard', 'debug'])
-  parser.add_argument('-t', '--task', choices=['egg', 'balloon', 'iceberg'], default='balloon')
+  parser.add_argument('-t', '--task_type', choices=['egg', 'balloon', 'iceberg'], default='balloon')
   parser.add_argument('-ao', '--avoid_only', action='store_true', default=False)
   parser.add_argument('-nd', '--no_data', action='store_true', default=False)
   parser.add_argument('-dt', '--debug_target', action='store_true', default=False)
@@ -213,7 +213,7 @@ def main():
   args = parse_args()
   set_screen_info(args)
 
-  TASK_TYPE = args.task
+  TASK_TYPE = args.task_type
   CONTEXT['difficulty'] = args.difficulty
   CONTEXT['avoid_only'] = args.avoid_only
   CONTEXT['store_data'] = not args.no_data
@@ -261,6 +261,7 @@ def main():
     get_collider_bounds = get_balloon_collider_bounds
 
   else:
+    assert TASK_TYPE == 'iceberg'
     task_stimuli = create_iceberg_stimuli(win)
     movement_info = make_iceberg_movement_info(task_stimuli)
 

@@ -14,6 +14,7 @@ def gen_yoking_file(response):
 def gen_run_command(response):
   cmd = 'python main.py'
   cmd = '{} --difficulty {}'.format(cmd, response['difficulty'])
+  cmd = '{} --task_type {}'.format(cmd, response['task_type'])
 
   if response['yoking']['enabled']:
     cmd = '{} --yoke_file "{}"'.format(cmd, os.path.join('data', 'yoke', response['yoking']['file_name']))

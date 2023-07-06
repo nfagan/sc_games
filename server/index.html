@@ -5,6 +5,21 @@
       <title>task configurator</title>
     </head>
     <body>
+      <fieldset id="task_type_selector">
+        <legend>task_type:</legend>
+        <div>
+          <input type="radio" id="balloon_task" name="task_type" value="balloon" checked>
+          <label for="balloon_task">balloon</label>
+        </div>
+        <div>
+          <input type="radio" id="egg_task" name="task_type" value="egg">
+          <label for="egg_task">egg</label>
+        </div>
+        <div>
+          <input type="radio" id="iceberg_task" name="task_type" value="iceberg">
+          <label for="iceberg_task">iceberg</label>
+        </div>
+      </fieldset>
       <fieldset id="difficulty_selector">
         <legend>difficulty:</legend>
         <div>
@@ -117,6 +132,7 @@
         function gen_json_task_command() {
           return {
             'command_type': 'gen_json_task_command',
+            'task_type': get_task_type(),
             'difficulty': get_difficulty(),
             'yoking': get_yoking_info(),
             'debug': get_debug_info(),
@@ -183,6 +199,16 @@
             }
           }
           return 'easy';
+        }
+
+        function get_task_type() {
+          const inputs = document.getElementById('task_type_selector').getElementsByTagName('input');
+          for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked) {
+              return inputs[i].value;
+            }
+          }
+          return 'balloon';
         }
 
         function get_labjack_info() {
