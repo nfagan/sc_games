@@ -1,6 +1,0 @@
-To get started:
-1) Install Psychopy module (see instructions in documentation folder)
-2) Create a local_config text file (see template in documentation folder)
-
-Once you've done the above, run the exp_wrapper.py script to run the games. You don't need a copy of the Psychopy desktop application to do this.
-

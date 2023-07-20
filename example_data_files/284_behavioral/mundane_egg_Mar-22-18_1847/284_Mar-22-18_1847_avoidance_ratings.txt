@@ -1,2 +1,0 @@
-balloon_avoidance	egg_avoidance
-9	9

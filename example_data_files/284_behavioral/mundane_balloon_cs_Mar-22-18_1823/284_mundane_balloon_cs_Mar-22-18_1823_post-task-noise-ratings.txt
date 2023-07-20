@@ -1,2 +1,0 @@
-post_task_noise_stress	post_task_game_stress
-7	5
