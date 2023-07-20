@@ -1,2 +1,7 @@
-local_config
-playground.py
+__pycache__/
+*.DS_Store
+data/*.json
+data/log/*.txt
+data/yoke/*.json
+data/original_format/*.txt
+run.sh

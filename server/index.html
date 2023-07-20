@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="UTF-8">
+    <head>
+      <title>task configurator</title>
+    </head>
+    <body>
+      <fieldset id="task_type_selector">
+        <legend>task_type:</legend>
+        <div>
+          <input type="radio" id="balloon_task" name="task_type" value="balloon" checked>
+          <label for="balloon_task">balloon</label>
+        </div>
+        <div>
+          <input type="radio" id="egg_task" name="task_type" value="egg">
+          <label for="egg_task">egg</label>
+        </div>
+        <div>
+          <input type="radio" id="iceberg_task" name="task_type" value="iceberg">
+          <label for="iceberg_task">iceberg</label>
+        </div>
+      </fieldset>
+      <fieldset id="difficulty_selector">
+        <legend>difficulty:</legend>
+        <div>
+          <input type="radio" id="easy" name="difficulty" value="easy" checked>
+          <label for="easy">easy</label>
+        </div>
+        <div>
+          <input type="radio" id="medium" name="difficulty" value="medium">
+          <label for="medium">medium</label>
+        </div>
+        <div>
+          <input type="radio" id="hard" name="difficulty" value="hard">
+          <label for="hard">hard</label>
+        </div>
+        <div>
+          <input type="radio" id="extra_hard" name="difficulty" value="extra_hard">
+          <label for="extra_hard">extra_hard</label>
+        </div>
+      </fieldset>
+
+      <fieldset id="yoking_input">
+        <legend>yoking:</legend>
+        <div>
+          <input type="radio" id="yoking_disabled" name="yoking_enabled" value="no" checked>
+          <label for="yoking_disabled">no</label>
+        </div>
+        <div>
+          <input type="radio" id="yoking_enabled" name="yoking_enabled" value="yes">
+          <label for="yoking_enabled">yes</label>
+        </div>
+        <div>
+          <input type="text" id="yoking_file_name" name="file_name">
+          <label for="yoking_file_name">yoking filename</label>
+        </div>
+        <div>
+          <span>generate from data:</span>
+        </div>
+        <div>
+          <input type="text" id="generate_yoking_file" name="generate_yoking_file">
+          <label for="generate_yoking_file">source data filename</label>
+        </div>
+        <div>
+          <button type="text" id="generate_yoking_file_button">generate yoking file</button>
+        </div>
+      </fieldset>
+
+      <fieldset id="participant_input">
+        <legend>participant:</legend>
+        <div>
+          <input type="text" id="participant_id" name="participant_id">
+          <label for="participant_id">id</label>
+        </div>
+      </fieldset>
+
+      <fieldset id="screen_input">
+        <legend>screen:</legend>
+        <div>
+          <input type="text" id="screen_width" name="screen_width">
+          <label for="screen_width">screen width</label>
+        </div>
+        <div>
+          <input type="text" id="screen_height" name="screen_height">
+          <label for="screen_height">screen height</label>
+        </div>
+        <div>
+          <input type="checkbox" id="full_screen" name="full_screen">
+          <label for="full_screen">full screen</label>
+        </div>
+      </fieldset>
+
+      <fieldset id="labjack_input">
+        <legend>labjack:</legend>
+        <div>
+          <input type="radio" id="labjack_disabled" name="labjack_enabled" value="disabled" checked>
+          <label for="labjack_disabled">disabled</label>
+        </div>
+        <div>
+          <input type="radio" id="labjack_enabled" name="labjack_enabled" value="enabled">
+          <label for="labjack_enabled">enabled</label>
+        </div>
+      </fieldset>
+
+      <fieldset id="mri_input">
+        <legend>mri:</legend>
+        <div>
+          <input type="radio" id="mri_disabled" name="mri_enabled" value="disabled" checked>
+          <label for="mri_disabled">disabled</label>
+        </div>
+        <div>
+          <input type="radio" id="mri_enabled" name="mri_enabled" value="enabled">
+          <label for="mri_enabled">enabled</label>
+        </div>
+      </fieldset>
+
+      <fieldset id="debug_input">
+        <legend>debug:</legend>
+        <div>
+          <input type="radio" id="debug_disabled" name="debug_enabled" value="no" checked>
+          <label for="debug_disabled">no</label>
+        </div>
+        <div>
+          <input type="radio" id="debug_enabled" name="debug_enabled" value="yes">
+          <label for="debug_enabled">yes</label>
+        </div>
+      </fieldset>
+
+      <button id="upload_button">generate run command</button>
+
+      <script>
+        function gen_json_task_command() {
+          return {
+            'command_type': 'gen_json_task_command',
+            'task_type': get_task_type(),
+            'difficulty': get_difficulty(),
+            'yoking': get_yoking_info(),
+            'debug': get_debug_info(),
+            'participant': get_participant_info(),
+            'labjack': get_labjack_info(),
+            'mri': get_mri_info(),
+            'screen': get_screen_info()
+          }
+        }
+
+        function get_yoking_src_data_filename() {
+          const filename = document.getElementById('generate_yoking_file').value
+          if (filename === '') {
+            const err_text = 'Expected non-empty yoking src data filename.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+          return filename;
+        }
+
+        function gen_yoke_file_command() {
+          return {
+            'command_type': 'gen_yoke_file_command',
+            'src_filename': get_yoking_src_data_filename(),
+          }
+        }
+
+        function get_yoking_info() {
+          const yoke_file_path = document.getElementById('yoking_file_name').value;
+          const yoke_enabled = document.getElementById('yoking_enabled').checked;
+          if (yoke_enabled && yoke_file_path === '') {
+            const err_text = 'Expected non-empty yoking filename.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+          return {
+            'enabled': yoke_enabled,
+            'file_name': yoke_file_path
+          }
+        }
+
+        function get_debug_info() {
+          return {
+            'enabled': document.getElementById('debug_enabled').checked
+          }          
+        }
+
+        function get_participant_info() {
+          const part_id = document.getElementById('participant_id').value
+          if (part_id === '') {
+            const err_text = 'Expected non-empty participant id.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+
+          return {'id': part_id}
+        }
+
+        function get_difficulty() {
+          const inputs = document.getElementById('difficulty_selector').getElementsByTagName('input');
+          for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked) {
+              return inputs[i].value;
+            }
+          }
+          return 'easy';
+        }
+
+        function get_task_type() {
+          const inputs = document.getElementById('task_type_selector').getElementsByTagName('input');
+          for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].checked) {
+              return inputs[i].value;
+            }
+          }
+          return 'balloon';
+        }
+
+        function get_labjack_info() {
+          const lj_enabled = document.getElementById('labjack_enabled').checked; 
+          return {
+            'enabled': lj_enabled
+          }
+        }
+
+        function get_mri_info() {
+          const mri_enabled = document.getElementById('mri_enabled').checked; 
+          return {
+            'enabled': mri_enabled
+          }
+        }
+        
+        function get_screen_info() {
+          const w = parseInt(document.getElementById('screen_width').value);
+          const h = parseInt(document.getElementById('screen_height').value);
+          if (isNaN(w) || isNaN(h)) {
+            const err_text = 'Neither screen width nor height can be empty, and must be integers.';
+            alert(err_text);
+            throw new Error(err_text);
+          }
+          const full_screen = document.getElementById('full_screen').checked; 
+          return {
+            'width': w,
+            'height': h,
+            'full_screen': full_screen
+          }
+        }
+
+        const upload_button = document.getElementById('upload_button');
+        upload_button.onclick = () => {
+          const req = new XMLHttpRequest();
+          req.open('POST', 'http://localhost:8080');
+          req.setRequestHeader('Content-type', 'application/json');
+          req.send(JSON.stringify(gen_json_task_command()))
+        }
+
+        const gen_yoke_file_button = document.getElementById('generate_yoking_file_button');
+        gen_yoke_file_button.onclick = () => {
+          const req = new XMLHttpRequest();
+          req.open('POST', 'http://localhost:8080');
+          req.setRequestHeader('Content-type', 'application/json');
+          req.send(JSON.stringify(gen_yoke_file_command()))
+        }
+
+      </script>
+    </body>
+</html>
