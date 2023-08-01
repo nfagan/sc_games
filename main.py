@@ -26,8 +26,8 @@ DEBUG_NUM_TRIALS = 8
 BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
 RES_ROOT = path.join(os.getcwd(), 'res')
 KEY_MAP = {
-  'move_left': '4',
-  'move_right': '2',
+  'move_left': '2',
+  'move_right': '4',
   'move_down': '3',
   'move_up': '1',
   'stop': 'escape'
