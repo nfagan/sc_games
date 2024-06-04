@@ -26,11 +26,11 @@ class FixedDirectionMovement(TargetMovement):
     return [x * dt for x in self.vel], False
   
 class KeypointMovement(TargetMovement):
-  def __init__(self, kps: List[Tuple[float, float]]) -> None:
+  def __init__(self, kps: List[Tuple[float, float]], speed_scale=1.) -> None:
     super().__init__()
     self.points = kps
     self.t = 0
-    self.speed = 2.
+    self.speed = 2. * speed_scale
     self.last_p0 = 0
 
   def reset(self):

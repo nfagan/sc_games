@@ -50,6 +50,7 @@ def _draw_debug_collider_bounds_stim(stim, bounds):
 
 def interactive_collider(*,
   task: Task, key_map, move_increment,
+  is_controllable: bool,
   always_draw_stimuli, 
   aversive_sound, pleasant_sound,
   play_aversive_sound,
@@ -156,7 +157,7 @@ def interactive_collider(*,
     touching_target = util.bounding_boxes_intersect(collider_bounds, implement_bounds)
 
     evaluate_implement_hit = False
-    if (not collider_did_reach_target) and (not implement_hit_collider):
+    if (not collider_did_reach_target) and (not implement_hit_collider) and is_controllable:
       if is_yoked:
         if is_yoked_implement_hit_collider and task.state_time() >= yoke_to.timestamp:
           evaluate_implement_hit = True

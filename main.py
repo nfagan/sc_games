@@ -12,7 +12,7 @@ import argparse
 import os
 from os import path
 import sys
-from typing import List
+from typing import List, Tuple
 import dataclasses
 from datetime import datetime
 import json
@@ -68,7 +68,9 @@ def create_balloon_stimuli(win):
     'background0': create_fullscreen_image_stim(win, res_path('images/Balloon_anticipatory_background.jpg')),
     'background1': create_fullscreen_image_stim(win, res_path('images/Balloon_avoidance_background.jpg')),
     'collider_stim': util.create_image_stim(win, res_path('images/pink_balloon{}.png'.format(string_suffix))),
-    'collided_stim': util.create_image_stim(win, res_path('images/pop_1{}.png'.format(string_suffix)))
+    'collided_stim': util.create_image_stim(win, res_path('images/pop_1{}.png'.format(string_suffix))),
+    'aversive_sound': util.create_sound(res_path('sounds/balloon_pop.wav')),
+    'pleasant_sound': util.create_sound(res_path('sounds/magic_sound.wav'))
   }
 
 def create_egg_stimuli(win):
@@ -76,15 +78,19 @@ def create_egg_stimuli(win):
     'background0': create_fullscreen_image_stim(win, res_path('images/Egg_anticipatory_background.jpg')),
     'background1': create_fullscreen_image_stim(win, res_path('images/Egg_avoidance_background.jpg')),
     'collider_stim': util.create_image_stim(win, res_path('images/egg.png')),
-    'collided_stim': util.create_image_stim(win, res_path('images/cracking_egg_1.png'))
+    'collided_stim': util.create_image_stim(win, res_path('images/cracking_egg_1.png')),
+    'aversive_sound': util.create_sound(res_path('sounds/balloon_pop.wav')),
+    'pleasant_sound': util.create_sound(res_path('sounds/magic_sound.wav'))
   }
 
 def create_iceberg_stimuli(win):
   return {
-    'background0': create_fullscreen_image_stim(win, res_path('images/Iceberg_anticipatory_background.png')),
-    'background1': create_fullscreen_image_stim(win, res_path('images/Iceberg_avoidance_background.png')),
-    'collider_stim': util.create_image_stim(win, res_path('images/egg.png')),
-    'collided_stim': util.create_image_stim(win, res_path('images/pop_1.png'))
+    'background0': create_fullscreen_image_stim(win, res_path('images/iceberg_background_Anticipatory.png')),
+    'background1': create_fullscreen_image_stim(win, res_path('images/iceberg_background_Avoidance.png')),
+    'collider_stim': util.create_image_stim(win, res_path('images/boat_stim_120_150.png')),
+    'collided_stim': util.create_image_stim(win, res_path('images/boat_stim_broken_120_150.png')),
+    'aversive_sound': util.create_sound(res_path('sounds/boat_smash.wav')),
+    'pleasant_sound': util.create_sound(res_path('sounds/magic_sound.wav'))
   }
 
 def gen_keypoints(trial, trajectories):
@@ -115,8 +121,17 @@ def make_egg_movement_info(stimuli):
     'reached_target': lambda pos: pos[1] < -screen_height() * 0.5 + stimuli['collider_stim'].height * 0.5
   }
 
-def make_iceberg_movement_info(stimuli):
-  return make_egg_movement_info(stimuli)
+def make_iceberg_movement_info(stimuli, trajectories):
+  # height of icebergs at bottom of screen
+  iceberg_offset = 50
+  # factor by which movement should be slowed to account for the boat hitting the iceberg sooner,
+  # compared to the balloon game, because of the above offset.
+  speed_scale = (screen_height() - iceberg_offset) / screen_height()
+  get_movement = lambda tn: KeypointMovement(gen_keypoints(tn, trajectories), speed_scale=speed_scale)
+  return {
+    'get_movement': get_movement,
+    'reached_target': lambda pos: pos[1] < -screen_height() * 0.5 + stimuli['collider_stim'].height * 0.5 + iceberg_offset
+  }
 
 def get_counter_stim_text_fn(trial):
   if CONTEXT['difficulty'] == 'debug':
@@ -164,6 +179,11 @@ def get_balloon_collider_bounds(collider):
   x0 = collider[0] + w * 0.5 - w * ws
   x1 = collider[0] + w * 0.5 + w * ws  
   return [x0, y0, x1, y1]
+
+def flip_trajectory_y_axis(ps: List[List[Tuple[int, int]]]):
+  for i in range(len(ps)):
+    for j in range(len(ps[i])):
+      ps[i][j][1] *= -1
 
 def load_yoke_file(yf: str):
   if yf.endswith('.pickle'):
@@ -271,6 +291,7 @@ def main():
     mri_interface=mri_interface)
 
   get_collider_bounds = get_identity_collider_bounds
+  is_controllable = False
   if TASK_TYPE == 'egg':
     task_stimuli = create_egg_stimuli(win)
     movement_info = make_egg_movement_info(task_stimuli)
@@ -279,11 +300,13 @@ def main():
     task_stimuli = create_balloon_stimuli(win)
     movement_info = make_balloon_movement_info(task_stimuli, trajectories)
     get_collider_bounds = get_balloon_collider_bounds
+    is_controllable = True
 
   else:
     assert TASK_TYPE == 'iceberg'
+    flip_trajectory_y_axis(trajectories['points'])
     task_stimuli = create_iceberg_stimuli(win)
-    movement_info = make_iceberg_movement_info(task_stimuli)
+    movement_info = make_iceberg_movement_info(task_stimuli, trajectories)
 
   wand = util.create_image_stim(win, res_path('images/magic_wand.png'))
   sparkle = util.create_image_stim(win, res_path('images/magic_effect.png'))
@@ -295,9 +318,6 @@ def main():
   counter_background = util.create_rect_stim(win, width=195., height=48.)
   counter_background.setColor((0, 0, 0), 'rgb255')
   counter_background.setPos(counter_stim.pos[:])
-
-  aversive_sound = util.create_sound(res_path('sounds/balloon_pop.wav'))
-  pleasant_sound = util.create_sound(res_path('sounds/magic_sound.wav'))
 
   spells_cast = 0
   trial_records: List[data.TrialRecord] = []
@@ -322,11 +342,12 @@ def main():
 
     interact_result = states.interactive_collider(
       task=task,
+      is_controllable=is_controllable,
       key_map=KEY_MAP, 
       move_increment=MOVE_INCR_PX,
       always_draw_stimuli=[task_stimuli['background1'], wand, counter_background, counter_stim],
-      aversive_sound=aversive_sound,
-      pleasant_sound=pleasant_sound,
+      aversive_sound=task_stimuli['aversive_sound'],
+      pleasant_sound=task_stimuli['pleasant_sound'],
       play_aversive_sound='conditionally',
       counter_stim=counter_stim,
       get_counter_stim_text=get_counter_stim_text_fn(trial),
