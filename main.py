@@ -79,7 +79,7 @@ def create_egg_stimuli(win):
     'background1': create_fullscreen_image_stim(win, res_path('images/Egg_avoidance_background.jpg')),
     'collider_stim': util.create_image_stim(win, res_path('images/egg.png')),
     'collided_stim': util.create_image_stim(win, res_path('images/cracking_egg_1.png')),
-    'aversive_sound': util.create_sound(res_path('sounds/balloon_pop.wav')),
+    'aversive_sound': util.create_sound(res_path('sounds/egg_crack.wav')),
     'pleasant_sound': util.create_sound(res_path('sounds/magic_sound.wav'))
   }
 
