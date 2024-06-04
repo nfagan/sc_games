@@ -26,14 +26,14 @@ DEBUG_NUM_TRIALS = 8
 BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
 RES_ROOT = path.join(os.getcwd(), 'res')
 KEY_MAP = {
-  'move_left': '4',
-  'move_right': '2',
+  'move_left': '2',
+  'move_right': '4',
   'move_down': '3',
   'move_up': '1',
   'stop': 'escape'
 }
 MOVE_INCR_PX = 80
-TASK_TYPE = 'balloon' # @TODO: Add to GUI.
+TASK_TYPE = 'balloon'
 CONTEXT = {'difficulty': '', 'trajectories': None}
 
 def screen_width() -> int:
@@ -228,19 +228,46 @@ def set_screen_info(args):
     SCREEN_INFO['height'] = int(args.screen_height)
 
 def create_instruction_slides(win, task_type: str):
-  instr_slide_info = [
-    {'p': 'images/instructions/instruction1.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction2.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction3.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction4.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction5.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction6.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction7.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction8.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction9.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction10.png', 'key': 'space'},
-    {'p': 'images/instructions/instruction11.png', 'key': 'space'},
-  ]
+  is_mirrored = True
+
+  if is_mirrored:
+    instr_folder = 'mirrored_instructions'
+    instr_prefix = 'Slide'
+    instr_slide_info = [
+      {'p': 'images/{}/{}1.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}2.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}3.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}4.png'.format(instr_folder, instr_prefix), 'key': KEY_MAP['move_left']},
+      {'p': 'images/{}/{}5.png'.format(instr_folder, instr_prefix), 'key': KEY_MAP['move_up']},
+      {'p': 'images/{}/{}6.png'.format(instr_folder, instr_prefix), 'key': KEY_MAP['move_right']},
+      {'p': 'images/{}/{}7.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}8.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}9.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}10.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}11.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}11.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}12.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}13.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}14.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}15.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+    ]
+
+  else:
+    instr_folder = 'instructions'
+    instr_prefix = 'instruction'  
+    instr_slide_info = [
+      {'p': 'images/{}/{}1.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}2.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}3.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}4.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}5.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}6.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}7.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}8.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}9.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}10.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}11.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+    ]
 
   for slide in instr_slide_info:
     slide['stim'] = create_fullscreen_image_stim(win, res_path(slide['p']))
