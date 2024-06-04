@@ -227,9 +227,7 @@ def set_screen_info(args):
   if args.screen_height is not None:
     SCREEN_INFO['height'] = int(args.screen_height)
 
-def create_instruction_slides(win, task_type: str):
-  is_mirrored = True
-
+def create_instruction_slides(win, task_type: str, is_mirrored: bool):
   if is_mirrored:
     instr_folder = 'mirrored_instructions'
     instr_prefix = 'Slide'
@@ -350,7 +348,7 @@ def main():
   trial_records: List[data.TrialRecord] = []
 
   # instructions
-  instr_slides = create_instruction_slides(win, TASK_TYPE)
+  instr_slides = create_instruction_slides(win, TASK_TYPE, is_mirrored=args.mri)
   for slide in instr_slides:
     states.key_press(task, slide['key'], [slide['stim']])
 
