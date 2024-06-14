@@ -26,8 +26,8 @@ DEBUG_NUM_TRIALS = 8
 BORDER_WIDTH = 30 # pixels, width of yellow/purple border; approximate.
 RES_ROOT = path.join(os.getcwd(), 'res')
 KEY_MAP = {
-  'move_left': '2',
-  'move_right': '4',
+  'move_left': '4',
+  'move_right': '2',
   'move_down': '3',
   'move_up': '1',
   'stop': 'escape'
@@ -35,6 +35,9 @@ KEY_MAP = {
 MOVE_INCR_PX = 80
 TASK_TYPE = 'balloon'
 CONTEXT = {'difficulty': '', 'trajectories': None}
+
+# height of icebergs at bottom of screen
+ICEBERG_OFFSET_PX = 120
 
 def screen_width() -> int:
   return SCREEN_INFO['width']
@@ -123,7 +126,7 @@ def make_egg_movement_info(stimuli):
 
 def make_iceberg_movement_info(stimuli, trajectories):
   # height of icebergs at bottom of screen
-  iceberg_offset = 50
+  iceberg_offset = ICEBERG_OFFSET_PX
   # factor by which movement should be slowed to account for the boat hitting the iceberg sooner,
   # compared to the balloon game, because of the above offset.
   speed_scale = (screen_height() - iceberg_offset) / screen_height()
@@ -228,8 +231,8 @@ def set_screen_info(args):
     SCREEN_INFO['height'] = int(args.screen_height)
 
 def create_instruction_slides(win, task_type: str, is_mirrored: bool):
-  if is_mirrored:
-    instr_folder = 'mirrored_instructions'
+  if is_mirrored or task_type != 'balloon':
+    instr_folder = f'mirrored_instructions/{task_type}'
     instr_prefix = 'Slide'
     instr_slide_info = [
       {'p': 'images/{}/{}1.png'.format(instr_folder, instr_prefix), 'key': 'space'},
@@ -251,20 +254,11 @@ def create_instruction_slides(win, task_type: str, is_mirrored: bool):
     ]
 
   else:
-    instr_folder = 'instructions'
-    instr_prefix = 'instruction'  
+    instr_folder = f'instructions/{task_type}'
+    instr_prefix = 'instruction' if task_type == 'balloon' else 'Slide'
+    num_slides = 11 if task_type == 'balloon' else 15  
     instr_slide_info = [
-      {'p': 'images/{}/{}1.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}2.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}3.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}4.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}5.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}6.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}7.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}8.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}9.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}10.png'.format(instr_folder, instr_prefix), 'key': 'space'},
-      {'p': 'images/{}/{}11.png'.format(instr_folder, instr_prefix), 'key': 'space'},
+      {'p': 'images/{}/{}{}.png'.format(instr_folder, instr_prefix, x), 'key': 'space'} for x in range(1, num_slides)
     ]
 
   for slide in instr_slide_info:
